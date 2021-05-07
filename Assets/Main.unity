@@ -1620,8 +1620,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!1 &95510299
 GameObject:
   m_ObjectHideFlags: 0
@@ -2414,6 +2412,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 125934544}
   m_CullTransparentMesh: 0
+--- !u!1 &131634708
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4109476329797527923}
+  m_Layer: 0
+  m_Name: scroll item (Missing Prefab)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &136523504
 GameObject:
   m_ObjectHideFlags: 0
@@ -4172,8 +4186,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!1 &215189815
 GameObject:
   m_ObjectHideFlags: 0
@@ -6599,8 +6611,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!1 &340370626
 GameObject:
   m_ObjectHideFlags: 0
@@ -7957,7 +7967,10 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 50229175}
+  - {fileID: 4109476329797527923}
+  - {fileID: 1883409639}
+  - {fileID: 4109476329797527924}
+  - {fileID: 4109476329797527925}
   m_Father: {fileID: 668006626}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9614,6 +9627,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 497091929}
   m_CullTransparentMesh: 0
+--- !u!1 &497693948
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 497693949}
+  m_Layer: 0
+  m_Name: scroll item (Missing Prefab)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &497693949
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497693948}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1453758962}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &498355664
 GameObject:
   m_ObjectHideFlags: 0
@@ -11119,18 +11162,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1038dd8af685fe44aab480f464103e62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  collections:
-  - {fileID: 206059495}
-  - {fileID: 95323042}
-  - {fileID: 1306255065}
-  - {fileID: 644865241}
-  - {fileID: 336237742}
-  - {fileID: 1403915287}
-  - {fileID: 649588241}
-  demonHunter: {fileID: 905738126}
-  racial: {fileID: 1136869324}
-  input: {fileID: 1809676660}
 --- !u!4 &575538034
 Transform:
   m_ObjectHideFlags: 0
@@ -12553,8 +12584,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!1 &649588239
 GameObject:
   m_ObjectHideFlags: 0
@@ -12598,8 +12627,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!1 &655039180 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4109476328235377808, guid: 5d771551bad2035438f80dd35547ba9c, type: 3}
@@ -14984,6 +15011,22 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!1 &800041881
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1096717793}
+  m_Layer: 0
+  m_Name: scroll item (Missing Prefab)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &803128708
 GameObject:
   m_ObjectHideFlags: 0
@@ -15521,8 +15564,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45c57ee0f3855f04e9fdde27afc867de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  worgen: {fileID: 575538030}
 --- !u!1 &839614056
 GameObject:
   m_ObjectHideFlags: 0
@@ -16662,8 +16703,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!4 &905738127
 Transform:
   m_ObjectHideFlags: 0
@@ -20772,6 +20811,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1084176751}
   m_CullTransparentMesh: 0
+--- !u!1 &1085203864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4109476329797527924}
+  m_Layer: 0
+  m_Name: scroll item (Missing Prefab)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1001 &1096717791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20885,6 +20940,40 @@ PrefabInstance:
       objectReference: {fileID: 63352384}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d771551bad2035438f80dd35547ba9c, type: 3}
+--- !u!4 &1096717792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100679928}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1118056841}
+  m_Father: {fileID: 1453758962}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1096717793
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800041881}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1453758962}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1096717794 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 1096717791}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1101855252
 GameObject:
   m_ObjectHideFlags: 0
@@ -21508,8 +21597,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!4 &1136869326
 Transform:
   m_ObjectHideFlags: 0
@@ -24195,8 +24282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!1 &1320692191
 GameObject:
   m_ObjectHideFlags: 0
@@ -25387,8 +25472,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c3b978d9291df347a1532eb7c7d608a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hiddenMaterial: {fileID: 2100000, guid: 49ff8ceb97684a340bfa8f66df1a8abe, type: 2}
-  character: {fileID: 575538030}
 --- !u!1 &1404650726
 GameObject:
   m_ObjectHideFlags: 0
@@ -26401,7 +26484,10 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1118056841}
+  - {fileID: 1096717792}
+  - {fileID: 497693949}
+  - {fileID: 1096717793}
+  - {fileID: 1096717794}
   m_Father: {fileID: 1943207864}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -31824,12 +31910,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1809676659}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: daac5f3c5d78cfb47bcc7dca2b80b814, type: 3}
+  m_Script: {fileID: 11500000, guid: eb5327626226ceb4db0fe83b857665b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 950221147}
-  scrollItem: {fileID: 4109476329765422788, guid: 5d771551bad2035438f80dd35547ba9c, type: 3}
-  customizationDropdown: {fileID: 8252854395339775924, guid: 6e7c50c8359bddf47ba6836903612410, type: 3}
+  scrollItem: {fileID: 0}
+  customizationDropdown: {fileID: 0}
   genderPanel: {fileID: 780378684}
   alliancePanel: {fileID: 1556214022}
   hordePanel: {fileID: 2058487067}
@@ -31842,32 +31928,29 @@ MonoBehaviour:
   importPanel: {fileID: 623850153}
   classButtons:
   - {fileID: 632998997}
-  - {fileID: 1101855256}
   - {fileID: 1502610408}
+  - {fileID: 715781377}
   - {fileID: 1690605256}
   - {fileID: 1889353088}
-  - {fileID: 932187719}
-  - {fileID: 715781377}
   - {fileID: 2079676313}
+  - {fileID: 1101855256}
   - {fileID: 124655612}
+  - {fileID: 932187719}
   - {fileID: 1472396079}
-  - {fileID: 2099041220}
   - {fileID: 196868436}
+  - {fileID: 2099041220}
   mainFormButton: {fileID: 916854494}
   exitButton: {fileID: 1721058970}
   customizeButton: {fileID: 387290801}
   gearButton: {fileID: 1123461431}
   openButton: {fileID: 33298851}
   importButton: {fileID: 574449766}
-  character: {fileID: 575538030}
-  gilnean: {fileID: 838828348}
-  druid: {fileID: 2064399971}
-  race: 1
-  itemSet: Tier5
+  race: 0
+  itemSet: 
   screenshot: 0
-  gender: 1
-  core: 1
-  allied: 1
+  gender: 0
+  core: 0
+  allied: 0
 --- !u!4 &1809676661
 Transform:
   m_ObjectHideFlags: 0
@@ -33142,6 +33225,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1879491782}
   m_CullTransparentMesh: 0
+--- !u!1 &1883409638
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1883409639}
+  m_Layer: 0
+  m_Name: scroll item (Missing Prefab)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1883409639
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1883409638}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 389401747}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1886516579
 GameObject:
   m_ObjectHideFlags: 0
@@ -35648,7 +35761,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 978530f41e5bcb9429c264eb15b3e99d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  character: {fileID: 575538030}
 --- !u!1 &2064634665
 GameObject:
   m_ObjectHideFlags: 0
@@ -36635,6 +36747,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2099041216}
   m_CullTransparentMesh: 0
+--- !u!1 &2100679928
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1096717792}
+  m_Layer: 0
+  m_Name: scroll item (Missing Prefab)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &2118888874
 GameObject:
   m_ObjectHideFlags: 0
@@ -37753,3 +37881,37 @@ PrefabInstance:
       objectReference: {fileID: 1043689053}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d771551bad2035438f80dd35547ba9c, type: 3}
+--- !u!4 &4109476329797527923
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131634708}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 50229175}
+  m_Father: {fileID: 389401747}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4109476329797527924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1085203864}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 389401747}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4109476329797527925 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 4109476329797527922}
+  m_PrefabAsset: {fileID: 0}
