@@ -82,30 +82,30 @@ public class ScreenInput : MonoBehaviour
         races = new Dictionary<int, string>();
         classes = new Dictionary<int, string>();
         customizationOptions = new List<GameObject>();
-        dbPath = "URI=file:" + Application.streamingAssetsPath + "/database.sqlite";
-        connection = new SqliteConnection(dbPath);
-        connection.Open();
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM Races;";
-            SqliteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                races.Add(reader.GetInt32(0), reader.GetString(1));
-            }
-        }
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM Classes;";
-            SqliteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                classes.Add(reader.GetInt32(0), reader.GetString(1));
-            }
-        }
-        connection.Close();
+        //dbPath = "URI=file:" + Application.streamingAssetsPath + "/database.sqlite";
+        //connection = new SqliteConnection(dbPath);
+        //connection.Open();
+        //using (SqliteCommand command = connection.CreateCommand())
+        //{
+        //    command.CommandType = CommandType.Text;
+        //    command.CommandText = "SELECT * FROM Races;";
+        //    SqliteDataReader reader = command.ExecuteReader();
+        //    while (reader.Read())
+        //    {
+        //        races.Add(reader.GetInt32(0), reader.GetString(1));
+        //    }
+        //}
+        //using (SqliteCommand command = connection.CreateCommand())
+        //{
+        //    command.CommandType = CommandType.Text;
+        //    command.CommandText = "SELECT * FROM Classes;";
+        //    SqliteDataReader reader = command.ExecuteReader();
+        //    while (reader.Read())
+        //    {
+        //        classes.Add(reader.GetInt32(0), reader.GetString(1));
+        //    }
+        //}
+        //connection.Close();
         //items = new List<Item>();
         scrollItems = new List<GameObject>();
         customize = false;
@@ -142,7 +142,7 @@ public class ScreenInput : MonoBehaviour
         }
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            //Exit();
+            Exit();
         }
         if (Input.GetKeyUp(KeyCode.F12))
         {
@@ -784,197 +784,197 @@ public class ScreenInput : MonoBehaviour
     //    gilnean.LoadModel(model);
     //}
 
-    //public void GenderButton(bool gender)
-    //{
-    //    if (character.Gender == gender)
-    //    {
-    //        return;
-    //    }
-    //    SwapIcons(gender);
-    //    ChangeBorder(EventSystem.current.currentSelectedGameObject);
-    //    Category(0);
-    //    string model;
-    //    connection.Open();
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + character.Race + " AND Gender = " + gender + ";";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        reader.Read();
-    //        model = reader.GetString(3);
-    //        character.Suffix1 = reader.GetString(4);
-    //        character.Suffix2 = reader.GetString(5);
-    //        character.RacePath = reader.GetString(6);
-    //        character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
-    //        character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
-    //    }
-    //    connection.Close();
-    //    ClearItems();
-    //    int c = character.Class;
-    //    character.Class = 1;
-    //    character.Gender = gender;
-    //    character.Form = 0;
-    //    SetupCustomizationPanel();
-    //    GetCustomizationOptions();
-    //    LinkDropdowns();
-    //    ChangeButtonColors();
-    //    ClassButton(c);
-    //    gilnean.gameObject.SetActive(true);
-    //    character.demonHunter.UnloadModel();
-    //    character.racial.UnloadModel();
-    //    character.LoadModel(model);
-    //    if (character.Race == 22)
-    //    {
-    //        LoadGilnean();
-    //    }
-    //    gilnean.gameObject.SetActive(false);
-    //}
+    public void GenderButton(bool gender)
+    {
+        //if (character.Gender == gender)
+        //{
+        //    return;
+        //}
+        SwapIcons(gender);
+        ChangeBorder(EventSystem.current.currentSelectedGameObject);
+        //Category(0);
+        //string model;
+        //connection.Open();
+        //using (SqliteCommand command = connection.CreateCommand())
+        //{
+        //    command.CommandType = CommandType.Text;
+        //    command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + character.Race + " AND Gender = " + gender + ";";
+        //    SqliteDataReader reader = command.ExecuteReader();
+        //    reader.Read();
+        //    model = reader.GetString(3);
+        //    character.Suffix1 = reader.GetString(4);
+        //    character.Suffix2 = reader.GetString(5);
+        //    character.RacePath = reader.GetString(6);
+        //    character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
+        //    character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
+        //}
+        //connection.Close();
+        //ClearItems();
+        //int c = character.Class;
+        //character.Class = 1;
+        //character.Gender = gender;
+        //character.Form = 0;
+        //SetupCustomizationPanel();
+        //GetCustomizationOptions();
+        //LinkDropdowns();
+        //ChangeButtonColors();
+        //ClassButton(c);
+        //gilnean.gameObject.SetActive(true);
+        //character.demonHunter.UnloadModel();
+        //character.racial.UnloadModel();
+        //character.LoadModel(model);
+        //if (character.Race == 22)
+        //{
+        //    LoadGilnean();
+        //}
+        //gilnean.gameObject.SetActive(false);
+    }
 
-    //public void RaceButton(int race)
-    //{
-    //    Button current;
-    //    if (EventSystem.current.currentSelectedGameObject == null)
-    //    {
-    //        current = alliancePanel.GetComponentsInChildren<Button>()[0];
-    //    }
-    //    else
-    //    {
-    //        current = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
-    //    }
-    //    formPanel.gameObject.SetActive(true);
-    //    mainFormButton.image.sprite = current.image.sprite;
-    //    formPanel.gameObject.SetActive(false);
-    //    ChangeRaceBorder(EventSystem.current.currentSelectedGameObject);
-    //    if (character.Race == race)
-    //    {
-    //        return;
-    //    }
-    //    Category(0);
-    //    bool value;
-    //    string model;
-    //    connection.Open();
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT * FROM RaceClassCombos WHERE Race = " + race + ";";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        reader.Read();
-    //        for (int i = 0; i < classButtons.Length; i++)
-    //        {
-    //            value = reader.GetBoolean(i + 1);
-    //            classButtons[i].interactable = value;
-    //        }
-    //    }
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + race + " AND Gender = " + character.Gender + ";";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        reader.Read();
-    //        model = reader.GetString(3);
-    //        character.Suffix1 = reader.GetString(4);
-    //        character.Suffix2 = reader.GetString(5);
-    //        character.RacePath = reader.GetString(6);
-    //        character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
-    //        character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
-    //    }
-    //    connection.Close();
-    //    ClearItems();
-    //    character.Race = race;
-    //    character.Class = 1;
-    //    character.Form = 0;
-    //    SetupCustomizationPanel();
-    //    GetCustomizationOptions();
-    //    ResetBorder();
-    //    LinkDropdowns();
-    //    ChangeButtonColors();
-    //    character.demonHunter.UnloadModel();
-    //    character.racial.UnloadModel();
-    //    character.LoadModel(model);
-    //    gilnean.gameObject.SetActive(true);
-    //    if (race == 22)
-    //    {
-    //        LoadGilnean();
-    //    }
-    //    gilnean.gameObject.SetActive(false);
-    //    druid.gameObject.SetActive(false);
-    //}
+    public void RaceButton(int race)
+    {
+        Button current;
+        if (EventSystem.current.currentSelectedGameObject == null)
+        {
+            current = alliancePanel.GetComponentsInChildren<Button>()[0];
+        }
+        else
+        {
+            current = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
+        }
+        formPanel.gameObject.SetActive(true);
+        mainFormButton.image.sprite = current.image.sprite;
+        formPanel.gameObject.SetActive(false);
+        ChangeRaceBorder(EventSystem.current.currentSelectedGameObject);
+        //if (character.Race == race)
+        //{
+        //    return;
+        //}
+        //Category(0);
+        //bool value;
+        //string model;
+        //connection.Open();
+        //using (SqliteCommand command = connection.CreateCommand())
+        //{
+        //    command.CommandType = CommandType.Text;
+        //    command.CommandText = "SELECT * FROM RaceClassCombos WHERE Race = " + race + ";";
+        //    SqliteDataReader reader = command.ExecuteReader();
+        //    reader.Read();
+        //    for (int i = 0; i < classButtons.Length; i++)
+        //    {
+        //        value = reader.GetBoolean(i + 1);
+        //        classButtons[i].interactable = value;
+        //    }
+        //}
+        //using (SqliteCommand command = connection.CreateCommand())
+        //{
+        //    command.CommandType = CommandType.Text;
+        //    command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + race + " AND Gender = " + character.Gender + ";";
+        //    SqliteDataReader reader = command.ExecuteReader();
+        //    reader.Read();
+        //    model = reader.GetString(3);
+        //    character.Suffix1 = reader.GetString(4);
+        //    character.Suffix2 = reader.GetString(5);
+        //    character.RacePath = reader.GetString(6);
+        //    character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
+        //    character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
+        //}
+        //connection.Close();
+        //ClearItems();
+        //character.Race = race;
+        //character.Class = 1;
+        //character.Form = 0;
+        //SetupCustomizationPanel();
+        //GetCustomizationOptions();
+        //ResetBorder();
+        //LinkDropdowns();
+        //ChangeButtonColors();
+        //character.demonHunter.UnloadModel();
+        //character.racial.UnloadModel();
+        //character.LoadModel(model);
+        //gilnean.gameObject.SetActive(true);
+        //if (race == 22)
+        //{
+        //    LoadGilnean();
+        //}
+        //gilnean.gameObject.SetActive(false);
+        //druid.gameObject.SetActive(false);
+    }
 
-    //public void FormButton(int form)
-    //{
-    //    if (character.Form == form)
-    //    {
-    //        return;
-    //    }
-    //    ChangeBorder(EventSystem.current.currentSelectedGameObject);
-    //    character.Form = form;
-    //    SetupCategories();
-    //    switch (form)
-    //    {
-    //        case 0:
-    //            gilnean.gameObject.SetActive(false);
-    //            druid.gameObject.SetActive(false);
-    //            character.gameObject.SetActive(true);
-    //            Category(0);
-    //            break;
-    //        case 1:
-    //        case 2:
-    //        case 3:
-    //        case 4:
-    //        case 5:
-    //        case 6:
-    //            gilnean.gameObject.SetActive(false);
-    //            druid.gameObject.SetActive(true);
-    //            character.gameObject.SetActive(false);
-    //            Category(3);
-    //            break;
-    //        case 7:
-    //            gilnean.gameObject.SetActive(true);
-    //            druid.gameObject.SetActive(false);
-    //            character.gameObject.SetActive(false);
-    //            Category(0);
-    //            break;
-    //    }
-    //    Dropdown(Array.FindIndex(character.Options, o => o.Form == character.Form));
-    //}
+    public void FormButton(int form)
+    {
+        //if (character.Form == form)
+        //{
+        //    return;
+        //}
+        ChangeBorder(EventSystem.current.currentSelectedGameObject);
+        //character.Form = form;
+        //SetupCategories();
+        //switch (form)
+        //{
+        //    case 0:
+        //        gilnean.gameObject.SetActive(false);
+        //        druid.gameObject.SetActive(false);
+        //        character.gameObject.SetActive(true);
+        //        Category(0);
+        //        break;
+        //    case 1:
+        //    case 2:
+        //    case 3:
+        //    case 4:
+        //    case 5:
+        //    case 6:
+        //        gilnean.gameObject.SetActive(false);
+        //        druid.gameObject.SetActive(true);
+        //        character.gameObject.SetActive(false);
+        //        Category(3);
+        //        break;
+        //    case 7:
+        //        gilnean.gameObject.SetActive(true);
+        //        druid.gameObject.SetActive(false);
+        //        character.gameObject.SetActive(false);
+        //        Category(0);
+        //        break;
+        //}
+        //Dropdown(Array.FindIndex(character.Options, o => o.Form == character.Form));
+    }
 
-    //public void ClassButton(int id)
-    //{
-    //    if (id == character.Class)
-    //    {
-    //        return;
-    //    }
-    //    ChangeBorder(EventSystem.current.currentSelectedGameObject);
-    //    Category(0);
-    //    character.Class = id;
-    //    int[] customization = character.Customization;
-    //    SetupCustomizationPanel();
-    //    switch (id)
-    //    {
-    //        case 6:
-    //            GetClassCustomizationOptions(6);
-    //            break;
-    //        case 11:
-    //            GetClassCustomizationOptions(11);
-    //            break;
-    //        case 12:
-    //            GetClassCustomizationOptions(12);
-    //            break;
-    //        default:
-    //            GetCustomizationOptions();
-    //            break;
-    //    }
-    //    LinkDropdowns();
-    //    for (int i = 0; i < customization.Length; i++)
-    //    {
-    //        EventSystem.current.SetSelectedGameObject(customizationOptions[i].GetComponentInChildren<Dropdown>(true).gameObject);
-    //        customization[i] = customization[i] >= character.Choices[i].Length ? character.Choices[i].Length - 1 : customization[i];
-    //        customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = customization[i];
-    //    }
-    //    ChangeButtonColors();
-    //    character.InitializeHelper();
-    //    character.Change = true;
-    //}
+    public void ClassButton(int id)
+    {
+        //if (id == character.Class)
+        //{
+        //    return;
+        //}
+        ChangeBorder(EventSystem.current.currentSelectedGameObject);
+        //Category(0);
+        //character.Class = id;
+        //int[] customization = character.Customization;
+        //SetupCustomizationPanel();
+        //switch (id)
+        //{
+        //    case 6:
+        //        GetClassCustomizationOptions(6);
+        //        break;
+        //    case 11:
+        //        GetClassCustomizationOptions(11);
+        //        break;
+        //    case 12:
+        //        GetClassCustomizationOptions(12);
+        //        break;
+        //    default:
+        //        GetCustomizationOptions();
+        //        break;
+        //}
+        //LinkDropdowns();
+        //for (int i = 0; i < customization.Length; i++)
+        //{
+        //    EventSystem.current.SetSelectedGameObject(customizationOptions[i].GetComponentInChildren<Dropdown>(true).gameObject);
+        //    customization[i] = customization[i] >= character.Choices[i].Length ? character.Choices[i].Length - 1 : customization[i];
+        //    customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = customization[i];
+        //}
+        //ChangeButtonColors();
+        //character.InitializeHelper();
+        //character.Change = true;
+    }
 
     //public void Category(int index)
     //{
@@ -1250,76 +1250,76 @@ public class ScreenInput : MonoBehaviour
     //    none.isOn = true;
     //}
 
-    //public void Exit()
-    //{
-    //    if (!customize)
-    //    {
-    //        #if UNITY_EDITOR
-    //            UnityEditor.EditorApplication.isPlaying = false;
-    //        #else
-    //            Application.Quit();
-    //        #endif
-    //    }
-    //    else
-    //    {
-    //        customize = false;
-    //        gear = false;
-    //        genderPanel.gameObject.SetActive(!customize);
-    //        alliancePanel.gameObject.SetActive(!customize);
-    //        hordePanel.gameObject.SetActive(!customize);
-    //        classPanel.gameObject.SetActive(!customize);
-    //        customizationPanel.gameObject.SetActive(customize);
-    //        gearButton.gameObject.SetActive(customize);
-    //        formPanel.gameObject.SetActive(false);
-    //        gearPanel.gameObject.SetActive(gear);
-    //        character.Form = 0;
-    //        gilnean.gameObject.SetActive(false);
-    //        druid.gameObject.SetActive(false);
-    //        character.gameObject.SetActive(true);
-    //        SetupCategories();
-    //        Category(0);
-    //    }
-    //    exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
-    //    customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
-    //}
+    public void Exit()
+    {
+        if (!customize)
+        {
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                Application.Quit();
+            #endif
+        }
+        else
+        {
+            customize = false;
+            gear = false;
+            genderPanel.gameObject.SetActive(!customize);
+            alliancePanel.gameObject.SetActive(!customize);
+            hordePanel.gameObject.SetActive(!customize);
+            classPanel.gameObject.SetActive(!customize);
+            customizationPanel.gameObject.SetActive(customize);
+            gearButton.gameObject.SetActive(customize);
+            formPanel.gameObject.SetActive(false);
+            gearPanel.gameObject.SetActive(gear);
+            //character.Form = 0;
+            //gilnean.gameObject.SetActive(false);
+            //druid.gameObject.SetActive(false);
+            //character.gameObject.SetActive(true);
+            //SetupCategories();
+            //Category(0);
+        }
+        exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
+        customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
+    }
 
-    //public void Customize()
-    //{
-    //    if (!customize)
-    //    {
-    //        customize = true;
-    //        genderPanel.gameObject.SetActive(!customize);
-    //        alliancePanel.gameObject.SetActive(!customize);
-    //        hordePanel.gameObject.SetActive(!customize);
-    //        classPanel.gameObject.SetActive(!customize);
-    //        customizationPanel.gameObject.SetActive(customize);
-    //        gearButton.gameObject.SetActive(customize);
-    //        formPanel.gameObject.SetActive(true);
-    //        SetupFormPanel();
-    //    }
-    //    else
-    //    {
-    //        Save();
-    //    }
-    //    customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
-    //    exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
-    //}
+    public void Customize()
+    {
+        if (!customize)
+        {
+            customize = true;
+            genderPanel.gameObject.SetActive(!customize);
+            alliancePanel.gameObject.SetActive(!customize);
+            hordePanel.gameObject.SetActive(!customize);
+            classPanel.gameObject.SetActive(!customize);
+            customizationPanel.gameObject.SetActive(customize);
+            gearButton.gameObject.SetActive(customize);
+            formPanel.gameObject.SetActive(true);
+            //SetupFormPanel();
+        }
+        else
+        {
+            //Save();
+        }
+        customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
+        exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
+    }
 
-    //public void Gear()
-    //{
-    //    gear = !gear;
-    //    if (character.Race == 22 || character.Race == 23)
-    //    {
-    //        formPanel.gameObject.SetActive(!gear);
-    //    }
-    //    customizationPanel.gameObject.SetActive(!gear);
-    //    gearPanel.gameObject.SetActive(gear);
-    //    if (!gear)
-    //    {
-    //        leftPanel.gameObject.SetActive(false);
-    //        rightPanel.gameObject.SetActive(false);
-    //    }
-    //}
+    public void Gear()
+    {
+        gear = !gear;
+        //if (character.Race == 22 || character.Race == 23)
+        //{
+        //    formPanel.gameObject.SetActive(!gear);
+        //}
+        customizationPanel.gameObject.SetActive(!gear);
+        gearPanel.gameObject.SetActive(gear);
+        if (!gear)
+        {
+            leftPanel.gameObject.SetActive(false);
+            rightPanel.gameObject.SetActive(false);
+        }
+    }
 
     //public void Open(string file)
     //{
