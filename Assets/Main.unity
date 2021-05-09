@@ -11422,9 +11422,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 575538029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1038dd8af685fe44aab480f464103e62, type: 3}
+  m_Script: {fileID: 11500000, guid: d6926af2d2f30b44baaeac62ea4897c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hiddenMaterial: {fileID: 0}
+  input: {fileID: 1809676660}
 --- !u!4 &575538034
 Transform:
   m_ObjectHideFlags: 0
@@ -15950,7 +15952,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &838828347
 Transform:
   m_ObjectHideFlags: 0
@@ -16574,7 +16576,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &865157106
 Transform:
   m_ObjectHideFlags: 0
@@ -17143,7 +17145,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &905738126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20635,7 +20637,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1068238020
 Transform:
   m_ObjectHideFlags: 0
@@ -22120,7 +22122,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1136869324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32557,27 +32559,28 @@ MonoBehaviour:
   importPanel: {fileID: 623850153}
   classButtons:
   - {fileID: 632998997}
+  - {fileID: 1101855256}
   - {fileID: 1502610408}
-  - {fileID: 715781377}
   - {fileID: 1690605256}
   - {fileID: 1889353088}
-  - {fileID: 2079676313}
-  - {fileID: 1101855256}
-  - {fileID: 124655612}
   - {fileID: 932187719}
+  - {fileID: 715781377}
+  - {fileID: 2079676313}
+  - {fileID: 124655612}
   - {fileID: 1472396079}
-  - {fileID: 196868436}
   - {fileID: 2099041220}
+  - {fileID: 196868436}
   mainFormButton: {fileID: 916854494}
   exitButton: {fileID: 1721058970}
   customizeButton: {fileID: 387290801}
   gearButton: {fileID: 1123461431}
   openButton: {fileID: 33298851}
   importButton: {fileID: 574449766}
-  race: 0
+  character: {fileID: 575538030}
+  race: 1
   itemSet: 
   screenshot: 0
-  gender: 0
+  gender: 1
   core: 0
   allied: 0
 --- !u!4 &1809676661
@@ -36434,7 +36437,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2064399970
 Transform:
   m_ObjectHideFlags: 0

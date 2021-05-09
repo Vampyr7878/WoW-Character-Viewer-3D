@@ -6,6 +6,29 @@ using Newtonsoft.Json;
 [UnityEditor.AssetImporters.ScriptedImporter(1, "m2")]
 public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
 {
+    //Set if it is a character model
+    public bool character;
+    //Shield attachment point
+    public GameObject shield;
+    //Right hand attachment point
+    public GameObject handRight;
+    //Left hand attachment point
+    public GameObject handLeft;
+    //Right Shoulder attachment point
+    public GameObject shoulderRight;
+    //Left Shoulder attachment point
+    public GameObject shoulderLeft;
+    //Helm attachment point
+    public GameObject helm;
+    //Quiver attachment point
+    public GameObject quiver;
+    //Buckle attachment point
+    public GameObject buckle;
+    //Book attachment point
+    public GameObject book;
+    //Backpack attachment point
+    public GameObject backpack;
+
     public override void OnImportAsset(UnityEditor.AssetImporters.AssetImportContext ctx)
     {
         //Load file contents
@@ -78,6 +101,20 @@ public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
                 bones[i].parent = bones[file.Skeleton.Bones[i].Parent];
             }
         }
+        //Add Attachment points
+        if (character)
+        {
+            AddAttachmentPoint(shield, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[0]].Bone]);
+            AddAttachmentPoint(handRight, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[1]].Bone]);
+            AddAttachmentPoint(handLeft, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[2]].Bone]);
+            AddAttachmentPoint(shoulderRight, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[5]].Bone]);
+            AddAttachmentPoint(shoulderLeft, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[6]].Bone]);
+            AddAttachmentPoint(helm, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[11]].Bone]);
+            AddAttachmentPoint(quiver, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[26]].Bone]);
+            AddAttachmentPoint(buckle, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[53]].Bone]); ;
+            AddAttachmentPoint(book, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[53]].Bone]);
+            AddAttachmentPoint(backpack, bones[file.Skeleton.Attachments[file.Skeleton.AttachmentLookup[57]].Bone]);
+        }
         Matrix4x4[] bind = new Matrix4x4[bones.Length];
         for (int i = 0; i < bones.Length; i++)
         {
@@ -114,8 +151,14 @@ public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
         ctx.AddObjectToAsset(json.name, json);
     }
 
+    private void AddAttachmentPoint(GameObject point, Transform bone)
+    {
+        GameObject attachment = Instantiate(point, bone);
+        attachment.name = attachment.name.Replace("(Clone)", "");
+    }
+
     //Particle shape
-    ParticleSystemShapeType ParticleShape(byte value)
+    private ParticleSystemShapeType ParticleShape(byte value)
     {
         ParticleSystemShapeType shape = ParticleSystemShapeType.Cone;
         switch (value)
@@ -134,7 +177,7 @@ public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
     }
 
     //Generate particle effect system based on the data
-    GameObject ParticleEffect(M2Particle particle)
+    private GameObject ParticleEffect(M2Particle particle)
     {
         //Create gameobject
         GameObject element = new GameObject();

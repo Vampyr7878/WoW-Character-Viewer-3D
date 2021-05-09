@@ -14,7 +14,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-//using WoW;
+using WoW;
 
 public class ScreenInput : MonoBehaviour
 {
@@ -38,7 +38,7 @@ public class ScreenInput : MonoBehaviour
     public Button gearButton;
     public Button openButton;
     public Button importButton;
-    //public Character character;
+    public Character character;
     //public Gilnean gilnean;
     //public Druid druid;
     public int race;
@@ -82,41 +82,41 @@ public class ScreenInput : MonoBehaviour
         races = new Dictionary<int, string>();
         classes = new Dictionary<int, string>();
         customizationOptions = new List<GameObject>();
-        //dbPath = "URI=file:" + Application.streamingAssetsPath + "/database.sqlite";
-        //connection = new SqliteConnection(dbPath);
-        //connection.Open();
-        //using (SqliteCommand command = connection.CreateCommand())
-        //{
-        //    command.CommandType = CommandType.Text;
-        //    command.CommandText = "SELECT * FROM Races;";
-        //    SqliteDataReader reader = command.ExecuteReader();
-        //    while (reader.Read())
-        //    {
-        //        races.Add(reader.GetInt32(0), reader.GetString(1));
-        //    }
-        //}
-        //using (SqliteCommand command = connection.CreateCommand())
-        //{
-        //    command.CommandType = CommandType.Text;
-        //    command.CommandText = "SELECT * FROM Classes;";
-        //    SqliteDataReader reader = command.ExecuteReader();
-        //    while (reader.Read())
-        //    {
-        //        classes.Add(reader.GetInt32(0), reader.GetString(1));
-        //    }
-        //}
-        //connection.Close();
+        dbPath = "URI=file:" + Application.streamingAssetsPath + "/database.sqlite";
+        connection = new SqliteConnection(dbPath);
+        connection.Open();
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM Races;";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                races.Add(reader.GetInt32(0), reader.GetString(1));
+            }
+        }
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM Classes;";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                classes.Add(reader.GetInt32(0), reader.GetString(1));
+            }
+        }
+        connection.Close();
         //items = new List<Item>();
         scrollItems = new List<GameObject>();
         customize = false;
         gear = false;
-        //RaceButton(race);
-        //GenderButton(gender);
+        RaceButton(race);
+        GenderButton(gender);
     }
 
     private void Update()
     {
-        //customizeButton.gameObject.SetActive(!gear);
+        customizeButton.gameObject.SetActive(!gear);
         if (screenshot && ((!allied && r >= coreRaceNames.Count) || r >= coreRaceNames.Count + alliedRaceNames.Count))
         {
             #if UNITY_EDITOR
@@ -125,11 +125,11 @@ public class ScreenInput : MonoBehaviour
                    Application.Quit();
             #endif
         }
-        //mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, mainCamera.transform.position.y, Mathf.Clamp(mainCamera.transform.position.z, -5f, -0.5f));
+        mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, mainCamera.transform.position.y, Mathf.Clamp(mainCamera.transform.position.z, -5f, -0.5f));
         if (!screenshot)
         {
             TranslateCamera();
-            //RotateCamera();
+            RotateCamera();
             ZoomCamera();
         }
         if (Input.GetKeyUp(KeyCode.Tab))
@@ -249,15 +249,15 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //private void RotateCamera()
-    //{
-    //    if (rotate && Input.GetMouseButton(0))
-    //    {
-    //        character.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
-    //        gilnean.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
-    //        druid.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
-    //    }
-    //}
+    private void RotateCamera()
+    {
+        if (rotate && Input.GetMouseButton(0))
+        {
+            character.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
+            //gilnean.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
+            //druid.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
+        }
+    }
 
     private void ZoomCamera()
     {
@@ -270,250 +270,250 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //private void GetCustomizationOptions()
-    //{
-    //    character.Choices = new CustomizationChoice[character.Options.Length][];
-    //    connection.Open();
-    //    for (int i = 0; i < character.Options.Length; i++)
-    //    {
-    //        using (SqliteCommand command = connection.CreateCommand())
-    //        {
-    //            List<CustomizationChoice> choices = new List<CustomizationChoice>();
-    //            command.CommandType = CommandType.Text;
-    //            command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class IS NULL;";
-    //            SqliteDataReader reader = command.ExecuteReader();
-    //            int j = 1;
-    //            while (reader.Read())
-    //            {
-    //                string name = reader.IsDBNull(2) ? j.ToString() : j.ToString() + ": " + reader.GetString(2);
-    //                int color;
-    //                Color color1, color2;
-    //                if (reader.IsDBNull(3))
-    //                {
-    //                    color = 0;
-    //                    color1 = Color.clear;
-    //                }
-    //                else
-    //                {
-    //                    color = reader.GetInt32(3);
-    //                    ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color1);
-    //                }
-    //                if (reader.IsDBNull(4))
-    //                {
-    //                    color = 0;
-    //                    color2 = Color.clear;
-    //                }
-    //                else
-    //                {
-    //                    color = reader.GetInt32(4);
-    //                    ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color2);
-    //                }
-    //                if (color1 != Color.clear)
-    //                {
-    //                    name += ": ";
-    //                }
-    //                string model = reader.IsDBNull(5) ? "" : reader.GetString(5);
-    //                string texture1 = reader.IsDBNull(6) ? "" : reader.GetString(6);
-    //                string texture2 = reader.IsDBNull(7) ? "" : reader.GetString(7);
-    //                string texture3 = reader.IsDBNull(8) ? "" : reader.GetString(8);
-    //                int geoset1 = reader.IsDBNull(9) ? -1 : reader.GetInt32(9);
-    //                int geoset2 = reader.IsDBNull(10) ? -1 : reader.GetInt32(10);
-    //                int geoset3 = reader.IsDBNull(11) ? -1 : reader.GetInt32(11);
-    //                int bone = reader.IsDBNull(12) ? -1 : reader.GetInt32(12);
-    //                int extra = reader.IsDBNull(13) ? -1 : reader.GetInt32(13);
-    //                int id = reader.IsDBNull(15) ? -1 : reader.GetInt32(15);
-    //                choices.Add(new CustomizationChoice(name, color1, color2, model, texture1, texture2, texture3, geoset1, geoset2, geoset3, bone, extra, id));
-    //                j++;
-    //            }
-    //            character.Choices[i] = choices.ToArray();
-    //        }
-    //        SetCustomizationNamesAndColors(i);
-    //    }
-    //    connection.Close();
-    //    SetupCategories();
-    //    Category(0);
-    //}
+    private void GetCustomizationOptions()
+    {
+        character.Choices = new CustomizationChoice[character.Options.Length][];
+        connection.Open();
+        for (int i = 0; i < character.Options.Length; i++)
+        {
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                List<CustomizationChoice> choices = new List<CustomizationChoice>();
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class IS NULL;";
+                SqliteDataReader reader = command.ExecuteReader();
+                int j = 1;
+                while (reader.Read())
+                {
+                    string name = reader.IsDBNull(2) ? j.ToString() : j.ToString() + ": " + reader.GetString(2);
+                    int color;
+                    Color color1, color2;
+                    if (reader.IsDBNull(3))
+                    {
+                        color = 0;
+                        color1 = Color.clear;
+                    }
+                    else
+                    {
+                        color = reader.GetInt32(3);
+                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color1);
+                    }
+                    if (reader.IsDBNull(4))
+                    {
+                        color = 0;
+                        color2 = Color.clear;
+                    }
+                    else
+                    {
+                        color = reader.GetInt32(4);
+                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color2);
+                    }
+                    if (color1 != Color.clear)
+                    {
+                        name += ": ";
+                    }
+                    string model = reader.IsDBNull(5) ? "" : reader.GetString(5);
+                    string texture1 = reader.IsDBNull(6) ? "" : reader.GetString(6);
+                    string texture2 = reader.IsDBNull(7) ? "" : reader.GetString(7);
+                    string texture3 = reader.IsDBNull(8) ? "" : reader.GetString(8);
+                    int geoset1 = reader.IsDBNull(9) ? -1 : reader.GetInt32(9);
+                    int geoset2 = reader.IsDBNull(10) ? -1 : reader.GetInt32(10);
+                    int geoset3 = reader.IsDBNull(11) ? -1 : reader.GetInt32(11);
+                    int bone = reader.IsDBNull(12) ? -1 : reader.GetInt32(12);
+                    int extra = reader.IsDBNull(13) ? -1 : reader.GetInt32(13);
+                    int id = reader.IsDBNull(15) ? -1 : reader.GetInt32(15);
+                    choices.Add(new CustomizationChoice(name, color1, color2, model, texture1, texture2, texture3, geoset1, geoset2, geoset3, bone, extra, id));
+                    j++;
+                }
+                character.Choices[i] = choices.ToArray();
+            }
+            SetCustomizationNamesAndColors(i);
+        }
+        connection.Close();
+        SetupCategories();
+        Category(0);
+    }
 
-    //private void GetClassCustomizationOptions(int id)
-    //{
-    //    character.Choices = new CustomizationChoice[character.Options.Length][];
-    //    connection.Open();
-    //    for (int i = 0; i < character.Options.Length; i++)
-    //    {
-    //        using (SqliteCommand command = connection.CreateCommand())
-    //        {
-    //            List<CustomizationChoice> choices = new List<CustomizationChoice>();
-    //            command.CommandType = CommandType.Text;
-    //            command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class = " + id + ";";
-    //            SqliteDataReader reader = command.ExecuteReader();
-    //            int j = 1;
-    //            while (reader.Read())
-    //            {
-    //                string name = reader.IsDBNull(2) ? j.ToString() : j.ToString() + ": " + reader.GetString(2);
-    //                int color;
-    //                Color color1, color2;
-    //                if (reader.IsDBNull(3))
-    //                {
-    //                    color = 0;
-    //                    color1 = Color.clear;
-    //                }
-    //                else
-    //                {
-    //                    color = reader.GetInt32(3);
-    //                    ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color1);
-    //                }
-    //                if (reader.IsDBNull(4))
-    //                {
-    //                    color = 0;
-    //                    color2 = Color.clear;
-    //                }
-    //                else
-    //                {
-    //                    color = reader.GetInt32(4);
-    //                    ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color2);
-    //                }
-    //                if (color1 != Color.clear)
-    //                {
-    //                    name += ": ";
-    //                }
-    //                string model = reader.IsDBNull(5) ? "" : reader.GetString(5);
-    //                string texture1 = reader.IsDBNull(6) ? "" : reader.GetString(6);
-    //                string texture2 = reader.IsDBNull(7) ? "" : reader.GetString(7);
-    //                string texture3 = reader.IsDBNull(8) ? "" : reader.GetString(8);
-    //                int geoset1 = reader.IsDBNull(9) ? -1 : reader.GetInt32(9);
-    //                int geoset2 = reader.IsDBNull(10) ? -1 : reader.GetInt32(10);
-    //                int geoset3 = reader.IsDBNull(11) ? -1 : reader.GetInt32(11);
-    //                int bone = reader.IsDBNull(12) ? -1 : reader.GetInt32(12);
-    //                int extra = reader.IsDBNull(13) ? -1 : reader.GetInt32(13);
-    //                int blizzard = reader.IsDBNull(15) ? -1 : reader.GetInt32(15);
-    //                choices.Add(new CustomizationChoice(name, color1, color2, model, texture1, texture2, texture3, geoset1, geoset2, geoset3, bone, extra, blizzard));
-    //                j++;
-    //            }
-    //            character.Choices[i] = choices.ToArray();
-    //        }
-    //        SetCustomizationNamesAndColors(i);
-    //    }
-    //    connection.Close();
-    //    SetupCategories();
-    //    Category(0);
-    //}
+    private void GetClassCustomizationOptions(int id)
+    {
+        character.Choices = new CustomizationChoice[character.Options.Length][];
+        connection.Open();
+        for (int i = 0; i < character.Options.Length; i++)
+        {
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                List<CustomizationChoice> choices = new List<CustomizationChoice>();
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class = " + id + ";";
+                SqliteDataReader reader = command.ExecuteReader();
+                int j = 1;
+                while (reader.Read())
+                {
+                    string name = reader.IsDBNull(2) ? j.ToString() : j.ToString() + ": " + reader.GetString(2);
+                    int color;
+                    Color color1, color2;
+                    if (reader.IsDBNull(3))
+                    {
+                        color = 0;
+                        color1 = Color.clear;
+                    }
+                    else
+                    {
+                        color = reader.GetInt32(3);
+                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color1);
+                    }
+                    if (reader.IsDBNull(4))
+                    {
+                        color = 0;
+                        color2 = Color.clear;
+                    }
+                    else
+                    {
+                        color = reader.GetInt32(4);
+                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color2);
+                    }
+                    if (color1 != Color.clear)
+                    {
+                        name += ": ";
+                    }
+                    string model = reader.IsDBNull(5) ? "" : reader.GetString(5);
+                    string texture1 = reader.IsDBNull(6) ? "" : reader.GetString(6);
+                    string texture2 = reader.IsDBNull(7) ? "" : reader.GetString(7);
+                    string texture3 = reader.IsDBNull(8) ? "" : reader.GetString(8);
+                    int geoset1 = reader.IsDBNull(9) ? -1 : reader.GetInt32(9);
+                    int geoset2 = reader.IsDBNull(10) ? -1 : reader.GetInt32(10);
+                    int geoset3 = reader.IsDBNull(11) ? -1 : reader.GetInt32(11);
+                    int bone = reader.IsDBNull(12) ? -1 : reader.GetInt32(12);
+                    int extra = reader.IsDBNull(13) ? -1 : reader.GetInt32(13);
+                    int blizzard = reader.IsDBNull(15) ? -1 : reader.GetInt32(15);
+                    choices.Add(new CustomizationChoice(name, color1, color2, model, texture1, texture2, texture3, geoset1, geoset2, geoset3, bone, extra, blizzard));
+                    j++;
+                }
+                character.Choices[i] = choices.ToArray();
+            }
+            SetCustomizationNamesAndColors(i);
+        }
+        connection.Close();
+        SetupCategories();
+        Category(0);
+    }
 
-    //public void SetCustomizationNamesAndColors(int i)
-    //{
-    //    Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color");
-    //    Dropdown dropdown = customizationOptions[i].GetComponentInChildren<Dropdown>(true);
-    //    dropdown.options.Clear();
-    //    for (int j = 0; j < character.Choices[i].Length; j++)
-    //    {
-    //        Rect rect = sprite.textureRect;
-    //        Texture2D texture = new Texture2D((int)rect.width + 20, (int)rect.height + 10);
-    //        for (int x = 0; x < texture.width; x++)
-    //        {
-    //            for (int y = 0; y < texture.height; y++)
-    //            {
-    //                texture.SetPixel(x, y, Color.clear);
-    //            }
-    //        }
-    //        for (int x = 0; x < texture.width - 20; x++)
-    //        {
-    //            for (int y = 10; y < texture.height; y++)
-    //            {
-    //                texture.SetPixel(x, y, sprite.texture.GetPixel((int)rect.x + x, (int)rect.y + y - 10) * character.Choices[i][j].Color1);
-    //            }
-    //        }
-    //        for (int x = 20; x < texture.width; x++)
-    //        {
-    //            for (int y = 0; y < texture.height - 10; y++)
-    //            {
-    //                Color c1 = texture.GetPixel(x, y);
-    //                Color c2 = sprite.texture.GetPixel((int)rect.x + x - 20, (int)rect.y + y) * character.Choices[i][j].Color2;
-    //                texture.SetPixel(x, y, Color.Lerp(c1, c2, c2.a));
-    //            }
-    //        }
-    //        texture.Apply();
-    //        Sprite s = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
-    //        CustomOptionData data = new CustomOptionData(character.Choices[i][j].Name, s);
-    //        dropdown.options.Add(data);
-    //        ((CustomDropdown)dropdown).RefreshShownValue();
-    //    }
-    //}
+    public void SetCustomizationNamesAndColors(int i)
+    {
+        Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color");
+        Dropdown dropdown = customizationOptions[i].GetComponentInChildren<Dropdown>(true);
+        dropdown.options.Clear();
+        for (int j = 0; j < character.Choices[i].Length; j++)
+        {
+            Rect rect = sprite.textureRect;
+            Texture2D texture = new Texture2D((int)rect.width + 20, (int)rect.height + 10);
+            for (int x = 0; x < texture.width; x++)
+            {
+                for (int y = 0; y < texture.height; y++)
+                {
+                    texture.SetPixel(x, y, Color.clear);
+                }
+            }
+            for (int x = 0; x < texture.width - 20; x++)
+            {
+                for (int y = 10; y < texture.height; y++)
+                {
+                    texture.SetPixel(x, y, sprite.texture.GetPixel((int)rect.x + x, (int)rect.y + y - 10) * character.Choices[i][j].Color1);
+                }
+            }
+            for (int x = 20; x < texture.width; x++)
+            {
+                for (int y = 0; y < texture.height - 10; y++)
+                {
+                    Color c1 = texture.GetPixel(x, y);
+                    Color c2 = sprite.texture.GetPixel((int)rect.x + x - 20, (int)rect.y + y) * character.Choices[i][j].Color2;
+                    texture.SetPixel(x, y, Color.Lerp(c1, c2, c2.a));
+                }
+            }
+            texture.Apply();
+            Sprite s = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
+            CustomOptionData data = new CustomOptionData(character.Choices[i][j].Name, s);
+            dropdown.options.Add(data);
+            ((CustomDropdown)dropdown).RefreshShownValue();
+        }
+    }
 
-    //private void SetupCategories()
-    //{
-    //    Button[] categories = customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().GetComponentsInChildren<Button>(true);
-    //    foreach (Button category in categories)
-    //    {
-    //        category.gameObject.SetActive(false);
-    //    }
-    //    for (int i = 0; i < character.Options.Length; i++)
-    //    {
-    //        if (character.Choices[i].Length > 1 && character.Options[i].Form == character.Form)
-    //        {
-    //            categories[character.Options[i].Category - 1].gameObject.SetActive(true);
-    //        }
-    //    }
-    //}
+    private void SetupCategories()
+    {
+        Button[] categories = customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().GetComponentsInChildren<Button>(true);
+        foreach (Button category in categories)
+        {
+            category.gameObject.SetActive(false);
+        }
+        for (int i = 0; i < character.Options.Length; i++)
+        {
+            if (character.Choices[i].Length > 1 && character.Options[i].Form == character.Form)
+            {
+                categories[character.Options[i].Category - 1].gameObject.SetActive(true);
+            }
+        }
+    }
 
-    //private void SetupCustomizationPanel()
-    //{
-    //    foreach (GameObject customizaionOption in customizationOptions)
-    //    {
-    //        Destroy(customizaionOption);
-    //    }
-    //    customizationOptions.Clear();
-    //    connection.Open();
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        List<CustomizationOption> options = new List<CustomizationOption>();
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT * FROM CustomizationOptions WHERE Race = " + character.Race + " AND Gender = " + character.Gender + ";";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        while (reader.Read())
-    //        {
-    //            int id = reader.GetInt32(0);
-    //            int category = reader.GetInt32(3);
-    //            string name = reader.GetString(4);
-    //            int form = reader.GetInt32(5);
-    //            int blizzard = reader.GetInt32(6);
-    //            options.Add(new CustomizationOption(id, category, name, form, blizzard));
-    //        }
-    //        character.Options = options.ToArray();
-    //        character.Customization = new int[options.Count];
-    //        for (int i = 0; i < character.Customization.Length; i++)
-    //        {
-    //            character.Customization[i] = 0;
-    //        }
-    //    }
-    //    connection.Close();
-    //    GameObject option;
-    //    Button[] buttons;
-    //    Dropdown dropdown;
-    //    Button[] categories = customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().GetComponentsInChildren<Button>(true);
-    //    for (int i = 0; i < character.Options.Length; i++)
-    //    {
-    //        option = Instantiate(customizationDropdown, customizationPanel.GetComponentInChildren<VerticalLayoutGroup>().transform);
-    //        buttons = option.GetComponentsInChildren<Button>();
-    //        int customizationValue = i;
-    //        foreach (Button button in buttons)
-    //        {
-    //            if (button.name.Contains("prev"))
-    //            {
-    //                button.onClick.AddListener(delegate { PrevButton(customizationValue); });
-    //            }
-    //            else if (button.name.Contains("next"))
-    //            {
-    //                button.onClick.AddListener(delegate { NextButton(customizationValue); });
-    //            }
-    //        }
-    //        dropdown = option.GetComponentInChildren<Dropdown>();
-    //        dropdown.onValueChanged.AddListener(delegate { Dropdown(customizationValue); });
-    //        EventTrigger trigger = option.GetComponent<EventTrigger>();
-    //        trigger.triggers[0].callback.AddListener(delegate { PointerEnter(); });
-    //        trigger.triggers[1].callback.AddListener(delegate { PointerExit(); });
-    //        option.GetComponentInChildren<Text>().text = character.Options[i].Name;
-    //        customizationOptions.Add(option);
-    //    }
-    //}
+    private void SetupCustomizationPanel()
+    {
+        foreach (GameObject customizaionOption in customizationOptions)
+        {
+            Destroy(customizaionOption);
+        }
+        customizationOptions.Clear();
+        connection.Open();
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            List<CustomizationOption> options = new List<CustomizationOption>();
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM CustomizationOptions WHERE Race = " + character.Race + " AND Gender = " + character.Gender + ";";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                int category = reader.GetInt32(3);
+                string name = reader.GetString(4);
+                int form = reader.GetInt32(5);
+                int blizzard = reader.GetInt32(6);
+                options.Add(new CustomizationOption(id, category, name, form, blizzard));
+            }
+            character.Options = options.ToArray();
+            character.Customization = new int[options.Count];
+            for (int i = 0; i < character.Customization.Length; i++)
+            {
+                character.Customization[i] = 0;
+            }
+        }
+        connection.Close();
+        GameObject option;
+        Button[] buttons;
+        Dropdown dropdown;
+        Button[] categories = customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().GetComponentsInChildren<Button>(true);
+        for (int i = 0; i < character.Options.Length; i++)
+        {
+            option = Instantiate(customizationDropdown, customizationPanel.GetComponentInChildren<VerticalLayoutGroup>().transform);
+            buttons = option.GetComponentsInChildren<Button>();
+            int customizationValue = i;
+            foreach (Button button in buttons)
+            {
+                if (button.name.Contains("prev"))
+                {
+                    button.onClick.AddListener(delegate { PrevButton(customizationValue); });
+                }
+                else if (button.name.Contains("next"))
+                {
+                    button.onClick.AddListener(delegate { NextButton(customizationValue); });
+                }
+            }
+            dropdown = option.GetComponentInChildren<Dropdown>();
+            dropdown.onValueChanged.AddListener(delegate { Dropdown(customizationValue); });
+            EventTrigger trigger = option.GetComponent<EventTrigger>();
+            trigger.triggers[0].callback.AddListener(delegate { PointerEnter(); });
+            trigger.triggers[1].callback.AddListener(delegate { PointerExit(); });
+            option.GetComponentInChildren<Text>().text = character.Options[i].Name;
+            customizationOptions.Add(option);
+        }
+    }
 
     //private void FillItems(int slot, GameObject panel)
     //{
@@ -590,60 +590,60 @@ public class ScreenInput : MonoBehaviour
     //    character.ClearItems();
     //}
 
-    //private void ChangeButtonColors()
-    //{
-    //    Color color;
-    //    switch (character.Class)
-    //    {
-    //        case 6:
-    //            color = new Color(0f, 0.5f, 1f);
-    //            break;
-    //        case 12:
-    //            color = new Color(0.25f, 0.5f, 0f);
-    //            break;
-    //        default:
-    //            color = new Color(0.75f, 0f, 0f);
-    //            break;
-    //    }
-    //    exitButton.GetComponent<Image>().color = color;
-    //    customizeButton.GetComponent<Image>().color = color;
-    //    gearButton.GetComponent<Image>().color = color;
-    //    importButton.GetComponent<Image>().color = color;
-    //    openButton.GetComponent<Image>().color = color;
-    //    foreach (Button button in leftPanel.GetComponentsInChildren<Button>())
-    //    {
-    //        button.GetComponent<Image>().color = color;
-    //    }
-    //    foreach (Button button in rightPanel.GetComponentsInChildren<Button>())
-    //    {
-    //        button.GetComponent<Image>().color = color;
-    //    }
-    //}
+    private void ChangeButtonColors()
+    {
+        Color color;
+        switch (character.Class)
+        {
+            case 6:
+                color = new Color(0f, 0.5f, 1f);
+                break;
+            case 12:
+                color = new Color(0.25f, 0.5f, 0f);
+                break;
+            default:
+                color = new Color(0.75f, 0f, 0f);
+                break;
+        }
+        exitButton.GetComponent<Image>().color = color;
+        customizeButton.GetComponent<Image>().color = color;
+        gearButton.GetComponent<Image>().color = color;
+        importButton.GetComponent<Image>().color = color;
+        openButton.GetComponent<Image>().color = color;
+        foreach (Button button in leftPanel.GetComponentsInChildren<Button>())
+        {
+            button.GetComponent<Image>().color = color;
+        }
+        foreach (Button button in rightPanel.GetComponentsInChildren<Button>())
+        {
+            button.GetComponent<Image>().color = color;
+        }
+    }
 
-    //private void SetupFormPanel()
-    //{
-    //    Mask[] buttons = formPanel.GetComponentsInChildren<Mask>(true);
-    //    foreach (Mask button in buttons)
-    //    {
-    //        button.transform.parent.gameObject.SetActive(false);
-    //    }
-    //    if (character.Race == 22)
-    //    {
-    //        buttons[7].transform.parent.gameObject.SetActive(true);
-    //        buttons[6].transform.parent.gameObject.SetActive(true);
-    //    }
-    //    ChangeBorder(buttons[7].GetComponentInChildren<Button>().gameObject);
-    //    if (character.Class == 11)
-    //    {
-    //        buttons[7].transform.parent.gameObject.SetActive(true);
-    //        buttons[5].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Bear Form"));
-    //        buttons[4].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Cat Form"));
-    //        buttons[3].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Moonkin Form"));
-    //        buttons[2].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Flight Form"));
-    //        buttons[1].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Aquatic Form"));
-    //        buttons[0].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Travel Form"));
-    //    }
-    //}
+    private void SetupFormPanel()
+    {
+        Mask[] buttons = formPanel.GetComponentsInChildren<Mask>(true);
+        foreach (Mask button in buttons)
+        {
+            button.transform.parent.gameObject.SetActive(false);
+        }
+        if (character.Race == 22)
+        {
+            buttons[7].transform.parent.gameObject.SetActive(true);
+            buttons[6].transform.parent.gameObject.SetActive(true);
+        }
+        ChangeBorder(buttons[7].GetComponentInChildren<Button>().gameObject);
+        if (character.Class == 11)
+        {
+            buttons[7].transform.parent.gameObject.SetActive(true);
+            buttons[5].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Bear Form"));
+            buttons[4].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Cat Form"));
+            buttons[3].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Moonkin Form"));
+            buttons[2].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Flight Form"));
+            buttons[1].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Aquatic Form"));
+            buttons[0].transform.parent.gameObject.SetActive(Array.Exists(character.Options, o => o.Name == "Travel Form"));
+        }
+    }
 
     private void ChangeBorder(GameObject selected)
     {
@@ -754,14 +754,14 @@ public class ScreenInput : MonoBehaviour
         formPanel.SetActive(false);
     }
 
-    //private void LinkDropdowns()
-    //{
-    //    character.CustomizationDropdowns.Clear();
-    //    foreach (GameObject option in customizationOptions)
-    //    {
-    //        character.CustomizationDropdowns.Add(option.GetComponentInChildren<Dropdown>(true));
-    //    }
-    //}
+    private void LinkDropdowns()
+    {
+        character.CustomizationDropdowns.Clear();
+        foreach (GameObject option in customizationOptions)
+        {
+            character.CustomizationDropdowns.Add(option.GetComponentInChildren<Dropdown>(true));
+        }
+    }
 
     //private void LoadGilnean()
     //{
@@ -786,43 +786,43 @@ public class ScreenInput : MonoBehaviour
 
     public void GenderButton(bool gender)
     {
-        //if (character.Gender == gender)
-        //{
-        //    return;
-        //}
+        if (character.Gender == gender)
+        {
+            return;
+        }
         SwapIcons(gender);
         ChangeBorder(EventSystem.current.currentSelectedGameObject);
-        //Category(0);
-        //string model;
-        //connection.Open();
-        //using (SqliteCommand command = connection.CreateCommand())
-        //{
-        //    command.CommandType = CommandType.Text;
-        //    command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + character.Race + " AND Gender = " + gender + ";";
-        //    SqliteDataReader reader = command.ExecuteReader();
-        //    reader.Read();
-        //    model = reader.GetString(3);
-        //    character.Suffix1 = reader.GetString(4);
-        //    character.Suffix2 = reader.GetString(5);
-        //    character.RacePath = reader.GetString(6);
-        //    character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
-        //    character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
-        //}
-        //connection.Close();
+        Category(0);
+        string model;
+        connection.Open();
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + character.Race + " AND Gender = " + gender + ";";
+            SqliteDataReader reader = command.ExecuteReader();
+            reader.Read();
+            model = reader.GetString(3);
+            character.Suffix1 = reader.GetString(4);
+            character.Suffix2 = reader.GetString(5);
+            character.RacePath = reader.GetString(6);
+            character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
+            character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
+        }
+        connection.Close();
         //ClearItems();
-        //int c = character.Class;
-        //character.Class = 1;
-        //character.Gender = gender;
-        //character.Form = 0;
-        //SetupCustomizationPanel();
-        //GetCustomizationOptions();
-        //LinkDropdowns();
-        //ChangeButtonColors();
-        //ClassButton(c);
+        int c = character.Class;
+        character.Class = 1;
+        character.Gender = gender;
+        character.Form = 0;
+        SetupCustomizationPanel();
+        GetCustomizationOptions();
+        LinkDropdowns();
+        ChangeButtonColors();
+        ClassButton(c);
         //gilnean.gameObject.SetActive(true);
         //character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
-        //character.LoadModel(model);
+        character.LoadModel(model);
         //if (character.Race == 22)
         //{
         //    LoadGilnean();
@@ -845,52 +845,52 @@ public class ScreenInput : MonoBehaviour
         mainFormButton.image.sprite = current.image.sprite;
         formPanel.gameObject.SetActive(false);
         ChangeRaceBorder(EventSystem.current.currentSelectedGameObject);
-        //if (character.Race == race)
-        //{
-        //    return;
-        //}
-        //Category(0);
-        //bool value;
-        //string model;
-        //connection.Open();
-        //using (SqliteCommand command = connection.CreateCommand())
-        //{
-        //    command.CommandType = CommandType.Text;
-        //    command.CommandText = "SELECT * FROM RaceClassCombos WHERE Race = " + race + ";";
-        //    SqliteDataReader reader = command.ExecuteReader();
-        //    reader.Read();
-        //    for (int i = 0; i < classButtons.Length; i++)
-        //    {
-        //        value = reader.GetBoolean(i + 1);
-        //        classButtons[i].interactable = value;
-        //    }
-        //}
-        //using (SqliteCommand command = connection.CreateCommand())
-        //{
-        //    command.CommandType = CommandType.Text;
-        //    command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + race + " AND Gender = " + character.Gender + ";";
-        //    SqliteDataReader reader = command.ExecuteReader();
-        //    reader.Read();
-        //    model = reader.GetString(3);
-        //    character.Suffix1 = reader.GetString(4);
-        //    character.Suffix2 = reader.GetString(5);
-        //    character.RacePath = reader.GetString(6);
-        //    character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
-        //    character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
-        //}
-        //connection.Close();
+        if (character.Race == race)
+        {
+            return;
+        }
+        Category(0);
+        bool value;
+        string model;
+        connection.Open();
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM RaceClassCombos WHERE Race = " + race + ";";
+            SqliteDataReader reader = command.ExecuteReader();
+            reader.Read();
+            for (int i = 0; i < classButtons.Length; i++)
+            {
+                value = reader.GetBoolean(i + 1);
+                classButtons[i].interactable = value;
+            }
+        }
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + race + " AND Gender = " + character.Gender + ";";
+            SqliteDataReader reader = command.ExecuteReader();
+            reader.Read();
+            model = reader.GetString(3);
+            character.Suffix1 = reader.GetString(4);
+            character.Suffix2 = reader.GetString(5);
+            character.RacePath = reader.GetString(6);
+            character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
+            character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
+        }
+        connection.Close();
         //ClearItems();
-        //character.Race = race;
-        //character.Class = 1;
-        //character.Form = 0;
-        //SetupCustomizationPanel();
-        //GetCustomizationOptions();
-        //ResetBorder();
-        //LinkDropdowns();
-        //ChangeButtonColors();
+        character.Race = race;
+        character.Class = 1;
+        character.Form = 0;
+        SetupCustomizationPanel();
+        GetCustomizationOptions();
+        ResetBorder();
+        LinkDropdowns();
+        ChangeButtonColors();
         //character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
-        //character.LoadModel(model);
+        character.LoadModel(model);
         //gilnean.gameObject.SetActive(true);
         //if (race == 22)
         //{
@@ -902,139 +902,139 @@ public class ScreenInput : MonoBehaviour
 
     public void FormButton(int form)
     {
-        //if (character.Form == form)
-        //{
-        //    return;
-        //}
+        if (character.Form == form)
+        {
+            return;
+        }
         ChangeBorder(EventSystem.current.currentSelectedGameObject);
-        //character.Form = form;
-        //SetupCategories();
-        //switch (form)
-        //{
-        //    case 0:
-        //        gilnean.gameObject.SetActive(false);
-        //        druid.gameObject.SetActive(false);
-        //        character.gameObject.SetActive(true);
-        //        Category(0);
-        //        break;
-        //    case 1:
-        //    case 2:
-        //    case 3:
-        //    case 4:
-        //    case 5:
-        //    case 6:
-        //        gilnean.gameObject.SetActive(false);
-        //        druid.gameObject.SetActive(true);
-        //        character.gameObject.SetActive(false);
-        //        Category(3);
-        //        break;
-        //    case 7:
-        //        gilnean.gameObject.SetActive(true);
-        //        druid.gameObject.SetActive(false);
-        //        character.gameObject.SetActive(false);
-        //        Category(0);
-        //        break;
-        //}
-        //Dropdown(Array.FindIndex(character.Options, o => o.Form == character.Form));
+        character.Form = form;
+        SetupCategories();
+        switch (form)
+        {
+            case 0:
+                //gilnean.gameObject.SetActive(false);
+                //druid.gameObject.SetActive(false);
+                //character.gameObject.SetActive(true);
+                Category(0);
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                //gilnean.gameObject.SetActive(false);
+                //druid.gameObject.SetActive(true);
+                //character.gameObject.SetActive(false);
+                Category(3);
+                break;
+            case 7:
+                //gilnean.gameObject.SetActive(true);
+                //druid.gameObject.SetActive(false);
+                //character.gameObject.SetActive(false);
+                Category(0);
+                break;
+        }
+        Dropdown(Array.FindIndex(character.Options, o => o.Form == character.Form));
     }
 
     public void ClassButton(int id)
     {
-        //if (id == character.Class)
-        //{
-        //    return;
-        //}
+        if (id == character.Class)
+        {
+            return;
+        }
         ChangeBorder(EventSystem.current.currentSelectedGameObject);
-        //Category(0);
-        //character.Class = id;
-        //int[] customization = character.Customization;
-        //SetupCustomizationPanel();
-        //switch (id)
-        //{
-        //    case 6:
-        //        GetClassCustomizationOptions(6);
-        //        break;
-        //    case 11:
-        //        GetClassCustomizationOptions(11);
-        //        break;
-        //    case 12:
-        //        GetClassCustomizationOptions(12);
-        //        break;
-        //    default:
-        //        GetCustomizationOptions();
-        //        break;
-        //}
-        //LinkDropdowns();
-        //for (int i = 0; i < customization.Length; i++)
-        //{
-        //    EventSystem.current.SetSelectedGameObject(customizationOptions[i].GetComponentInChildren<Dropdown>(true).gameObject);
-        //    customization[i] = customization[i] >= character.Choices[i].Length ? character.Choices[i].Length - 1 : customization[i];
-        //    customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = customization[i];
-        //}
-        //ChangeButtonColors();
-        //character.InitializeHelper();
-        //character.Change = true;
+        Category(0);
+        character.Class = id;
+        int[] customization = character.Customization;
+        SetupCustomizationPanel();
+        switch (id)
+        {
+            case 6:
+                GetClassCustomizationOptions(6);
+                break;
+            case 11:
+                GetClassCustomizationOptions(11);
+                break;
+            case 12:
+                GetClassCustomizationOptions(12);
+                break;
+            default:
+                GetCustomizationOptions();
+                break;
+        }
+        LinkDropdowns();
+        for (int i = 0; i < customization.Length; i++)
+        {
+            EventSystem.current.SetSelectedGameObject(customizationOptions[i].GetComponentInChildren<Dropdown>(true).gameObject);
+            customization[i] = customization[i] >= character.Choices[i].Length ? character.Choices[i].Length - 1 : customization[i];
+            customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = customization[i];
+        }
+        ChangeButtonColors();
+        character.InitializeHelper();
+        character.Change = true;
     }
 
-    //public void Category(int index)
-    //{
-    //    string icon;
-    //    Sprite sprite;
-    //    Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreate");
-    //    Button[] buttons = customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().GetComponentsInChildren<Button>(true);
-    //    for (int i = 0; i < buttons.Length; i++)
-    //    {
-    //        icon = buttons[i].image.sprite.name.Replace("on", "off");
-    //        sprite = sprites.Single(s => s.name == icon);
-    //        buttons[i].image.sprite = sprite;
-    //    }
-    //    icon = buttons[index].image.sprite.name.Replace("off", "on");
-    //    sprite = sprites.Single(s => s.name == icon);
-    //    buttons[index].image.sprite = sprite;
-    //    for (int i = 0; i < customizationOptions.Count; i++)
-    //    {
-    //        if (character.Options[i].Category == index + 1 && character.Choices[i].Length > 1 && character.Form == character.Options[i].Form)
-    //        {
-    //            customizationOptions[i].SetActive(true);
-    //        }
-    //        else
-    //        {
-    //            customizationOptions[i].SetActive(false);
-    //        }
-    //    }
-    //}
+    public void Category(int index)
+    {
+        string icon;
+        Sprite sprite;
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreate");
+        Button[] buttons = customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().GetComponentsInChildren<Button>(true);
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            icon = buttons[i].image.sprite.name.Replace("on", "off");
+            sprite = sprites.Single(s => s.name == icon);
+            buttons[i].image.sprite = sprite;
+        }
+        icon = buttons[index].image.sprite.name.Replace("off", "on");
+        sprite = sprites.Single(s => s.name == icon);
+        buttons[index].image.sprite = sprite;
+        for (int i = 0; i < customizationOptions.Count; i++)
+        {
+            if (character.Options[i].Category == index + 1 && character.Choices[i].Length > 1 && character.Form == character.Options[i].Form)
+            {
+                customizationOptions[i].SetActive(true);
+            }
+            else
+            {
+                customizationOptions[i].SetActive(false);
+            }
+        }
+    }
 
-    //public void Dropdown(int index)
-    //{
-    //    Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
-    //    character.Customization[index] = dropdown.value;
-    //    string str = dropdown.captionText.text;
-    //    str = str.Substring(str.IndexOf(':') + 1);
-    //    dropdown.captionText.text = str;
-    //    Text text = dropdown.GetComponentInChildren<Text>();
-    //    TextGenerationSettings settings = new TextGenerationSettings();
-    //    settings.textAnchor = text.alignment;
-    //    settings.pivot = Vector2.zero;
-    //    settings.font = text.font;
-    //    settings.fontSize = text.fontSize;
-    //    settings.fontStyle = text.fontStyle;
-    //    settings.horizontalOverflow = text.horizontalOverflow;
-    //    if (text.cachedTextGenerator.GetPreferredWidth(text.text, settings) > 120f)
-    //    {
-    //        text.alignment = TextAnchor.MiddleLeft;
-    //    }
-    //    else
-    //    {
-    //        text.alignment = TextAnchor.MiddleCenter;
-    //    }
-    //    if (druid.gameObject.activeSelf)
-    //    {
-    //        druid.LoadModel(character.Choices[index][character.Customization[index]].Model);
-    //    }
-    //    character.Change = true;
-    //    gilnean.Change = true;
-    //    druid.Change = true;
-    //}
+    public void Dropdown(int index)
+    {
+        Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
+        character.Customization[index] = dropdown.value;
+        string str = dropdown.captionText.text;
+        str = str.Substring(str.IndexOf(':') + 1);
+        dropdown.captionText.text = str;
+        Text text = dropdown.GetComponentInChildren<Text>();
+        TextGenerationSettings settings = new TextGenerationSettings();
+        settings.textAnchor = text.alignment;
+        settings.pivot = Vector2.zero;
+        settings.font = text.font;
+        settings.fontSize = text.fontSize;
+        settings.fontStyle = text.fontStyle;
+        settings.horizontalOverflow = text.horizontalOverflow;
+        if (text.cachedTextGenerator.GetPreferredWidth(text.text, settings) > 120f)
+        {
+            text.alignment = TextAnchor.MiddleLeft;
+        }
+        else
+        {
+            text.alignment = TextAnchor.MiddleCenter;
+        }
+        //if (druid.gameObject.activeSelf)
+        //{
+        //    druid.LoadModel(character.Choices[index][character.Customization[index]].Model);
+        //}
+        character.Change = true;
+        //gilnean.Change = true;
+        //druid.Change = true;
+    }
 
     public void PointerEnter()
     {
@@ -1050,53 +1050,51 @@ public class ScreenInput : MonoBehaviour
         zoom = true;
     }
 
-    //public void PrevButton(int index)
-    //{
-    //    Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
-    //    if (dropdown.value == 0)
-    //    {
-    //        dropdown.value = dropdown.value;
-    //    }
-    //    else
-    //    {
-    //        int value = dropdown.value - 1;
-    //        while (value > -1)
-    //        {
-    //            if (((CustomOptionData)dropdown.options[value]).Interactable)
-    //            {
-    //                dropdown.value = value;
-    //                return;
-    //            }
-    //            value--;
-    //        }
-    //        dropdown.value = dropdown.value;
-    //    }
-    //    //dropdown.value = dropdown.value == 0 ? 0 : dropdown.value - 1;
-    //}
+    public void PrevButton(int index)
+    {
+        Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
+        if (dropdown.value == 0)
+        {
+            dropdown.value = dropdown.value;
+        }
+        else
+        {
+            int value = dropdown.value - 1;
+            while (value > -1)
+            {
+                if (((CustomOptionData)dropdown.options[value]).Interactable)
+                {
+                    dropdown.value = value;
+                    return;
+                }
+                value--;
+            }
+            dropdown.value = dropdown.value;
+        }
+    }
 
-    //public void NextButton(int index)
-    //{
-    //    Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
-    //    if (dropdown.value == dropdown.options.Count - 1)
-    //    {
-    //        dropdown.value = dropdown.value;
-    //    }
-    //    else
-    //    {
-    //        int value = dropdown.value + 1;
-    //        while (value < dropdown.options.Count)
-    //        {
-    //            if (((CustomOptionData)dropdown.options[value]).Interactable)
-    //            {
-    //                dropdown.value = value;
-    //                return;
-    //            }
-    //            value++;
-    //        }
-    //        dropdown.value = dropdown.value;
-    //    }
-    //    //dropdown.value = dropdown.value == dropdown.options.Count - 1 ? dropdown.options.Count - 1 : dropdown.value + 1;
-    //}
+    public void NextButton(int index)
+    {
+        Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
+        if (dropdown.value == dropdown.options.Count - 1)
+        {
+            dropdown.value = dropdown.value;
+        }
+        else
+        {
+            int value = dropdown.value + 1;
+            while (value < dropdown.options.Count)
+            {
+                if (((CustomOptionData)dropdown.options[value]).Interactable)
+                {
+                    dropdown.value = value;
+                    return;
+                }
+                value++;
+            }
+            dropdown.value = dropdown.value;
+        }
+    }
 
     //public void LeftButton(int slot)
     //{
@@ -1272,12 +1270,12 @@ public class ScreenInput : MonoBehaviour
             gearButton.gameObject.SetActive(customize);
             formPanel.gameObject.SetActive(false);
             gearPanel.gameObject.SetActive(gear);
-            //character.Form = 0;
+            character.Form = 0;
             //gilnean.gameObject.SetActive(false);
             //druid.gameObject.SetActive(false);
             //character.gameObject.SetActive(true);
-            //SetupCategories();
-            //Category(0);
+            SetupCategories();
+            Category(0);
         }
         exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
         customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
@@ -1295,7 +1293,7 @@ public class ScreenInput : MonoBehaviour
             customizationPanel.gameObject.SetActive(customize);
             gearButton.gameObject.SetActive(customize);
             formPanel.gameObject.SetActive(true);
-            //SetupFormPanel();
+            SetupFormPanel();
         }
         else
         {

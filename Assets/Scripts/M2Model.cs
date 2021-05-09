@@ -8,12 +8,9 @@ public class M2Model : MonoBehaviour
     //Json asset containing the data
     public TextAsset json;
 
-    //Object containing the date
-    public M2 model;
-
-    void Start()
+    //Load all the date into the object
+    public M2 LoadModel(string text)
     {
-        //Load all the date into the object
-        model = JsonConvert.DeserializeObject<M2>(json.text);
+        return JsonConvert.DeserializeObject<M2>(text);
     }
 }
