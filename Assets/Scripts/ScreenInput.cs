@@ -38,6 +38,7 @@ public class ScreenInput : MonoBehaviour
     public Button gearButton;
     public Button openButton;
     public Button importButton;
+    public Text loading;
     public Character character;
     //public Gilnean gilnean;
     //public Druid druid;
@@ -116,6 +117,7 @@ public class ScreenInput : MonoBehaviour
 
     private void Update()
     {
+        loading.gameObject.SetActive(!character.Loaded);
         customizeButton.gameObject.SetActive(!gear);
         if (screenshot && ((!allied && r >= coreRaceNames.Count) || r >= coreRaceNames.Count + alliedRaceNames.Count))
         {
@@ -169,7 +171,8 @@ public class ScreenInput : MonoBehaviour
         {
             using (HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("POST"), "https://us.battle.net/oauth/token"))
             {
-                string auth = Convert.ToBase64String(Encoding.ASCII.GetBytes("3f44c5a6587340b09d9ba5be6911f0f9:j8gHtaj66jnxosek3YIY5aUgtmpkK2wM"));
+                TextAsset api = Resources.Load<TextAsset>("API");
+                string auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(api.text));
                 request.Headers.TryAddWithoutValidation("Authorization", $"Basic {auth}");
                 request.Content = new StringContent("grant_type=client_credentials", Encoding.UTF8, "application/x-www-form-urlencoded");
                 HttpResponseMessage response = client.SendAsync(request).Result;

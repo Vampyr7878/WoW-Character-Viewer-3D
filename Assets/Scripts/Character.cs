@@ -25,9 +25,11 @@ public class Character : MonoBehaviour
     private Texture2D[] textures;
     private float[] time;
     private int[] frame;
-    private bool loaded;
+    private Thread loadBinaries;
 
     public M2 Model { get; private set; }
+
+    public bool Loaded { get; private set; }
 
     public List<Dropdown> CustomizationDropdowns { get; set; }
     public string DemonHunterFile { get; set; }
@@ -52,14 +54,14 @@ public class Character : MonoBehaviour
         CustomizationDropdowns = new List<Dropdown>();
         Gender = true;
         Change = false;
-        loaded = false;
+        Loaded = false;
     }
 
     private void FixedUpdate()
     {
         SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
         Animator animator = GetComponentInChildren<Animator>();
-        if (Change && loaded)
+        if (Change && Loaded)
         {
             try
             {
@@ -68,10 +70,10 @@ public class Character : MonoBehaviour
                 //helper.ChangeGeosets(activeGeosets);
                 //EquipArmor();
                 //helper.LoadTextures(textures);
-                //for (int i = 0; i < Model.Skin.Textures.Length; i++)
-                //{
-                //    SetMaterial(renderer, i);
-                //}
+                for (int i = 0; i < Model.Skin.Textures.Length; i++)
+                {
+                    SetMaterial(renderer, i);
+                }
                 //int index = Array.FindIndex(Options, o => o.Name == "Face");
                 //animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
                 //demonHunter.Change = true;
@@ -243,11 +245,11 @@ public class Character : MonoBehaviour
         }
         else if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            Material material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
-            renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
-            renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
-            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
-            SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
+            //Material material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
+            //renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
+            //renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
+            //renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
+            //SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
         }
         else
         {
@@ -1459,15 +1461,18 @@ public class Character : MonoBehaviour
 
     private IEnumerator LoadPrefab(string modelfile)
     {
-        DestroyImmediate(mesh);
         bool done = false;
+        DestroyImmediate(mesh);
         GameObject prefab = Resources.Load<GameObject>(modelsPath + RacePath + modelfile + "_prefab");
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
-        M2Model m = GetComponentInChildren<M2Model>();
-        string text = m.json.text;
+        M2Model m2 = GetComponentInChildren<M2Model>();
+        byte[] data = m2.data.bytes;
+        byte[] skin = m2.skin.bytes;
+        byte[] skel = m2.skel.bytes;
+        loadBinaries = new Thread(() => { Model = m2.LoadModel(data, skin, skel); done = true; });
+        loadBinaries.Start();
         yield return null;
-        new Thread(() => { Model = m.LoadModel(text); done = true; }).Start();
         activeGeosets = new List<int> { 0, 2301 };
         //if (Race == 4 || Race == 10)
         //{
@@ -1479,7 +1484,7 @@ public class Character : MonoBehaviour
         //    racial.Path = modelsPath + RacePath;
         //    racial.LoadModel(RacialCollection);
         //}
-        while (!done)
+        while(loadBinaries.IsAlive)
         {
             yield return null;
         }
@@ -1498,14 +1503,19 @@ public class Character : MonoBehaviour
                 frame[i] = 0;
                 yield return null;
             }
+            Change = true;
+            Loaded = !loadBinaries.IsAlive;
+            yield return null;
         }
-        Change = true;
-        loaded = true;
-        yield return null;
     }
 
     public void LoadModel(string modelfile)
     {
+        Loaded = false;
+        if (loadBinaries != null)
+        {
+            loadBinaries.Abort();
+        }
         StartCoroutine(LoadPrefab(modelfile));
     }
 }

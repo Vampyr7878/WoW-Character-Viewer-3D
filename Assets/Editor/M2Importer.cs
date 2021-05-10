@@ -1,10 +1,12 @@
 ﻿using M2Lib;
+using System.IO;
+using UnityEditor;
+using UnityEditor.AssetImporters;
 using UnityEngine;
-using Newtonsoft.Json;
 
 //Importer for m2 files
-[UnityEditor.AssetImporters.ScriptedImporter(1, "m2")]
-public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
+[ScriptedImporter(1, "m2")]
+public class M2Importer : ScriptedImporter
 {
     //Set if it is a character model
     public bool character;
@@ -29,7 +31,7 @@ public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
     //Backpack attachment point
     public GameObject backpack;
 
-    public override void OnImportAsset(UnityEditor.AssetImporters.AssetImportContext ctx)
+    public override void OnImportAsset(AssetImportContext ctx)
     {
         //Load file contents
         M2 file = new M2();
@@ -126,11 +128,6 @@ public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
         renderer.bones = bones;
         renderer.rootBone = bones[0];
         mesh.bindposes = bind;
-        //Seralize data in json so they can be accessible at runtime
-        TextAsset json = new TextAsset(JsonConvert.SerializeObject(file));
-        json.name = file.Name + "_data";
-        model.AddComponent<M2Model>();
-        model.GetComponent<M2Model>().json = json;
         //Fill particle effect data
         if (file.Particles.Length > 0)
         {
@@ -144,13 +141,30 @@ public class M2Importer : UnityEditor.AssetImporters.ScriptedImporter
                 ctx.AddObjectToAsset(particles[i].name, particles[i]);
             }
         }
+        //Load *.bytes files so data can be easly accessible at runtime
+        string path = Path.GetDirectoryName(ctx.assetPath);
+        TextAsset data = AssetDatabase.LoadAssetAtPath<TextAsset>(path + "\\data.bytes");
+        TextAsset skin = AssetDatabase.LoadAssetAtPath<TextAsset>(path + "\\skin.bytes");
+        TextAsset skel = new TextAsset("");
+        skel.name = "skel";
+        if (file.SkelFileID != 0)
+        {
+            skel = AssetDatabase.LoadAssetAtPath<TextAsset>(path + "\\skel.bytes");
+        }
+        M2Model m2 = model.AddComponent<M2Model>();
+        m2.data = data;
+        m2.skin = skin;
+        m2.skel = skel;
         //Populate the asset
         ctx.AddObjectToAsset(file.Name, model);
         ctx.AddObjectToAsset(mesh.name, mesh);
         ctx.AddObjectToAsset(skeleton.name, skeleton);
-        ctx.AddObjectToAsset(json.name, json);
+        ctx.AddObjectToAsset(data.name, data);
+        ctx.AddObjectToAsset(skin.name, skin);
+        ctx.AddObjectToAsset(skel.name, skel);
     }
 
+    //Instantiate empty GameObject as an attachment point for armor and weapons
     private void AddAttachmentPoint(GameObject point, Transform bone)
     {
         GameObject attachment = Instantiate(point, bone);

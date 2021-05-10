@@ -1,19 +1,22 @@
-﻿using SkelLib;
+﻿using M2Lib;
+using SkelLib;
 using System.IO;
+using UnityEditor.AssetImporters;
 using UnityEngine;
 
 //Importer for bone files
-[UnityEditor.AssetImporters.ScriptedImporter(1, "bone")]
-public class BoneImporter : UnityEditor.AssetImporters.ScriptedImporter
+[ScriptedImporter(1, "bone")]
+public class BoneImporter : ScriptedImporter
 {
-    public override void OnImportAsset(UnityEditor.AssetImporters.AssetImportContext ctx)
+    public override void OnImportAsset(AssetImportContext ctx)
     {
         //Load file contents
         BoneLib.Bone file = new BoneLib.Bone();
         file.LoadFile(ctx.assetPath);
         //Load skel file for reference
-        Skel skeleton = new Skel();
-        skeleton.LoadFile(ctx.assetPath.Substring(0, ctx.assetPath.Length - 8) + ".skel");
+        M2 model = new M2();
+        model.LoadFile(ctx.assetPath.Substring(0, ctx.assetPath.Length - 8) + ".m2");
+        Skel skeleton = model.Skeleton;
         //Create empty animation clip
         AnimationClip clip = new AnimationClip();
         AnimationCurve curve;
