@@ -2,36 +2,37 @@
 
 namespace WoW
 {
+    //Class to store customization choice data
     public class CustomizationChoice
     {
-        public Color Color1 { get; set; }
-        public Color Color2 { get; set; }
-        public string Name { get; set; }
+        //ID from database
+        public int Index { get; private set; }
+        //Choice's name
+        public string Name { get; private set; }
+        //Choice's colors
+        public Color Color1 { get; private set; }
+        public Color Color2 { get; private set; }
+        //Druid form model
         public string Model { get; private set; }
-        public string Texture1 { get; private set; }
-        public string Texture2 { get; private set; }
-        public string Texture3 { get; private set; }
-        public int Geoset1 { get; private set; }
-        public int Geoset2 { get; private set; }
-        public int Geoset3 { get; private set; }
+        //Face boneset
         public int Bone { get; private set; }
-        public int Extra { get; private set; }
+        //ID used by Blizzard for armory import
         public int ID { get; private set; }
+
+        //Geosets used by this choice
+        public CustomizationGeosets[] Geosets { get; set; }
+        //Textures used by this choice
+        public CustomizationTextures[] Textures{ get; set; }
         
-        public CustomizationChoice(string name, Color color1, Color color2, string model, string texture1, string texture2, string texture3, int geoset1, int geoset2, int geoset3, int bone, int extra, int id)
+        //Constructor
+        public CustomizationChoice(int index, string name, Color color1, Color color2, string model, int bone, int id)
         {
+            Index = index;
             Name = name;
             Color1 = color1;
             Color2 = color2;
             Model = model;
-            Texture1 = texture1;
-            Texture2 = texture2;
-            Texture3 = texture3;
-            Geoset1 = geoset1;
-            Geoset2 = geoset2;
-            Geoset3 = geoset3;
             Bone = bone;
-            Extra = extra;
             ID = id;
         }
     }

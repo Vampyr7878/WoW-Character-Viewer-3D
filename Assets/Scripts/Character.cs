@@ -1,4 +1,5 @@
-﻿using M2Lib;
+﻿using CASCLib;
+using M2Lib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using WoW;
-//using WoW.Characters;
+using WoW.Characters;
 
 public class Character : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class Character : MonoBehaviour
     //public Collection racial;
     public ScreenInput input;
 
-    //private CharacterHelper helper;
+    private CharacterHelper helper;
     private GameObject mesh;
     private Color[] colors;
     private List<int> activeGeosets;
@@ -67,9 +68,9 @@ public class Character : MonoBehaviour
             {
                 Resources.UnloadUnusedAssets();
                 GC.Collect();
-                //helper.ChangeGeosets(activeGeosets);
-                //EquipArmor();
-                //helper.LoadTextures(textures);
+                helper.ChangeGeosets(activeGeosets);
+                EquipArmor();
+                helper.LoadTextures(textures);
                 for (int i = 0; i < Model.Skin.Textures.Length; i++)
                 {
                     SetMaterial(renderer, i);
@@ -151,34 +152,34 @@ public class Character : MonoBehaviour
 
     public void ChangeFaceDropdown(int index, int index2)
     {
-        int bone = Choices[index][Customization[index]].Bone;
-        for (int i = 0; i < Choices[index2].Length; i++)
-        {
-            if (Choices[index2][i].Extra == bone)
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-            }
-            else if (bone == 0 && Choices[index2][i].Extra == 66)
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
-            }
-            else if (bone == 6 && Choices[index2][i].Extra == 66)
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-            }
-            else if (bone == 10 && Choices[index2][i].Extra == 16)
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-            }
-            else if (bone == 0 && Choices[index2][i].Extra == 6)
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-            }
-            else
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
-            }
-        }
+        //int bone = Choices[index][Customization[index]].Bone;
+        //for (int i = 0; i < Choices[index2].Length; i++)
+        //{
+        //    if (Choices[index2][i].Extra == bone)
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
+        //    }
+        //    else if (bone == 0 && Choices[index2][i].Extra == 66)
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
+        //    }
+        //    else if (bone == 6 && Choices[index2][i].Extra == 66)
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
+        //    }
+        //    else if (bone == 10 && Choices[index2][i].Extra == 16)
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
+        //    }
+        //    else if (bone == 0 && Choices[index2][i].Extra == 6)
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
+        //    }
+        //    else
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
+        //    }
+        //}
     }
 
     public void ChangeTattooDropdown(int index, int index2)
@@ -206,18 +207,18 @@ public class Character : MonoBehaviour
 
     public void ChangeDropdown(int index, int index2)
     {
-        int extra = Choices[index][Customization[index]].Extra;
-        for (int i = 0; i < Choices[index2].Length; i++)
-        {
-            if (i > extra)
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
-            }
-            else
-            {
-                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-            }
-        }
+        //int extra = Choices[index][Customization[index]].Extra;
+        //for (int i = 0; i < Choices[index2].Length; i++)
+        //{
+        //    if (i > extra)
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
+        //    }
+        //    else
+        //    {
+        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
+        //    }
+        //}
     }
 
     public void ChangeDropdown(int index, int[] array)
@@ -245,11 +246,15 @@ public class Character : MonoBehaviour
         }
         else if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            //Material material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
-            //renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
-            //renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
-            //renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
-            //SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
+            Material material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
+            if (material == null)
+            {
+                Debug.LogError(Model.Skin.Textures[i].Shader);
+            }
+            renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
+            renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
+            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
+            SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
         }
         else
         {
@@ -1272,16 +1277,16 @@ public class Character : MonoBehaviour
 
     private void SetTexture(Material material, int i)
     {
-        material.SetTexture("_MainTex", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
-        material.SetTexture("_Second", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
-        //if (helper.Emission == null)
-        //{
-        //    material.SetTexture("_Emission", Texture2D.blackTexture);
-        //}
-        //else if (Model.Textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]].Type == 1)
-        //{
-        //    material.SetTexture("_Emission", helper.Emission);
-        //}
+        material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
+        material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
+        if (helper.Emission == null)
+        {
+            material.SetTexture("_Emission", Texture2D.blackTexture);
+        }
+        else if (Model.Textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]].Type == 1)
+        {
+            material.SetTexture("_Emission", helper.Emission);
+        }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         if (Model.Skin.Textures[i].Color != -1)
@@ -1303,83 +1308,83 @@ public class Character : MonoBehaviour
         }
     }
 
-    public void InitializeHelper()
+    public void InitializeHelper(CASCHandler casc)
     {
-        //if (Gender)
-        //{
-        //    switch (Race)
-        //    {
-        //        case 1:
-        //            helper = new HumanMale(Model, this);
-        //            break;
-        //        case 2:
-        //            helper = new OrcMale(Model, this);
-        //            break;
-        //        case 3:
-        //            helper = new DwarfMale(Model, this);
-        //            break;
-        //        case 4:
-        //            helper = new NightElfMale(Model, this);
-        //            break;
-        //        case 5:
-        //            helper = new UndeadMale(Model, this);
-        //            break;
-        //        case 6:
-        //            helper = new TaurenMale(Model, this);
-        //            break;
-        //        case 7:
-        //            helper = new GnomeMale(Model, this);
-        //            break;
-        //        case 8:
-        //            helper = new TrollMale(Model, this);
-        //            break;
-        //        case 9:
-        //            helper = new GoblinMale(Model, this);
-        //            break;
-        //        case 10:
-        //            helper = new BloodElfMale(Model, this);
-        //            break;
-        //        case 11:
-        //            helper = new DraeneiMale(Model, this);
-        //            break;
-        //        case 22:
-        //            helper = new WorgenMale(Model, this);
-        //            break;
-        //        case 24:
-        //            helper = new PandarenMale(Model, this);
-        //            break;
-        //        case 27:
-        //            helper = new NightborneMale(Model, this);
-        //            break;
-        //        case 28:
-        //            helper = new HighmountainMale(Model, this);
-        //            break;
-        //        case 29:
-        //            helper = new VoidElfMale(Model, this);
-        //            break;
-        //        case 30:
-        //            helper = new LightforgedMale(Model, this);
-        //            break;
-        //        case 31:
-        //            helper = new ZandalariMale(Model, this);
-        //            break;
-        //        case 32:
-        //            helper = new KulTiranMale(Model, this);
-        //            break;
-        //        case 34:
-        //            helper = new DarkIronMale(Model, this);
-        //            break;
-        //        case 35:
-        //            helper = new VulperaMale(Model, this);
-        //            break;
-        //        case 36:
-        //            helper = new MagharMale(Model, this);
-        //            break;
-        //        case 37:
-        //            helper = new MechagnomeMale(Model, this);
-        //            break;
-        //    }
-        //}
+        if (Gender)
+        {
+            switch (Race)
+            {
+                case 1:
+                    helper = new HumanMale(Model, this, casc);
+                    break;
+                //case 2:
+                //    helper = new OrcMale(Model, this);
+                //    break;
+                //case 3:
+                //    helper = new DwarfMale(Model, this);
+                //    break;
+                //case 4:
+                //    helper = new NightElfMale(Model, this);
+                //    break;
+                //case 5:
+                //    helper = new UndeadMale(Model, this);
+                //    break;
+                //case 6:
+                //    helper = new TaurenMale(Model, this);
+                //    break;
+                //case 7:
+                //    helper = new GnomeMale(Model, this);
+                //    break;
+                //case 8:
+                //    helper = new TrollMale(Model, this);
+                //    break;
+                //case 9:
+                //    helper = new GoblinMale(Model, this);
+                //    break;
+                //case 10:
+                //    helper = new BloodElfMale(Model, this);
+                //    break;
+                //case 11:
+                //    helper = new DraeneiMale(Model, this);
+                //    break;
+                //case 22:
+                //    helper = new WorgenMale(Model, this);
+                //    break;
+                //case 24:
+                //    helper = new PandarenMale(Model, this);
+                //    break;
+                //case 27:
+                //    helper = new NightborneMale(Model, this);
+                //    break;
+                //case 28:
+                //    helper = new HighmountainMale(Model, this);
+                //    break;
+                //case 29:
+                //    helper = new VoidElfMale(Model, this);
+                //    break;
+                //case 30:
+                //    helper = new LightforgedMale(Model, this);
+                //    break;
+                //case 31:
+                //    helper = new ZandalariMale(Model, this);
+                //    break;
+                //case 32:
+                //    helper = new KulTiranMale(Model, this);
+                //    break;
+                //case 34:
+                //    helper = new DarkIronMale(Model, this);
+                //    break;
+                //case 35:
+                //    helper = new VulperaMale(Model, this);
+                //    break;
+                //case 36:
+                //    helper = new MagharMale(Model, this);
+                //    break;
+                //case 37:
+                //    helper = new MechagnomeMale(Model, this);
+                //    break;
+            }
+        }
         //else
         //{
         //    switch (Race)
@@ -1459,7 +1464,7 @@ public class Character : MonoBehaviour
         //helper.RacePath = RacePath;
     }
 
-    private IEnumerator LoadPrefab(string modelfile)
+    private IEnumerator LoadPrefab(string modelfile, CASCHandler casc)
     {
         bool done = false;
         DestroyImmediate(mesh);
@@ -1493,7 +1498,7 @@ public class Character : MonoBehaviour
             LoadColors();
             yield return null;
             textures = new Texture2D[Model.Textures.Length];
-            InitializeHelper();
+            InitializeHelper(casc);
             yield return null;
             time = new float[Model.TextureAnimations.Length];
             frame = new int[Model.TextureAnimations.Length];
@@ -1509,13 +1514,13 @@ public class Character : MonoBehaviour
         }
     }
 
-    public void LoadModel(string modelfile)
+    public void LoadModel(string modelfile, CASCHandler casc)
     {
         Loaded = false;
         if (loadBinaries != null)
         {
             loadBinaries.Abort();
         }
-        StartCoroutine(LoadPrefab(modelfile));
+        StartCoroutine(LoadPrefab(modelfile, casc));
     }
 }

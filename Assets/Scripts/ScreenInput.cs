@@ -1,4 +1,5 @@
-﻿using Crosstales.FB;
+﻿using CASCLib;
+using Crosstales.FB;
 using Mono.Data.Sqlite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -53,6 +54,7 @@ public class ScreenInput : MonoBehaviour
     private SqliteConnection connection;
     private Dictionary<int, string> races;
     private Dictionary<int, string> classes;
+    private CASCHandler casc;
     //private List<Item> items;
     private List<GameObject> scrollItems;
     private string slotName;
@@ -71,6 +73,8 @@ public class ScreenInput : MonoBehaviour
 
     private void Start()
     {
+        casc = CASCHandler.OpenLocalStorage(@"D:\Program Files\World of Warcraft", "wow");
+        casc.Root.SetFlags(LocaleFlags.enGB, true, false);
         translate = true;
         rotate = true;
         zoom = true;
@@ -279,15 +283,16 @@ public class ScreenInput : MonoBehaviour
         connection.Open();
         for (int i = 0; i < character.Options.Length; i++)
         {
+            List<CustomizationChoice> choices = new List<CustomizationChoice>();
             using (SqliteCommand command = connection.CreateCommand())
             {
-                List<CustomizationChoice> choices = new List<CustomizationChoice>();
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class IS NULL;";
+                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class & " + (1 << (character.Class -1)).ToString() + ";";
                 SqliteDataReader reader = command.ExecuteReader();
                 int j = 1;
                 while (reader.Read())
                 {
+                    int index = reader.GetInt32(0);
                     string name = reader.IsDBNull(2) ? j.ToString() : j.ToString() + ": " + reader.GetString(2);
                     int color;
                     Color color1, color2;
@@ -316,84 +321,46 @@ public class ScreenInput : MonoBehaviour
                         name += ": ";
                     }
                     string model = reader.IsDBNull(5) ? "" : reader.GetString(5);
-                    string texture1 = reader.IsDBNull(6) ? "" : reader.GetString(6);
-                    string texture2 = reader.IsDBNull(7) ? "" : reader.GetString(7);
-                    string texture3 = reader.IsDBNull(8) ? "" : reader.GetString(8);
-                    int geoset1 = reader.IsDBNull(9) ? -1 : reader.GetInt32(9);
-                    int geoset2 = reader.IsDBNull(10) ? -1 : reader.GetInt32(10);
-                    int geoset3 = reader.IsDBNull(11) ? -1 : reader.GetInt32(11);
-                    int bone = reader.IsDBNull(12) ? -1 : reader.GetInt32(12);
-                    int extra = reader.IsDBNull(13) ? -1 : reader.GetInt32(13);
-                    int id = reader.IsDBNull(15) ? -1 : reader.GetInt32(15);
-                    choices.Add(new CustomizationChoice(name, color1, color2, model, texture1, texture2, texture3, geoset1, geoset2, geoset3, bone, extra, id));
+                    int bone = reader.IsDBNull(6) ? -1 : reader.GetInt32(6);
+                    int id = reader.IsDBNull(8) ? -1 : reader.GetInt32(8);
+                    choices.Add(new CustomizationChoice(index, name, color1, color2, model, bone, id));
                     j++;
                 }
-                character.Choices[i] = choices.ToArray();
             }
-            SetCustomizationNamesAndColors(i);
-        }
-        connection.Close();
-        SetupCategories();
-        Category(0);
-    }
-
-    private void GetClassCustomizationOptions(int id)
-    {
-        character.Choices = new CustomizationChoice[character.Options.Length][];
-        connection.Open();
-        for (int i = 0; i < character.Options.Length; i++)
-        {
-            using (SqliteCommand command = connection.CreateCommand())
+            foreach (CustomizationChoice choice in choices)
             {
-                List<CustomizationChoice> choices = new List<CustomizationChoice>();
-                command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class = " + id + ";";
-                SqliteDataReader reader = command.ExecuteReader();
-                int j = 1;
-                while (reader.Read())
+                using (SqliteCommand command = connection.CreateCommand())
                 {
-                    string name = reader.IsDBNull(2) ? j.ToString() : j.ToString() + ": " + reader.GetString(2);
-                    int color;
-                    Color color1, color2;
-                    if (reader.IsDBNull(3))
+                    List<CustomizationGeosets> geosets = new List<CustomizationGeosets>();
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = "SELECT * FROM CustomizationGeosets WHERE Customization = " + choice.Index + ";";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        color = 0;
-                        color1 = Color.clear;
+                        int geoset1 = reader.IsDBNull(2) ? -1 : reader.GetInt32(2);
+                        int geoset2 = reader.IsDBNull(3) ? -1 : reader.GetInt32(3);
+                        int geoset3 = reader.IsDBNull(4) ? -1 : reader.GetInt32(4);
+                        geosets.Add(new CustomizationGeosets(geoset1, geoset2, geoset3));
                     }
-                    else
-                    {
-                        color = reader.GetInt32(3);
-                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color1);
-                    }
-                    if (reader.IsDBNull(4))
-                    {
-                        color = 0;
-                        color2 = Color.clear;
-                    }
-                    else
-                    {
-                        color = reader.GetInt32(4);
-                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color2);
-                    }
-                    if (color1 != Color.clear)
-                    {
-                        name += ": ";
-                    }
-                    string model = reader.IsDBNull(5) ? "" : reader.GetString(5);
-                    string texture1 = reader.IsDBNull(6) ? "" : reader.GetString(6);
-                    string texture2 = reader.IsDBNull(7) ? "" : reader.GetString(7);
-                    string texture3 = reader.IsDBNull(8) ? "" : reader.GetString(8);
-                    int geoset1 = reader.IsDBNull(9) ? -1 : reader.GetInt32(9);
-                    int geoset2 = reader.IsDBNull(10) ? -1 : reader.GetInt32(10);
-                    int geoset3 = reader.IsDBNull(11) ? -1 : reader.GetInt32(11);
-                    int bone = reader.IsDBNull(12) ? -1 : reader.GetInt32(12);
-                    int extra = reader.IsDBNull(13) ? -1 : reader.GetInt32(13);
-                    int blizzard = reader.IsDBNull(15) ? -1 : reader.GetInt32(15);
-                    choices.Add(new CustomizationChoice(name, color1, color2, model, texture1, texture2, texture3, geoset1, geoset2, geoset3, bone, extra, blizzard));
-                    j++;
+                    choice.Geosets = geosets.ToArray();
                 }
-                character.Choices[i] = choices.ToArray();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    List<CustomizationTextures> textures = new List<CustomizationTextures>();
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = "SELECT * FROM CustomizationTextures WHERE Customization = " + choice.Index + ";";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        int texture1 = reader.IsDBNull(2) ? -1 : reader.GetInt32(2);
+                        int texture2 = reader.IsDBNull(3) ? -1 : reader.GetInt32(3);
+                        int texture3 = reader.IsDBNull(4) ? -1 : reader.GetInt32(4);
+                        textures.Add(new CustomizationTextures(texture1, texture2, texture3));
+                    }
+                    choice.Textures = textures.ToArray();
+                }
             }
+            character.Choices[i] = choices.ToArray();
             SetCustomizationNamesAndColors(i);
         }
         connection.Close();
@@ -825,7 +792,7 @@ public class ScreenInput : MonoBehaviour
         //gilnean.gameObject.SetActive(true);
         //character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
-        character.LoadModel(model);
+        character.LoadModel(model, casc);
         //if (character.Race == 22)
         //{
         //    LoadGilnean();
@@ -893,7 +860,7 @@ public class ScreenInput : MonoBehaviour
         ChangeButtonColors();
         //character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
-        character.LoadModel(model);
+        character.LoadModel(model, casc);
         //gilnean.gameObject.SetActive(true);
         //if (race == 22)
         //{
@@ -952,21 +919,7 @@ public class ScreenInput : MonoBehaviour
         character.Class = id;
         int[] customization = character.Customization;
         SetupCustomizationPanel();
-        switch (id)
-        {
-            case 6:
-                GetClassCustomizationOptions(6);
-                break;
-            case 11:
-                GetClassCustomizationOptions(11);
-                break;
-            case 12:
-                GetClassCustomizationOptions(12);
-                break;
-            default:
-                GetCustomizationOptions();
-                break;
-        }
+        GetCustomizationOptions();
         LinkDropdowns();
         for (int i = 0; i < customization.Length; i++)
         {
@@ -975,7 +928,7 @@ public class ScreenInput : MonoBehaviour
             customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = customization[i];
         }
         ChangeButtonColors();
-        character.InitializeHelper();
+        character.InitializeHelper(casc);
         character.Change = true;
     }
 
