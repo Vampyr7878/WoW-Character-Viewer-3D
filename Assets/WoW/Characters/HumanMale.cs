@@ -32,40 +32,20 @@ namespace WoW.Characters
 
         private void ChangeSkinColor()
         {
-            //int index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
-            //int index2 = Array.FindIndex(Character.Options, o => o.Name == "Face");
-            //int bone = Character.Choices[index][Character.Customization[index]].Bone;
-            //int extra = Character.Choices[index2][Character.Customization[index2]].Extra;
-            //if (bone != extra)
-            //{
-            //    if (bone == 15 || bone == 18)
-            //    {
-            //        for (int i = 0; i < Character.Choices[index2].Length; i++)
-            //        {
-            //            if (Character.Choices[index2][i].Extra == bone)
-            //            {
-            //                Character.CustomizationDropdowns[index2].value = i;
-            //                break;
-            //            }
-            //        }
-            //    }
-            //    else if (bone == 6 && extra != 6)
-            //    {
-            //        for (int i = 0; i < Character.Choices[index2].Length; i++)
-            //        {
-            //            if (Character.Choices[index2][i].Extra == bone)
-            //            {
-            //                Character.CustomizationDropdowns[index2].value = i;
-            //                break;
-            //            }
-            //        }
-            //    }
-            //    else if (extra != 6)
-            //    {
-            //        Character.CustomizationDropdowns[index2].value = 0;
-            //    }
-            //}
-            //Character.ChangeFaceDropdown(index, index2);
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
+            int index2 = Array.FindIndex(Character.Options, o => o.Name == "Face");
+            if (Character.Choices[index2][Character.Customization[index2]].Textures[Character.Customization[index]].Texture1 == -1)
+            {
+                for (int i = 0; i < Character.Choices[index2].Length; i++)
+                {
+                    if (Character.Choices[index2][i].Textures[Character.Customization[index]].Texture1 >= 0)
+                    {
+                        Character.CustomizationDropdowns[index2].value = i;
+                        break;
+                    }
+                }
+            }
+            Character.ChangeFaceDropdown(index, index2);
         }
 
         private void ChangeEars(List<int> activeGeosets)
@@ -148,8 +128,9 @@ namespace WoW.Characters
         private void ChangeFaceShape(List<int> activeGeosets)
         {
             //int index = Array.FindIndex(Character.Options, o => o.Name == "Face Shape");
-            //activeGeosets.RemoveAll(x => x > 3199 && x < 3300);
+            activeGeosets.RemoveAll(x => x > 3199 && x < 3300);
             //activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geoset1);
+            activeGeosets.Add(3201);
         }
 
         private void ChangeEyebrows(List<int> activeGeosets)
@@ -171,10 +152,10 @@ namespace WoW.Characters
         protected override void LayeredTexture(Texture2D texture)
         {
             int index, index2;
-            //index = Array.FindIndex(Character.Options, o => o.Name == "Face");
-            //index2 = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
-            //Texture2D face = Resources.Load<Texture2D>(ModelsPath + RacePath + Character.Choices[index][Character.Customization[index]].Texture1 + Character.Choices[index2][Character.Customization[index2]].Extra.ToString("00"));
-            //DrawTexture(texture, face, 512, 0);
+            index = Array.FindIndex(Character.Options, o => o.Name == "Face");
+            index2 = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
+            Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+            DrawTexture(texture, face, 512, 0);
             index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
             int file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture2;
             if (file >= 0)

@@ -355,7 +355,8 @@ public class ScreenInput : MonoBehaviour
                         int texture1 = reader.IsDBNull(2) ? -1 : reader.GetInt32(2);
                         int texture2 = reader.IsDBNull(3) ? -1 : reader.GetInt32(3);
                         int texture3 = reader.IsDBNull(4) ? -1 : reader.GetInt32(4);
-                        textures.Add(new CustomizationTextures(texture1, texture2, texture3));
+                        int texture4 = reader.IsDBNull(6) ? -1 : reader.GetInt32(5);
+                        textures.Add(new CustomizationTextures(texture1, texture2, texture3, texture4));
                     }
                     choice.Textures = textures.ToArray();
                 }

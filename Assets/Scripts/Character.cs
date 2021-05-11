@@ -75,8 +75,8 @@ public class Character : MonoBehaviour
                 {
                     SetMaterial(renderer, i);
                 }
-                //int index = Array.FindIndex(Options, o => o.Name == "Face");
-                //animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
+                int index = Array.FindIndex(Options, o => o.Name == "Face");
+                animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
                 //demonHunter.Change = true;
                 //racial.Change = true;
                 //foreach (Collection collection in collections)
@@ -152,34 +152,17 @@ public class Character : MonoBehaviour
 
     public void ChangeFaceDropdown(int index, int index2)
     {
-        //int bone = Choices[index][Customization[index]].Bone;
-        //for (int i = 0; i < Choices[index2].Length; i++)
-        //{
-        //    if (Choices[index2][i].Extra == bone)
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-        //    }
-        //    else if (bone == 0 && Choices[index2][i].Extra == 66)
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
-        //    }
-        //    else if (bone == 6 && Choices[index2][i].Extra == 66)
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-        //    }
-        //    else if (bone == 10 && Choices[index2][i].Extra == 16)
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-        //    }
-        //    else if (bone == 0 && Choices[index2][i].Extra == 6)
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-        //    }
-        //    else
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
-        //    }
-        //}
+        for (int i = 0; i < Choices[index2].Length; i++)
+        {
+            if (Choices[index2][i].Textures[Customization[index]].Texture1 == -1)
+            {
+                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
+            }
+            else
+            {
+                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
+            }
+        }
     }
 
     public void ChangeTattooDropdown(int index, int index2)
