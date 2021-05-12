@@ -6,18 +6,22 @@ using UnityEngine;
 
 namespace WoW
 {
+    //Abstact class for handling character customization for each specific race
     public abstract class CharacterHelper
     {
+        //All the data from m2 file
         public M2 Model { get; protected set; }
+        //Emission texture used for glowing tattoos
         public Texture2D Emission { get; protected set; }
+        //Reference to a main class that handles character models
         public Character Character { get; protected set; }
 
-        public string ModelsPath { get; set; }
-        public string RacePath { get; set; }
-
+        //Reference to loaded casc data
         protected CASCHandler casc;
+        //Image converter for loading textures
         protected System.Drawing.ImageConverter converter;
 
+        //Draw Texture on top of another
         protected void DrawTexture(Texture2D texture, Texture2D layer, int i, int j, float cover = 1f)
         {
             for (int x = 0; x < layer.width; x++)
@@ -30,6 +34,7 @@ namespace WoW
             }
         }
 
+        //Overlay textures together
         protected void OverlayTexture(Texture2D texture, Texture2D layer, int i, int j)
         {
             for (int x = 0; x < layer.width; x++)
@@ -53,6 +58,7 @@ namespace WoW
             }
         }
 
+        //Multiply textures
         protected void MultiplyTexture(Texture2D texture, Texture2D layer, int i, int j)
         {
             for (int x = 0; x < layer.width; x++)
@@ -65,6 +71,7 @@ namespace WoW
             }
         }
 
+        //Generate black texture
         public void BlackTexture(Texture2D src, Texture2D dst)
         {
             for (int x = 0; x < src.width; x++)
@@ -86,6 +93,7 @@ namespace WoW
             }
         }
 
+        //Create texture from BLP file
         protected Texture2D TextureFromBLP(int file)
         {
             BLP blp = new BLP(casc.OpenFile(file));
@@ -96,12 +104,16 @@ namespace WoW
             return texture;
         }
 
+        //Change geosets according to chosen character customization
         public abstract void ChangeGeosets(List<int> activeGeosets);
 
+        //Generate skin texture from many layers
         protected abstract void LayeredTexture(Texture2D texture);
 
+        //Load texture from casc
         protected abstract int LoadTexture(M2Texture texture, int i , out bool skin);
 
+        //Load textures and store them to be used while rendering
         public abstract void LoadTextures(Texture2D[] textures);
     }
 }

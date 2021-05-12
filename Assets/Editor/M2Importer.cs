@@ -129,18 +129,18 @@ public class M2Importer : ScriptedImporter
         renderer.rootBone = bones[0];
         mesh.bindposes = bind;
         //Fill particle effect data
-        if (file.Particles.Length > 0)
-        {
-            GameObject[] particles = new GameObject[file.Particles.Length];
-            for (int i = 0; i < particles.Length; i++)
-            {
-                particles[i] = ParticleEffect(file.Particles[i]);
-                particles[i].transform.parent = bones[file.Particles[i].Bone];
-                particles[i].transform.localPosition = Vector3.zero;
-                particles[i].name = "Particle" + i;
-                ctx.AddObjectToAsset(particles[i].name, particles[i]);
-            }
-        }
+        //if (file.Particles.Length > 0)
+        //{
+        //    GameObject[] particles = new GameObject[file.Particles.Length];
+        //    for (int i = 0; i < particles.Length; i++)
+        //    {
+        //        particles[i] = ParticleEffect(file.Particles[i]);
+        //        particles[i].transform.parent = bones[file.Particles[i].Bone];
+        //        particles[i].transform.localPosition = Vector3.zero;
+        //        particles[i].name = "Particle" + i;
+        //        ctx.AddObjectToAsset(particles[i].name, particles[i]);
+        //    }
+        //}
         //Load *.bytes files so data can be easly accessible at runtime
         string path = Path.GetDirectoryName(ctx.assetPath);
         TextAsset data = AssetDatabase.LoadAssetAtPath<TextAsset>(path + "\\data.bytes");

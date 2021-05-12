@@ -10,10 +10,10 @@ namespace WoW
         //Choice's name
         public string Name { get; private set; }
         //Choice's colors
-        public Color Color1 { get; private set; }
-        public Color Color2 { get; private set; }
+        public Color Color1 { get; set; }
+        public Color Color2 { get; set; }
         //Druid form model
-        public string Model { get; private set; }
+        public int Model { get; private set; }
         //Face boneset
         public int Bone { get; private set; }
         //ID used by Blizzard for armory import
@@ -25,7 +25,7 @@ namespace WoW
         public CustomizationTextures[] Textures{ get; set; }
         
         //Constructor
-        public CustomizationChoice(int index, string name, Color color1, Color color2, string model, int bone, int id)
+        public CustomizationChoice(int index, string name, Color color1, Color color2, int model, int bone, int id)
         {
             Index = index;
             Name = name;

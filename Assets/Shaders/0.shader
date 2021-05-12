@@ -11,6 +11,8 @@ Shader "Custom/0"
 		[Enum(UnityEngine.Rendering.BlendMode)] _DstBlend("Destination Blend", Int) = 0
 		[Enum(UnityEngine.Rendering.CullMode)] _Cull("Culling", Int) = 0
 		[ToggleOff] _DepthTest("Depth Test", Float) = 1.0
+		[ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 0.0
+		[ToggleOff] _GlossyReflections("Glossy Reflections", Float) = 0.0
 	}
 
 	SubShader
@@ -24,6 +26,8 @@ Shader "Custom/0"
 		CGPROGRAM
 			#pragma surface surfaceFunction Standard fullforwardshadows
 			#pragma target 3.0
+			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
+			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF
 
 			struct Input
 			{
@@ -38,6 +42,8 @@ Shader "Custom/0"
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				OUT.Albedo = color.rgb;
 				OUT.Alpha = color.a;
+				OUT.Metallic = 0;
+				OUT.Smoothness = 0;
 			}
 		ENDCG
 	}

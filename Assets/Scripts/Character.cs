@@ -62,92 +62,90 @@ public class Character : MonoBehaviour
     {
         SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
         Animator animator = GetComponentInChildren<Animator>();
-        if (Change && Loaded)
+        if (Loaded)
         {
-            try
+            if (Change)
             {
-                Resources.UnloadUnusedAssets();
-                GC.Collect();
-                helper.ChangeGeosets(activeGeosets);
-                EquipArmor();
-                helper.LoadTextures(textures);
-                for (int i = 0; i < Model.Skin.Textures.Length; i++)
+                try
                 {
-                    SetMaterial(renderer, i);
+                    Resources.UnloadUnusedAssets();
+                    GC.Collect();
+                    helper.ChangeGeosets(activeGeosets);
+                    EquipArmor();
+                    helper.LoadTextures(textures);
+                    for (int i = 0; i < Model.Skin.Textures.Length; i++)
+                    {
+                        SetMaterial(renderer, i);
+                    }
+                    int index = Array.FindIndex(Options, o => o.Name == "Face");
+                    animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
+                    //demonHunter.Change = true;
+                    //racial.Change = true;
+                    //foreach (Collection collection in collections)
+                    //{
+                    //    collection.Change = true;
+                    //}
                 }
-                int index = Array.FindIndex(Options, o => o.Name == "Face");
-                animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
-                //demonHunter.Change = true;
-                //racial.Change = true;
-                //foreach (Collection collection in collections)
-                //{
-                //    collection.Change = true;
-                //}
+                catch (Exception e)
+                {
+                    Debug.LogException(e, this);
+                }
+                Change = false;
             }
-            catch (Exception e)
+            for (int i = 0; i < Model.Skin.Textures.Length; i++)
             {
-                Debug.LogException(e, this);
+                AnimateTextures(renderer, i);
             }
-            Change = false;
+            for (int i = 0; i < time.Length; i++)
+            {
+                time[i] += Time.deltaTime;
+            }
         }
-        //for (int i = 0; i < Model.Skin.Textures.Length; i++)
-        //{
-        //    if (Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation] != -1 || Model.Skin.Textures[i].Shader == 16404 || Model.Skin.Textures[i].Shader == 32783)
-        //    {
-        //        AnimateTexture(renderer, i);
-        //    }
-        //}
-        //for (int i = 0; i < time.Length; i++)
-        //{
-        //    time[i] += Time.deltaTime;
-        //}
     }
 
-    private void AnimateTexture(SkinnedMeshRenderer renderer, int i)
+    private void AnimateTextures(SkinnedMeshRenderer renderer, int i)
     {
-        Vector2 offset;
-        TextureAnimation animation;
-        string texture;
-        int index;
-        switch(Model.Skin.Textures[i].Shader)
-        {
-            case 16404:
-                index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
-                animation = Model.TextureAnimations[index];
-                texture = "_Second";
-                break;
-            case 32783:
-                index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
-                animation = Model.TextureAnimations[index];
-                texture = "_Smolder";
-                break;
-            default:
-                index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
-                animation = Model.TextureAnimations[index];
-                texture = "_MainTex";
-                break;
-        }
         if (renderer.materials[Model.Skin.Textures[i].Id].shader != hiddenMaterial.shader)
         {
-            offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-            if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
+            int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
+            string texture = "_Texture1";
+            if (index >= 0)
             {
-                frame[index]++;
-                if (frame[index] == animation.Translation.Timestamps[0].Length - 1)
-                {
-                    frame[index] = 0;
-                    time[index] = 0f;
-                }
+                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
+                offset = AnimateTexture(index, texture, offset);
+                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
             }
-            float timestamp = (animation.Translation.Timestamps[0][frame[index] + 1] - animation.Translation.Timestamps[0][frame[index]]) / 1000f;
-            offset.x += (animation.Translation.Values[0][frame[index]].X - animation.Translation.Values[0][frame[index] + 1].X) / timestamp * Time.deltaTime;
-            offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
-            offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
-            offset.y += (animation.Translation.Values[0][frame[index]].Y - animation.Translation.Values[0][frame[index] + 1].Y) / timestamp * Time.deltaTime;
-            offset.y = offset.y > 1 ? offset.y - 1 : offset.y;
-            offset.y = offset.y < -1 ? offset.y + 1 : offset.y;
-            renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+            index= Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
+            texture = "_Texture2";
+            if (index >= 0)
+            {
+                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
+                offset = AnimateTexture(index, texture, offset);
+                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+            }
         }
+    }
+
+    private Vector2 AnimateTexture(int index, string texture, Vector2 offset)
+    {
+        TextureAnimation animation = Model.TextureAnimations[index];
+        if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
+        {
+            frame[index]++;
+            if (frame[index] == animation.Translation.Timestamps[0].Length - 1)
+            {
+                frame[index] = 0;
+                time[index] = 0f;
+            }
+        }
+        float timestamp = (animation.Translation.Timestamps[0][frame[index] + 1] - animation.Translation.Timestamps[0][frame[index]]) / 1000f;
+        offset.x += (animation.Translation.Values[0][frame[index]].X - animation.Translation.Values[0][frame[index] + 1].X) / timestamp * Time.deltaTime;
+        offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
+        offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
+        offset.y += (animation.Translation.Values[0][frame[index]].Y - animation.Translation.Values[0][frame[index] + 1].Y) / timestamp * Time.deltaTime;
+        offset.y = offset.y > 1 ? offset.y - 1 : offset.y;
+        offset.y = offset.y < -1 ? offset.y + 1 : offset.y;
+        return offset;
     }
 
     public void ChangeFaceDropdown(int index, int index2)
@@ -190,18 +188,18 @@ public class Character : MonoBehaviour
 
     public void ChangeDropdown(int index, int index2)
     {
-        //int extra = Choices[index][Customization[index]].Extra;
-        //for (int i = 0; i < Choices[index2].Length; i++)
-        //{
-        //    if (i > extra)
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
-        //    }
-        //    else
-        //    {
-        //        ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
-        //    }
-        //}
+        int bone = Choices[index][Customization[index]].Bone;
+        for (int i = 0; i < Choices[index2].Length; i++)
+        {
+            if (i > bone)
+            {
+                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
+            }
+            else
+            {
+                ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = true;
+            }
+        }
     }
 
     public void ChangeDropdown(int index, int[] array)
@@ -443,10 +441,10 @@ public class Character : MonoBehaviour
     private void EquipChest()
     {
         //collections[2].UnloadModel();
-        //activeGeosets.RemoveAll(x => x > 799 && x < 900);
-        //activeGeosets.RemoveAll(x => x > 999 && x < 1100);
-        //activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
-        //activeGeosets.RemoveAll(x => x > 2199 && x < 2300);
+        activeGeosets.RemoveAll(x => x > 799 && x < 900);
+        activeGeosets.RemoveAll(x => x > 999 && x < 1100);
+        activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
+        activeGeosets.RemoveAll(x => x > 2199 && x < 2300);
         //if (Items[3] != null)
         //{
         //    if (Items[3].LeftModel != "")
@@ -490,10 +488,10 @@ public class Character : MonoBehaviour
         //}
         //else
         //{
-        //    activeGeosets.Add(801);
-        //    activeGeosets.Add(1001);
-        //    activeGeosets.Add(1301);
-        //    activeGeosets.Add(2201);
+            activeGeosets.Add(801);
+            activeGeosets.Add(1001);
+            activeGeosets.Add(1301);
+            activeGeosets.Add(2201);
         //}
         //if (Items[10] != null && Items[10].Geoset3 == 1)
         //{
@@ -547,7 +545,7 @@ public class Character : MonoBehaviour
     private void EquipHands()
     {
         //collections[3].UnloadModel();
-        //activeGeosets.RemoveAll(x => x > 399 && x < 500);
+        activeGeosets.RemoveAll(x => x > 399 && x < 500);
         //if (Items[8] != null)
         //{
         //    if (Items[8].LeftModel != "")
@@ -574,7 +572,7 @@ public class Character : MonoBehaviour
         //}
         //else
         //{
-        //    activeGeosets.Add(401);
+            activeGeosets.Add(401);
         //}
     }
 
@@ -583,7 +581,7 @@ public class Character : MonoBehaviour
         //collections[4].UnloadModel();
         //ItemObject buckle = GameObject.Find("buckle").GetComponent<ItemObject>();
         //buckle.UnloadModel();
-        //activeGeosets.RemoveAll(x => x > 1799 && x < 1900);
+        activeGeosets.RemoveAll(x => x > 1799 && x < 1900);
         //if (Items[9] != null)
         //{
         //    if (Items[9].RightModel != "")
@@ -611,16 +609,16 @@ public class Character : MonoBehaviour
         //}
         //else
         //{
-        //    activeGeosets.Add(1801);
+            activeGeosets.Add(1801);
         //}
     }
 
     private void EquipLegs()
     {
         //collections[5].UnloadModel();
-        //activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
-        //activeGeosets.RemoveAll(x => x > 899 && x < 1000);
-        //activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
+        activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
+        activeGeosets.RemoveAll(x => x > 899 && x < 1000);
+        activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
         //if (Items[10] != null)
         //{
         //    if (Items[10].LeftModel != "")
@@ -653,17 +651,17 @@ public class Character : MonoBehaviour
         //}
         //else
         //{
-        //    activeGeosets.Add(1101);
-        //    activeGeosets.Add(901);
-        //    activeGeosets.Add(1301);
+            activeGeosets.Add(1101);
+            activeGeosets.Add(901);
+            activeGeosets.Add(1301);
         //}
     }
 
     private void EquipFeet()
     {
         //collections[6].UnloadModel();
-        //activeGeosets.RemoveAll(x => x > 499 && x < 600);
-        //activeGeosets.RemoveAll(x => x > 1999 && x < 2100);
+        activeGeosets.RemoveAll(x => x > 499 && x < 600);
+        activeGeosets.RemoveAll(x => x > 1999 && x < 2100);
         //if (Items[11] != null)
         //{
         //    if (Items[11].LeftModel != "")
@@ -692,11 +690,11 @@ public class Character : MonoBehaviour
         //}
         //else
         //{
-        //    if (!activeGeosets.Contains(1302))
-        //    {
-        //        activeGeosets.Add(501);
-        //    }
-        //    activeGeosets.Add(2001);
+            if (!activeGeosets.Contains(1302))
+            {
+                activeGeosets.Add(501);
+            }
+            activeGeosets.Add(2001);
         //}
     }
 

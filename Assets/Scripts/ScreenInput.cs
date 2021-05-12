@@ -320,7 +320,7 @@ public class ScreenInput : MonoBehaviour
                     {
                         name += ": ";
                     }
-                    string model = reader.IsDBNull(5) ? "" : reader.GetString(5);
+                    int model = reader.IsDBNull(5) ? -1 : reader.GetInt32(5);
                     int bone = reader.IsDBNull(6) ? -1 : reader.GetInt32(6);
                     int id = reader.IsDBNull(8) ? -1 : reader.GetInt32(8);
                     choices.Add(new CustomizationChoice(index, name, color1, color2, model, bone, id));
