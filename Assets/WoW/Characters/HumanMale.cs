@@ -255,29 +255,5 @@ namespace WoW.Characters
             }
             return file;
         }
-
-        public override void LoadTextures(Texture2D[] textures)
-        {
-            bool skin;
-            for (int i = 0; i < textures.Length; i++)
-            {
-                int file = LoadTexture(Model.Textures[i], i, out skin);
-                if (file == -1)
-                {
-                    textures[i] = new Texture2D(200, 200);
-                }
-                else
-                {
-                    Texture2D texture = TextureFromBLP(file);
-                    textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
-                    textures[i].SetPixels32(texture.GetPixels32());
-                    if (skin)
-                    {
-                        LayeredTexture(textures[i]);
-                    }
-                    textures[i].Apply();
-                }
-            }
-        }
     }
 }

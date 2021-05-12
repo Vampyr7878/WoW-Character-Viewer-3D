@@ -1299,150 +1299,148 @@ public class Character : MonoBehaviour
                     helper = new HumanMale(Model, this, casc);
                     break;
                 //case 2:
-                //    helper = new OrcMale(Model, this);
+                //    helper = new OrcMale(Model, this, casc);
                 //    break;
                 //case 3:
-                //    helper = new DwarfMale(Model, this);
+                //    helper = new DwarfMale(Model, this, casc);
                 //    break;
                 //case 4:
-                //    helper = new NightElfMale(Model, this);
+                //    helper = new NightElfMale(Model, this, casc);
                 //    break;
                 //case 5:
-                //    helper = new UndeadMale(Model, this);
+                //    helper = new UndeadMale(Model, this, casc);
                 //    break;
                 //case 6:
-                //    helper = new TaurenMale(Model, this);
+                //    helper = new TaurenMale(Model, this, casc);
                 //    break;
                 //case 7:
-                //    helper = new GnomeMale(Model, this);
+                //    helper = new GnomeMale(Model, this, casc);
                 //    break;
                 //case 8:
-                //    helper = new TrollMale(Model, this);
+                //    helper = new TrollMale(Model, this, casc);
                 //    break;
                 //case 9:
-                //    helper = new GoblinMale(Model, this);
+                //    helper = new GoblinMale(Model, this, casc);
                 //    break;
                 //case 10:
-                //    helper = new BloodElfMale(Model, this);
+                //    helper = new BloodElfMale(Model, this, casc);
                 //    break;
                 //case 11:
-                //    helper = new DraeneiMale(Model, this);
+                //    helper = new DraeneiMale(Model, this, casc);
                 //    break;
                 //case 22:
-                //    helper = new WorgenMale(Model, this);
+                //    helper = new WorgenMale(Model, this, casc);
                 //    break;
                 //case 24:
-                //    helper = new PandarenMale(Model, this);
+                //    helper = new PandarenMale(Model, this, casc);
                 //    break;
                 //case 27:
-                //    helper = new NightborneMale(Model, this);
+                //    helper = new NightborneMale(Model, this, casc);
                 //    break;
                 //case 28:
-                //    helper = new HighmountainMale(Model, this);
+                //    helper = new HighmountainMale(Model, this, casc);
                 //    break;
                 //case 29:
-                //    helper = new VoidElfMale(Model, this);
+                //    helper = new VoidElfMale(Model, this, casc);
                 //    break;
                 //case 30:
-                //    helper = new LightforgedMale(Model, this);
+                //    helper = new LightforgedMale(Model, this, casc);
                 //    break;
                 //case 31:
-                //    helper = new ZandalariMale(Model, this);
+                //    helper = new ZandalariMale(Model, this, casc);
                 //    break;
                 //case 32:
-                //    helper = new KulTiranMale(Model, this);
+                //    helper = new KulTiranMale(Model, this, casc);
                 //    break;
                 //case 34:
-                //    helper = new DarkIronMale(Model, this);
+                //    helper = new DarkIronMale(Model, this, casc);
                 //    break;
                 //case 35:
-                //    helper = new VulperaMale(Model, this);
+                //    helper = new VulperaMale(Model, this, casc);
                 //    break;
                 //case 36:
-                //    helper = new MagharMale(Model, this);
+                //    helper = new MagharMale(Model, this, casc);
                 //    break;
                 //case 37:
-                //    helper = new MechagnomeMale(Model, this);
+                //    helper = new MechagnomeMale(Model, this, casc);
                 //    break;
             }
         }
-        //else
-        //{
-        //    switch (Race)
-        //    {
-        //        case 1:
-        //            helper = new HumanFemale(Model, this);
-        //            break;
-        //        case 2:
-        //            helper = new OrcFemale(Model, this);
-        //            break;
-        //        case 3:
-        //            helper = new DwarfFemale(Model, this);
-        //            break;
-        //        case 4:
-        //            helper = new NightElfFemale(Model, this);
-        //            break;
-        //        case 5:
-        //            helper = new UndeadFemale(Model, this);
-        //            break;
-        //        case 6:
-        //            helper = new TaurenFemale(Model, this);
-        //            break;
-        //        case 7:
-        //            helper = new GnomeFemale(Model, this);
-        //            break;
-        //        case 8:
-        //            helper = new TrollFemale(Model, this);
-        //            break;
-        //        case 9:
-        //            helper = new GoblinFemale(Model, this);
-        //            break;
-        //        case 10:
-        //            helper = new BloodElfFemale(Model, this);
-        //            break;
-        //        case 11:
-        //            helper = new DraeneiFemale(Model, this);
-        //            break;
-        //        case 22:
-        //            helper = new WorgenFemale(Model, this);
-        //            break;
-        //        case 24:
-        //            helper = new PandarenFemale(Model, this);
-        //            break;
-        //        case 27:
-        //            helper = new NightborneFemale(Model, this);
-        //            break;
-        //        case 28:
-        //            helper = new HighmountainFemale(Model, this);
-        //            break;
-        //        case 29:
-        //            helper = new VoidElfFemale(Model, this);
-        //            break;
-        //        case 30:
-        //            helper = new LightforgedFemale(Model, this);
-        //            break;
-        //        case 31:
-        //            helper = new ZandalariFemale(Model, this);
-        //            break;
-        //        case 32:
-        //            helper = new KulTiranFemale(Model, this);
-        //            break;
-        //        case 34:
-        //            helper = new DarkIronFemale(Model, this);
-        //            break;
-        //        case 35:
-        //            helper = new VulperaFemale(Model, this);
-        //            break;
-        //        case 36:
-        //            helper = new MagharFemale(Model, this);
-        //            break;
-        //        case 37:
-        //            helper = new MechagnomeFemale(Model, this);
-        //            break;
-        //    }
-        //}
-        //helper.ModelsPath = modelsPath;
-        //helper.RacePath = RacePath;
+        else
+        {
+            switch (Race)
+            {
+                case 1:
+                    helper = new HumanFemale(Model, this, casc);
+                    break;
+                //case 2:
+                //    helper = new OrcFemale(Model, this, casc);
+                //    break;
+                //case 3:
+                //    helper = new DwarfFemale(Model, this, casc);
+                //    break;
+                //case 4:
+                //    helper = new NightElfFemale(Model, this, casc);
+                //    break;
+                //case 5:
+                //    helper = new UndeadFemale(Model, this, casc);
+                //    break;
+                //case 6:
+                //    helper = new TaurenFemale(Model, this, casc);
+                //    break;
+                //case 7:
+                //    helper = new GnomeFemale(Model, this, casc);
+                //    break;
+                //case 8:
+                //    helper = new TrollFemale(Model, this, casc);
+                //    break;
+                //case 9:
+                //    helper = new GoblinFemale(Model, this, casc);
+                //    break;
+                //case 10:
+                //    helper = new BloodElfFemale(Model, this, casc);
+                //    break;
+                //case 11:
+                //    helper = new DraeneiFemale(Model, this, casc);
+                //    break;
+                //case 22:
+                //    helper = new WorgenFemale(Model, this, casc);
+                //    break;
+                //case 24:
+                //    helper = new PandarenFemale(Model, this, casc);
+                //    break;
+                //case 27:
+                //    helper = new NightborneFemale(Model, this, casc);
+                //    break;
+                //case 28:
+                //    helper = new HighmountainFemale(Model, this, casc);
+                //    break;
+                //case 29:
+                //    helper = new VoidElfFemale(Model, this, casc);
+                //    break;
+                //case 30:
+                //    helper = new LightforgedFemale(Model, this, casc);
+                //    break;
+                //case 31:
+                //    helper = new ZandalariFemale(Model, this, casc);
+                //    break;
+                //case 32:
+                //    helper = new KulTiranFemale(Model, this, casc);
+                //    break;
+                //case 34:
+                //    helper = new DarkIronFemale(Model, this, casc);
+                //    break;
+                //case 35:
+                //    helper = new VulperaFemale(Model, this, casc);
+                //    break;
+                //case 36:
+                //    helper = new MagharFemale(Model, this, casc);
+                //    break;
+                //case 37:
+                //    helper = new MechagnomeFemale(Model, this, casc);
+                //    break;
+            }
+        }
     }
 
     private IEnumerator LoadPrefab(string modelfile, CASCHandler casc)
