@@ -1298,9 +1298,9 @@ public class Character : MonoBehaviour
                 case 1:
                     helper = new HumanMale(Model, this, casc);
                     break;
-                //case 2:
-                //    helper = new OrcMale(Model, this, casc);
-                //    break;
+                case 2:
+                    helper = new OrcMale(Model, this, casc);
+                    break;
                 //case 3:
                 //    helper = new DwarfMale(Model, this, casc);
                 //    break;
