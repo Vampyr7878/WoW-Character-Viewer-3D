@@ -38,7 +38,7 @@ namespace WoW.Characters
                 {
                     if (Character.Choices[index2][i].Textures[Character.Customization[index]].Texture1 >= 0)
                     {
-                        Character.CustomizationDropdowns[index2].value = i;
+                        Character.CustomizationDropdowns[index2].SetValue(i);
                         break;
                     }
                 }

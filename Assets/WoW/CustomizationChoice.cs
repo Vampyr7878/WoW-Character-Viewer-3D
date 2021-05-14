@@ -16,6 +16,8 @@ namespace WoW
         public int Model { get; private set; }
         //Face boneset
         public int Bone { get; private set; }
+        //Bit mask of available classes for tha option
+        public int Class { get; private set; }
         //ID used by Blizzard for armory import
         public int ID { get; private set; }
 
@@ -25,7 +27,7 @@ namespace WoW
         public CustomizationTextures[] Textures{ get; set; }
         
         //Constructor
-        public CustomizationChoice(int index, string name, Color color1, Color color2, int model, int bone, int id)
+        public CustomizationChoice(int index, string name, Color color1, Color color2, int model, int bone, int c, int id)
         {
             Index = index;
             Name = name;
@@ -33,6 +35,7 @@ namespace WoW
             Color2 = color2;
             Model = model;
             Bone = bone;
+            Class = c;
             ID = id;
         }
     }

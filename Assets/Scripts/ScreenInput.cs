@@ -287,7 +287,7 @@ public class ScreenInput : MonoBehaviour
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + " AND Class & " + (1 << (character.Class -1)).ToString() + ";";
+                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + ";";
                 SqliteDataReader reader = command.ExecuteReader();
                 int j = 1;
                 while (reader.Read())
@@ -322,9 +322,13 @@ public class ScreenInput : MonoBehaviour
                     }
                     int model = reader.IsDBNull(5) ? -1 : reader.GetInt32(5);
                     int bone = reader.IsDBNull(6) ? -1 : reader.GetInt32(6);
+                    int c = reader.IsDBNull(7) ? -1 : reader.GetInt32(7);
                     int id = reader.IsDBNull(8) ? -1 : reader.GetInt32(8);
-                    choices.Add(new CustomizationChoice(index, name, color1, color2, model, bone, id));
-                    j++;
+                    choices.Add(new CustomizationChoice(index, name, color1, color2, model, bone, c, id));
+                    if ((choices[choices.Count - 1].Class & (1 << (character.Class - 1))) != 0)
+                    {
+                        j++;
+                    }
                 }
             }
             foreach (CustomizationChoice choice in choices)
@@ -376,6 +380,10 @@ public class ScreenInput : MonoBehaviour
         dropdown.options.Clear();
         for (int j = 0; j < character.Choices[i].Length; j++)
         {
+            if ((character.Choices[i][j].Class & (1 << (character.Class - 1))) == 0)
+            {
+                continue;
+            }
             Rect rect = sprite.textureRect;
             Texture2D texture = new Texture2D((int)rect.width + 20, (int)rect.height + 10);
             for (int x = 0; x < texture.width; x++)
@@ -403,7 +411,7 @@ public class ScreenInput : MonoBehaviour
             }
             texture.Apply();
             Sprite s = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
-            CustomOptionData data = new CustomOptionData(character.Choices[i][j].Name, s);
+            CustomOptionData data = new CustomOptionData(character.Choices[i][j].Name, s, j);
             dropdown.options.Add(data);
             ((CustomDropdown)dropdown).RefreshShownValue();
         }
@@ -730,7 +738,7 @@ public class ScreenInput : MonoBehaviour
         character.CustomizationDropdowns.Clear();
         foreach (GameObject option in customizationOptions)
         {
-            character.CustomizationDropdowns.Add(option.GetComponentInChildren<Dropdown>(true));
+            character.CustomizationDropdowns.Add(option.GetComponentInChildren<CustomDropdown>(true));
         }
     }
 
@@ -791,7 +799,7 @@ public class ScreenInput : MonoBehaviour
         ChangeButtonColors();
         ClassButton(c);
         //gilnean.gameObject.SetActive(true);
-        //character.demonHunter.UnloadModel();
+        character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
         character.LoadModel(model, casc);
         //if (character.Race == 22)
@@ -859,7 +867,7 @@ public class ScreenInput : MonoBehaviour
         ResetBorder();
         LinkDropdowns();
         ChangeButtonColors();
-        //character.demonHunter.UnloadModel();
+        character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
         character.LoadModel(model, casc);
         //gilnean.gameObject.SetActive(true);
@@ -926,7 +934,7 @@ public class ScreenInput : MonoBehaviour
         {
             EventSystem.current.SetSelectedGameObject(customizationOptions[i].GetComponentInChildren<Dropdown>(true).gameObject);
             customization[i] = customization[i] >= character.Choices[i].Length ? character.Choices[i].Length - 1 : customization[i];
-            customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = customization[i];
+            customizationOptions[i].GetComponentInChildren<CustomDropdown>(true).SetValue(customization[i]);
         }
         ChangeButtonColors();
         character.InitializeHelper(casc);
@@ -950,7 +958,7 @@ public class ScreenInput : MonoBehaviour
         buttons[index].image.sprite = sprite;
         for (int i = 0; i < customizationOptions.Count; i++)
         {
-            if (character.Options[i].Category == index + 1 && character.Choices[i].Length > 1 && character.Form == character.Options[i].Form)
+            if (character.Options[i].Category == index + 1 && customizationOptions[i].GetComponentInChildren<Dropdown>().options.Count > 1 && character.Form == character.Options[i].Form)
             {
                 customizationOptions[i].SetActive(true);
             }
@@ -963,8 +971,8 @@ public class ScreenInput : MonoBehaviour
 
     public void Dropdown(int index)
     {
-        Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
-        character.Customization[index] = dropdown.value;
+        CustomDropdown dropdown = customizationOptions[index].GetComponentInChildren<CustomDropdown>();
+        character.Customization[index] = dropdown.GetValue();
         string str = dropdown.captionText.text;
         str = str.Substring(str.IndexOf(':') + 1);
         dropdown.captionText.text = str;

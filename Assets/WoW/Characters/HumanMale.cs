@@ -40,7 +40,7 @@ namespace WoW.Characters
                 {
                     if (Character.Choices[index2][i].Textures[Character.Customization[index]].Texture1 >= 0)
                     {
-                        Character.CustomizationDropdowns[index2].value = i;
+                        Character.CustomizationDropdowns[index2].SetValue(i);
                         break;
                     }
                 }
@@ -120,7 +120,7 @@ namespace WoW.Characters
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
             if (Character.Customization[index2] > Character.Choices[index][Character.Customization[index]].Bone)
             {
-                Character.CustomizationDropdowns[index2].value = Character.Choices[index][Character.Customization[index]].Bone;
+                Character.CustomizationDropdowns[index2].SetValue(Character.Choices[index][Character.Customization[index]].Bone);
             }
             Character.ChangeDropdown(index, index2);
         }

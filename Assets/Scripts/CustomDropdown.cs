@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 //Custom dropdown that allows you to disable some options
@@ -59,5 +60,17 @@ public class CustomDropdown : Dropdown
         string text = captionText.text;
         text = text.Substring(text.IndexOf(':') + 1);
         captionText.text = text;
+    }
+
+    //Get current dropdown value index
+    public int GetValue()
+    {
+        return ((CustomOptionData)options[value]).Index;
+    }
+
+    //Set current dropdown value based on index
+    public void SetValue(int val)
+    {
+        value = options.FindIndex(x => ((CustomOptionData)x).Index == val);
     }
 }

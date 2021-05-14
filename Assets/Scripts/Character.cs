@@ -14,7 +14,7 @@ public class Character : MonoBehaviour
 {
     public Material hiddenMaterial;
     //public Collection[] collections;
-    //public Collection demonHunter;
+    public Collection demonHunter;
     //public Collection racial;
     public ScreenInput input;
 
@@ -32,7 +32,7 @@ public class Character : MonoBehaviour
 
     public bool Loaded { get; private set; }
 
-    public List<Dropdown> CustomizationDropdowns { get; set; }
+    public List<CustomDropdown> CustomizationDropdowns { get; set; }
     public string DemonHunterFile { get; set; }
     public string RacialCollection { get; set; }
     //public ItemModel[] Items { get; set; }
@@ -52,7 +52,7 @@ public class Character : MonoBehaviour
     {
         //Items = new ItemModel[13];
         modelsPath = @"character\";
-        CustomizationDropdowns = new List<Dropdown>();
+        CustomizationDropdowns = new List<CustomDropdown>();
         Gender = true;
         Change = false;
         Loaded = false;
@@ -79,7 +79,7 @@ public class Character : MonoBehaviour
                     }
                     int index = Array.FindIndex(Options, o => o.Name == "Face");
                     animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
-                    //demonHunter.Change = true;
+                    demonHunter.Change = true;
                     //racial.Change = true;
                     //foreach (Collection collection in collections)
                     //{
@@ -166,7 +166,7 @@ public class Character : MonoBehaviour
     public void ChangeTattooDropdown(int index, int index2)
     {
         int bone = Choices[index][Customization[index]].Bone;
-        for (int i = 0; i < Choices[index2].Length; i++)
+        for (int i = 0; i < CustomizationDropdowns[index2].options.Count; i++)
         {
             if (bone != 0)
             {
@@ -189,7 +189,7 @@ public class Character : MonoBehaviour
     public void ChangeDropdown(int index, int index2)
     {
         int bone = Choices[index][Customization[index]].Bone;
-        for (int i = 0; i < Choices[index2].Length; i++)
+        for (int i = 0; i < CustomizationDropdowns[index2].options.Count; i++)
         {
             if (i > bone)
             {
@@ -204,7 +204,7 @@ public class Character : MonoBehaviour
 
     public void ChangeDropdown(int index, int[] array)
     {
-        for (int i = 0; i < Choices[index].Length; i++)
+        for (int i = 0; i < CustomizationDropdowns[index].options.Count; i++)
         {
             if (array[i] == 0)
             {
@@ -1304,9 +1304,9 @@ public class Character : MonoBehaviour
                 case 3:
                     helper = new DwarfMale(Model, this, casc);
                     break;
-                //case 4:
-                //    helper = new NightElfMale(Model, this, casc);
-                //    break;
+                case 4:
+                    helper = new NightElfMale(Model, this, casc);
+                    break;
                 //case 5:
                 //    helper = new UndeadMale(Model, this, casc);
                 //    break;
@@ -1458,20 +1458,25 @@ public class Character : MonoBehaviour
         loadBinaries.Start();
         yield return null;
         activeGeosets = new List<int> { 0, 2301 };
-        //if (Race == 4 || Race == 10)
-        //{
-        //    demonHunter.Path = modelsPath + RacePath;
-        //    demonHunter.LoadModel(DemonHunterFile);
-        //}
+        while (loadBinaries.IsAlive)
+        {
+            yield return null;
+        }
+        if (Race == 4 || Race == 10)
+        {
+            demonHunter.Path = modelsPath + RacePath;
+            StartCoroutine(demonHunter.LoadModel(DemonHunterFile, casc));
+            yield return null;
+            while (!demonHunter.Loaded)
+            {
+                yield return null;
+            }
+        }
         //if (Race == 37)
         //{
         //    racial.Path = modelsPath + RacePath;
         //    racial.LoadModel(RacialCollection);
         //}
-        while(loadBinaries.IsAlive)
-        {
-            yield return null;
-        }
         if (done)
         {
             LoadColors();
