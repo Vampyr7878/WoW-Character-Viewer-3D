@@ -42,7 +42,7 @@ public class ScreenInput : MonoBehaviour
     public Text loading;
     public Character character;
     //public Gilnean gilnean;
-    //public Druid druid;
+    public Druid druid;
     public int race;
     public string itemSet;
     public bool screenshot;
@@ -54,6 +54,7 @@ public class ScreenInput : MonoBehaviour
     private SqliteConnection connection;
     private Dictionary<int, string> races;
     private Dictionary<int, string> classes;
+    private Dictionary<int, string> druidModels;
     private CASCHandler casc;
     //private List<Item> items;
     private List<GameObject> scrollItems;
@@ -86,6 +87,7 @@ public class ScreenInput : MonoBehaviour
         token = GetToken();
         races = new Dictionary<int, string>();
         classes = new Dictionary<int, string>();
+        druidModels = new Dictionary<int, string>();
         customizationOptions = new List<GameObject>();
         dbPath = "URI=file:" + Application.streamingAssetsPath + "/database.sqlite";
         connection = new SqliteConnection(dbPath);
@@ -108,6 +110,16 @@ public class ScreenInput : MonoBehaviour
             while (reader.Read())
             {
                 classes.Add(reader.GetInt32(0), reader.GetString(1));
+            }
+        }
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM DruidModels;";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                druidModels.Add(reader.GetInt32(0), reader.GetString(1));
             }
         }
         connection.Close();
@@ -262,7 +274,7 @@ public class ScreenInput : MonoBehaviour
         {
             character.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
             //gilnean.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
-            //druid.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
+            druid.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
         }
     }
 
@@ -876,7 +888,7 @@ public class ScreenInput : MonoBehaviour
         //    LoadGilnean();
         //}
         //gilnean.gameObject.SetActive(false);
-        //druid.gameObject.SetActive(false);
+        druid.gameObject.SetActive(false);
     }
 
     public void FormButton(int form)
@@ -892,8 +904,8 @@ public class ScreenInput : MonoBehaviour
         {
             case 0:
                 //gilnean.gameObject.SetActive(false);
-                //druid.gameObject.SetActive(false);
-                //character.gameObject.SetActive(true);
+                druid.gameObject.SetActive(false);
+                character.gameObject.SetActive(true);
                 Category(0);
                 break;
             case 1:
@@ -903,14 +915,14 @@ public class ScreenInput : MonoBehaviour
             case 5:
             case 6:
                 //gilnean.gameObject.SetActive(false);
-                //druid.gameObject.SetActive(true);
-                //character.gameObject.SetActive(false);
+                druid.gameObject.SetActive(true);
+                character.gameObject.SetActive(false);
                 Category(3);
                 break;
             case 7:
                 //gilnean.gameObject.SetActive(true);
-                //druid.gameObject.SetActive(false);
-                //character.gameObject.SetActive(false);
+                druid.gameObject.SetActive(false);
+                character.gameObject.SetActive(false);
                 Category(0);
                 break;
         }
@@ -992,13 +1004,39 @@ public class ScreenInput : MonoBehaviour
         {
             text.alignment = TextAnchor.MiddleCenter;
         }
-        //if (druid.gameObject.activeSelf)
-        //{
-        //    druid.LoadModel(character.Choices[index][character.Customization[index]].Model);
-        //}
+        if (druid.gameObject.activeSelf)
+        {
+            druid.LoadModel(druidModels[character.Choices[index][character.Customization[index]].Model], casc);
+            ParticleColor[] particleColors = new ParticleColor[3];
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                int start, mid, end;
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT * FROM ParticleColors WHERE ID = " + character.Choices[index][character.Customization[index]].Textures[0].Texture4 + ";";
+                SqliteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    start = reader.GetInt32(1);
+                    mid = reader.GetInt32(4);
+                    end = reader.GetInt32(7);
+                    particleColors[0] = new ParticleColor(start, mid, end);
+                    start = reader.GetInt32(2);
+                    mid = reader.GetInt32(5);
+                    end = reader.GetInt32(8);
+                    particleColors[1] = new ParticleColor(start, mid, end);
+                    start = reader.GetInt32(3);
+                    mid = reader.GetInt32(6);
+                    end = reader.GetInt32(9);
+                    particleColors[2] = new ParticleColor(start, mid, end);
+                }
+            }
+            connection.Close();
+            druid.ParticleColors = particleColors;
+        }
         character.Change = true;
         //gilnean.Change = true;
-        //druid.Change = true;
+        druid.Change = true;
     }
 
     public void PointerEnter()
@@ -1237,8 +1275,8 @@ public class ScreenInput : MonoBehaviour
             gearPanel.gameObject.SetActive(gear);
             character.Form = 0;
             //gilnean.gameObject.SetActive(false);
-            //druid.gameObject.SetActive(false);
-            //character.gameObject.SetActive(true);
+            druid.gameObject.SetActive(false);
+            character.gameObject.SetActive(true);
             SetupCategories();
             Category(0);
         }

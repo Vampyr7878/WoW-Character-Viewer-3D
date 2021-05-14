@@ -112,7 +112,7 @@ public class Character : MonoBehaviour
             if (index >= 0)
             {
                 Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, texture, offset);
+                offset = AnimateTexture(index, offset);
                 renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
             }
             index= Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
@@ -120,13 +120,13 @@ public class Character : MonoBehaviour
             if (index >= 0)
             {
                 Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, texture, offset);
+                offset = AnimateTexture(index, offset);
                 renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
             }
         }
     }
 
-    private Vector2 AnimateTexture(int index, string texture, Vector2 offset)
+    private Vector2 AnimateTexture(int index, Vector2 offset)
     {
         TextureAnimation animation = Model.TextureAnimations[index];
         if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
@@ -1259,7 +1259,10 @@ public class Character : MonoBehaviour
     private void SetTexture(Material material, int i)
     {
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
-        material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
+        if (Model.Skin.Textures[i].TextureCount > 1)
+        {
+            material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
+        }
         if (helper.Emission == null)
         {
             material.SetTexture("_Emission", Texture2D.blackTexture);
