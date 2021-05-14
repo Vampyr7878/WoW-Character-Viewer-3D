@@ -10,9 +10,9 @@ public class CustomMenu : MonoBehaviour
     [MenuItem("WoW Character Viewer/Generate *.bytes files")]
     public static void GenerateBytesFiles()
     {
-        List<string> m2 = ListFiles(@"Assets\Resources\character", ".m2");
-        List<string> skin = ListFiles(@"Assets\Resources\character", ".skin");
-        List<string> skel = ListFiles(@"Assets\Resources\character", ".skel");
+        List<string> m2 = ListFiles(@"Assets\Resources\", ".m2");
+        List<string> skin = ListFiles(@"Assets\Resources\", ".skin");
+        List<string> skel = ListFiles(@"Assets\Resources\", ".skel");
         foreach (string file in m2)
         {
             File.Copy(file, Path.GetDirectoryName(file) + "\\data.bytes", true);
@@ -31,7 +31,7 @@ public class CustomMenu : MonoBehaviour
     [MenuItem("WoW Character Viewer/Cleanup *.bytes files")]
     public static void CleanupBytesFiles()
     {
-        List<string> files = ListFiles(@"Assets\Resources\character", ".bytes");
+        List<string> files = ListFiles(@"Assets\Resources\", ".bytes");
         foreach (string file in files)
         {
             File.Delete(file);
