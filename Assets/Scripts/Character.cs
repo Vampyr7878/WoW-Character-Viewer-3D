@@ -1310,9 +1310,9 @@ public class Character : MonoBehaviour
                 case 4:
                     helper = new NightElfMale(Model, this, casc);
                     break;
-                //case 5:
-                //    helper = new UndeadMale(Model, this, casc);
-                //    break;
+                case 5:
+                    helper = new UndeadMale(Model, this, casc);
+                    break;
                 //case 6:
                 //    helper = new TaurenMale(Model, this, casc);
                 //    break;
