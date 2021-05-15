@@ -272,10 +272,15 @@ public class Collection : MonoBehaviour
     {
         DestroyImmediate(mesh);
         Loaded = false;
+        if (loadBinaries != null)
+        {
+            loadBinaries.Abort();
+        }
     }
 
     public IEnumerator LoadModel(string collectionfile, CASCHandler casc)
     {
+        UnloadModel();
         bool done = false;
         converter = new System.Drawing.ImageConverter();
         this.casc = casc;

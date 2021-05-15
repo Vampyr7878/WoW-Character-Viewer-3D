@@ -105,7 +105,7 @@ namespace WoW
         }
 
         //Load textures and store them to be used while rendering
-        public virtual void LoadTextures(Texture2D[] textures)
+        public void LoadTextures(Texture2D[] textures)
         {
             bool skin;
             for (int i = 0; i < textures.Length; i++)

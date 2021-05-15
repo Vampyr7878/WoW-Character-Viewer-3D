@@ -811,7 +811,6 @@ public class ScreenInput : MonoBehaviour
         ChangeButtonColors();
         ClassButton(c);
         //gilnean.gameObject.SetActive(true);
-        character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
         character.LoadModel(model, casc);
         //if (character.Race == 22)
@@ -879,7 +878,6 @@ public class ScreenInput : MonoBehaviour
         ResetBorder();
         LinkDropdowns();
         ChangeButtonColors();
-        character.demonHunter.UnloadModel();
         //character.racial.UnloadModel();
         character.LoadModel(model, casc);
         //gilnean.gameObject.SetActive(true);

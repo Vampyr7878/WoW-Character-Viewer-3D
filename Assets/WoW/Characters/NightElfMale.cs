@@ -324,11 +324,5 @@ namespace WoW.Characters
             }
             return file;
         }
-
-        public override void LoadTextures(Texture2D[] textures)
-        {
-            base.LoadTextures(textures);
-            //Character.demonHunter.LoadTextures();
-        }
     }
 }
