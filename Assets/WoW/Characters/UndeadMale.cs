@@ -86,8 +86,8 @@ namespace WoW.Characters
             int index, index2;
             index = Array.FindIndex(Character.Options, o => o.Name == "Face");
             index2 = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
-                Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
-                DrawTexture(texture, face, 512, 0);
+            Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+            DrawTexture(texture, face, 512, 0);
             index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
             index2 = Array.FindIndex(Character.Options, o => o.Name == "Skin Type");
             //if (!(Character.Items[3] != null && Character.Items[3].UpperLeg != "") && Character.Items[10] == null)
