@@ -1388,9 +1388,9 @@ public class Character : MonoBehaviour
                 case 5:
                     helper = new UndeadFemale(Model, this, casc);
                     break;
-                //case 6:
-                //    helper = new TaurenFemale(Model, this, casc);
-                //    break;
+                case 6:
+                    helper = new TaurenFemale(Model, this, casc);
+                    break;
                 //case 7:
                 //    helper = new GnomeFemale(Model, this, casc);
                 //    break;
