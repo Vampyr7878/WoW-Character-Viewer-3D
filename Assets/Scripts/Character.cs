@@ -1319,9 +1319,9 @@ public class Character : MonoBehaviour
                 case 7:
                     helper = new GnomeMale(Model, this, casc);
                     break;
-                //case 8:
-                //    helper = new TrollMale(Model, this, casc);
-                //    break;
+                case 8:
+                    helper = new TrollMale(Model, this, casc);
+                    break;
                 //case 9:
                 //    helper = new GoblinMale(Model, this, casc);
                 //    break;
