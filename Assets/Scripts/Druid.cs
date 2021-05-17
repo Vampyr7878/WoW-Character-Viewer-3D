@@ -16,7 +16,6 @@ public class Druid : MonoBehaviour
     private Color[] colors;
     private string modelsPath;
     private Texture2D[] textures;
-    private Texture2D[] emission;
     private float[] time;
     private int[] frame;
     //Reference to loaded casc data
@@ -257,7 +256,7 @@ public class Druid : MonoBehaviour
         if (Model.Skin.Textures[i].TextureCount > 1)
         {
             material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
-            material.SetTexture("_Emission", emission[0]);
+            material.SetTexture("_Emission", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
         }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
@@ -313,23 +312,6 @@ public class Druid : MonoBehaviour
         return file;
     }
 
-    private void LoadEmissions(int file, int i)
-    {
-        Texture2D texture;
-        int index = Array.FindIndex(character.Options, o => o.Form == character.Form);
-        if (file == -1)
-        {
-            texture = Resources.Load<Texture2D>("Materials/Emission");
-        }
-        else
-        {
-            texture = TextureFromBLP(character.Choices[index][character.Customization[index]].Textures[0].Texture2);
-        }
-        emission[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
-        emission[i].SetPixels32(texture.GetPixels32());
-        emission[i].Apply();
-    }
-
     private void LoadTextures()
     {
         for (int i = 0; i < textures.Length; i++)
@@ -346,9 +328,6 @@ public class Druid : MonoBehaviour
                 textures[i].SetPixels32(texture.GetPixels32());
                 textures[i].Apply();
             }
-            int index = Array.FindIndex(character.Options, o => o.Form == character.Form);
-            LoadEmissions(character.Choices[index][character.Customization[index]].Textures[0].Texture2, 0);
-            LoadEmissions(character.Choices[index][character.Customization[index]].Textures[0].Texture3, 1);
         }
 
     }
@@ -380,7 +359,6 @@ public class Druid : MonoBehaviour
         {
             LoadColors();
             textures = new Texture2D[Model.Textures.Length];
-            emission = new Texture2D[2];
             Transform[] bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
             yield return null;
             if (Model.Particles.Length > 0)
