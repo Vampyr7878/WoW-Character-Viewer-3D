@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle gnome male customization
     public class GnomeMale : CharacterHelper
     {
         public GnomeMale(M2 model, Character character, CASCHandler casc)

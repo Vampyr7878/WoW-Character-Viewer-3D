@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle night elf female customization
     public class NightElfFemale : CharacterHelper
     {
         public int[] eyes;

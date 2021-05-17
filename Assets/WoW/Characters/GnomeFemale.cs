@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle gnome female customization
     public class GnomeFemale : CharacterHelper
     {
         public GnomeFemale(M2 model, Character character, CASCHandler casc)

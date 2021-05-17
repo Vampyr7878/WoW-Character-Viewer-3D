@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle orc male customization
     public class OrcMale : CharacterHelper
     {
         public OrcMale(M2 model, Character character, CASCHandler casc)

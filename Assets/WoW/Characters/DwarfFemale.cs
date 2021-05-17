@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle dwarf female customization
     public class DwarfFemale : CharacterHelper
     {
         public DwarfFemale(M2 model, Character character, CASCHandler casc)

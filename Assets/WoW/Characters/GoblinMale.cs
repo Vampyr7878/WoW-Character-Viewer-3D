@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle goblin male customization
     public class GoblinMale : CharacterHelper
     {
         private int[] nose;

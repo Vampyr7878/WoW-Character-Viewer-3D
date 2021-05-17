@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle night elf male customization
     public class NightElfMale : CharacterHelper
     {
         private int[] eyes;

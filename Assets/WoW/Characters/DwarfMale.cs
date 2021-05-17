@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle dwarf male customization
     public class DwarfMale : CharacterHelper
     {
         public DwarfMale(M2 model, Character character, CASCHandler casc)

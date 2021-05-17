@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle troll female customization
     public class TrollFemale : CharacterHelper
     {
         public TrollFemale(M2 model, Character character, CASCHandler casc)

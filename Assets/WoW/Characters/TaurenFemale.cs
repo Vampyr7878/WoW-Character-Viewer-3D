@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle tauren female customization
     public class TaurenFemale : CharacterHelper
     {
         public TaurenFemale(M2 model, Character character, CASCHandler casc)
