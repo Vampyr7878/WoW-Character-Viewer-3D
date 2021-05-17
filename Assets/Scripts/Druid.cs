@@ -257,8 +257,8 @@ public class Druid : MonoBehaviour
         if (Model.Skin.Textures[i].TextureCount > 1)
         {
             material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
+            material.SetTexture("_Emission", emission[0]);
         }
-        material.SetTexture("_Emission", emission[0]);
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         if (Model.Skin.Textures[i].Color != -1)
