@@ -1322,9 +1322,9 @@ public class Character : MonoBehaviour
                 case 8:
                     helper = new TrollMale(Model, this, casc);
                     break;
-                //case 9:
-                //    helper = new GoblinMale(Model, this, casc);
-                //    break;
+                case 9:
+                    helper = new GoblinMale(Model, this, casc);
+                    break;
                 //case 10:
                 //    helper = new BloodElfMale(Model, this, casc);
                 //    break;
