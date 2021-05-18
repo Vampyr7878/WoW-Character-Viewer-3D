@@ -233,7 +233,7 @@ namespace WoW.Characters
             {
                 if (bra != null)
                 {
-                    Texture2D temp = new Texture2D(underwear.width, underwear.height, TextureFormat.ARGB32, false);
+                    Texture2D temp = new Texture2D(bra.width, bra.height, TextureFormat.ARGB32, false);
                     BlackTexture(bra, temp);
                     temp.Apply();
                     DrawTexture(Emission, temp, 256, 384);

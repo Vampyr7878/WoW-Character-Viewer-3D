@@ -1400,9 +1400,9 @@ public class Character : MonoBehaviour
                 case 9:
                     helper = new GoblinFemale(Model, this, casc);
                     break;
-                //case 10:
-                //    helper = new BloodElfFemale(Model, this, casc);
-                //    break;
+                case 10:
+                    helper = new BloodElfFemale(Model, this, casc);
+                    break;
                 //case 11:
                 //    helper = new DraeneiFemale(Model, this, casc);
                 //    break;
