@@ -438,7 +438,7 @@ public class ScreenInput : MonoBehaviour
         }
         for (int i = 0; i < character.Options.Length; i++)
         {
-            if (character.Choices[i].Length > 1 && character.Options[i].Form == character.Form)
+            if (customizationOptions[i].GetComponentInChildren<Dropdown>().options.Count > 1 && character.Options[i].Form == character.Form)
             {
                 categories[character.Options[i].Category - 1].gameObject.SetActive(true);
             }
