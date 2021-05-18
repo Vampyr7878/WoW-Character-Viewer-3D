@@ -38,6 +38,31 @@ public class CustomMenu : MonoBehaviour
         }
     }
 
+    [MenuItem("Assets/Generate *.bytes fioles")]
+    public static void GenerateBytesFilesForFolder()
+    {
+        string path = AssetDatabase.GetAssetPath(Selection.activeObject);
+        if (!Directory.Exists(path))
+        {
+            path = Path.GetDirectoryName(path);
+        }
+        List<string> m2 = ListFiles(path, ".m2");
+        List<string> skin = ListFiles(path, ".skin");
+        List<string> skel = ListFiles(path, ".skel");
+        foreach (string file in m2)
+        {
+            File.Copy(file, Path.GetDirectoryName(file) + "\\data.bytes", true);
+        }
+        foreach (string file in skin)
+        {
+            File.Copy(file, Path.GetDirectoryName(file) + "\\skin.bytes", true);
+        }
+        foreach (string file in skel)
+        {
+            File.Copy(file, Path.GetDirectoryName(file) + "\\skel.bytes", true);
+        }
+    }
+
     //Recursively search for all files with given extension in given directory.
     private static List<string> ListFiles(string path, string extension)
     {

@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
+    //Class to handle draenei male customization
     public class DraeneiMale : CharacterHelper
     {
         private int[] decorations;
