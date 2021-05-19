@@ -150,9 +150,9 @@ public class Character : MonoBehaviour
 
     public void ChangeFaceDropdown(int index, int index2)
     {
-        for (int i = 0; i < Choices[index2].Length; i++)
+        for (int i = 0; i < CustomizationDropdowns[index2].options.Count; i++)
         {
-            if (Choices[index2][i].Textures[Customization[index]].Texture1 == -1)
+            if (Choices[index2][((CustomOptionData)CustomizationDropdowns[index2].options[i]).Index].Textures[Customization[index]].Texture1 == -1)
             {
                 ((CustomOptionData)CustomizationDropdowns[index2].options[i]).Interactable = false;
             }
@@ -1331,9 +1331,9 @@ public class Character : MonoBehaviour
                 case 11:
                     helper = new DraeneiMale(Model, this, casc);
                     break;
-                //case 22:
-                //    helper = new WorgenMale(Model, this, casc);
-                //    break;
+                case 22:
+                    helper = new WorgenMale(Model, this, casc);
+                    break;
                 //case 24:
                 //    helper = new PandarenMale(Model, this, casc);
                 //    break;

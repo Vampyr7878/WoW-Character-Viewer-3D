@@ -15974,7 +15974,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &838828347
 Transform:
   m_ObjectHideFlags: 0
@@ -15998,9 +15998,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 838828346}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45c57ee0f3855f04e9fdde27afc867de, type: 3}
+  m_Script: {fileID: 11500000, guid: 199c4c7f415ea9944870fb402b46ba53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hiddenMaterial: {fileID: 2100000, guid: a21f596c570fe984a98420611af50e78, type: 2}
+  worgen: {fileID: 575538030}
 --- !u!1 &839614056
 GameObject:
   m_ObjectHideFlags: 0
@@ -32486,11 +32488,12 @@ MonoBehaviour:
   importButton: {fileID: 574449766}
   loading: {fileID: 646548374}
   character: {fileID: 575538030}
+  gilnean: {fileID: 838828348}
   druid: {fileID: 2064399971}
-  race: 11
+  race: 22
   itemSet: 
   screenshot: 0
-  gender: 0
+  gender: 1
   core: 0
   allied: 0
 --- !u!4 &1809676661

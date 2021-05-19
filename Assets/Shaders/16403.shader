@@ -24,7 +24,7 @@ Shader "Custom/16403"
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard alphatest:_AlphaCut fullforwardshadows
+			#pragma surface surfaceFunction Standard alpha:blend fullforwardshadows
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF

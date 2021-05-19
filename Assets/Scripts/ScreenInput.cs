@@ -41,7 +41,7 @@ public class ScreenInput : MonoBehaviour
     public Button importButton;
     public Text loading;
     public Character character;
-    //public Gilnean gilnean;
+    public Gilnean gilnean;
     public Druid druid;
     public int race;
     public string itemSet;
@@ -126,7 +126,6 @@ public class ScreenInput : MonoBehaviour
         //items = new List<Item>();
         scrollItems = new List<GameObject>();
         customize = false;
-        gear = false;
         RaceButton(race);
         GenderButton(gender);
     }
@@ -273,7 +272,7 @@ public class ScreenInput : MonoBehaviour
         if (rotate && Input.GetMouseButton(0))
         {
             character.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
-            //gilnean.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
+            gilnean.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
             druid.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
         }
     }
@@ -754,26 +753,26 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //private void LoadGilnean()
-    //{
-    //    string model;
-    //    connection.Open();
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT * FROM RaceModels WHERE Race = 23 AND Gender = " + character.Gender + ";";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        reader.Read();
-    //        model = reader.GetString(3);
-    //        gilnean.Suffix1 = reader.GetString(4);
-    //        gilnean.Suffix2 = reader.GetString(5);
-    //        gilnean.RacePath = reader.GetString(6);
-    //    }
-    //    connection.Close();
-    //    ClearItems();
-    //    gilnean.Gender = character.Gender;
-    //    gilnean.LoadModel(model);
-    //}
+    private void LoadGilnean()
+    {
+        string model;
+        connection.Open();
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT * FROM RaceModels WHERE Race = 23 AND Gender = " + character.Gender + ";";
+            SqliteDataReader reader = command.ExecuteReader();
+            reader.Read();
+            model = reader.GetString(3);
+            gilnean.Suffix1 = reader.GetString(4);
+            gilnean.Suffix2 = reader.GetString(5);
+            gilnean.RacePath = reader.GetString(6);
+        }
+        connection.Close();
+        //ClearItems();
+        gilnean.Gender = character.Gender;
+        gilnean.LoadModel(model, casc);
+    }
 
     public void GenderButton(bool gender)
     {
@@ -810,14 +809,17 @@ public class ScreenInput : MonoBehaviour
         LinkDropdowns();
         ChangeButtonColors();
         ClassButton(c);
-        //gilnean.gameObject.SetActive(true);
+        gilnean.gameObject.SetActive(true);
         //character.racial.UnloadModel();
         character.LoadModel(model, casc);
-        //if (character.Race == 22)
-        //{
-        //    LoadGilnean();
-        //}
-        //gilnean.gameObject.SetActive(false);
+        if (character.Race == 22)
+        {
+            LoadGilnean();
+        }
+        else
+        {
+            gilnean.UnloadModel();
+        }
     }
 
     public void RaceButton(int race)
@@ -880,12 +882,15 @@ public class ScreenInput : MonoBehaviour
         ChangeButtonColors();
         //character.racial.UnloadModel();
         character.LoadModel(model, casc);
-        //gilnean.gameObject.SetActive(true);
-        //if (race == 22)
-        //{
-        //    LoadGilnean();
-        //}
-        //gilnean.gameObject.SetActive(false);
+        gilnean.gameObject.SetActive(true);
+        if (race == 22)
+        {
+            LoadGilnean();
+        }
+        else
+        {
+            gilnean.UnloadModel();
+        }
         druid.gameObject.SetActive(false);
     }
 
@@ -901,7 +906,7 @@ public class ScreenInput : MonoBehaviour
         switch (form)
         {
             case 0:
-                //gilnean.gameObject.SetActive(false);
+                gilnean.gameObject.SetActive(false);
                 druid.gameObject.SetActive(false);
                 character.gameObject.SetActive(true);
                 Category(0);
@@ -912,13 +917,13 @@ public class ScreenInput : MonoBehaviour
             case 4:
             case 5:
             case 6:
-                //gilnean.gameObject.SetActive(false);
+                gilnean.gameObject.SetActive(false);
                 druid.gameObject.SetActive(true);
                 character.gameObject.SetActive(false);
                 Category(3);
                 break;
             case 7:
-                //gilnean.gameObject.SetActive(true);
+                gilnean.gameObject.SetActive(true);
                 druid.gameObject.SetActive(false);
                 character.gameObject.SetActive(false);
                 Category(0);
@@ -1033,7 +1038,7 @@ public class ScreenInput : MonoBehaviour
             druid.ParticleColors = particleColors;
         }
         character.Change = true;
-        //gilnean.Change = true;
+        gilnean.Change = true;
         druid.Change = true;
     }
 
@@ -1272,7 +1277,7 @@ public class ScreenInput : MonoBehaviour
             formPanel.gameObject.SetActive(false);
             gearPanel.gameObject.SetActive(gear);
             character.Form = 0;
-            //gilnean.gameObject.SetActive(false);
+            gilnean.gameObject.SetActive(false);
             druid.gameObject.SetActive(false);
             character.gameObject.SetActive(true);
             SetupCategories();
