@@ -114,7 +114,7 @@ namespace WoW.Characters
         protected override int LoadTexture(M2Texture texture, int i, out bool skin)
         {
             int file = -1;
-            int index, index2;
+            int index;
             skin = false;
             switch (texture.Type)
             {

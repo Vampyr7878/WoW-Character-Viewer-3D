@@ -200,7 +200,7 @@ namespace WoW.Characters
         protected override int LoadTexture(M2Texture texture, int i, out bool skin)
         {
             int file = -1;
-            int index, index2;
+            int index;
             skin = false;
             switch (texture.Type)
             {
@@ -223,9 +223,8 @@ namespace WoW.Characters
                 //    }
                 //    break;
                 case 6:
-                    index = Array.FindIndex(Character.Options, o => o.Name == "Hair Style");
-                    index2 = Array.FindIndex(Character.Options, o => o.Name == "Hair Color");
-                    file = Character.Choices[index2][Character.Customization[index2]].Textures[0].Texture1;
+                    index = Array.FindIndex(Character.Options, o => o.Name == "Hair Color");
+                    file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
                     break;
                 case 8:
                     index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
