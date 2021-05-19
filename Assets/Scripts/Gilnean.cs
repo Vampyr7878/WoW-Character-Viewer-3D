@@ -262,7 +262,7 @@ public class Gilnean : MonoBehaviour
             }
             else
             {
-                //helper = new GilneanFemale(Model, worgen);
+                helper = new GilneanFemale(Model, worgen, casc);
             }
             yield return null;
             time = new float[Model.TextureAnimations.Length];

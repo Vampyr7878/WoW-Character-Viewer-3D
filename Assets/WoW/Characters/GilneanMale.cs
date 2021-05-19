@@ -156,10 +156,9 @@ namespace WoW.Characters
             Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
             DrawTexture(texture, face, 512, 0);
             index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color" && o.Form == 7);
-            int file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture2;
-            if (file >= 0)
+            if (Character.Choices[index][Character.Customization[index]].Textures[0].Texture2 >= 0)
             {
-                Texture2D texture2 = TextureFromBLP(file);
+                Texture2D texture2 = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
                 OverlayTexture(texture, texture2, 0, 0);
             }
             //if (!(Character.Items[3] != null && Character.Items[3].UpperLeg != "") && Character.Items[10] == null)
