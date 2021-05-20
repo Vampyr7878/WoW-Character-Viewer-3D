@@ -1417,9 +1417,9 @@ public class Character : MonoBehaviour
                 case 28:
                     helper = new HighmountainFemale(Model, this, casc);
                     break;
-                //case 29:
-                //    helper = new VoidElfFemale(Model, this, casc);
-                //    break;
+                case 29:
+                    helper = new VoidElfFemale(Model, this, casc);
+                    break;
                 //case 30:
                 //    helper = new LightforgedFemale(Model, this, casc);
                 //    break;
