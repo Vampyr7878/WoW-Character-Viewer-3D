@@ -256,7 +256,10 @@ public class Druid : MonoBehaviour
         if (Model.Skin.Textures[i].TextureCount > 1)
         {
             material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
-            material.SetTexture("_Emission", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
+        }
+        if (Model.Skin.Textures[i].TextureCount > 2)
+        {
+            material.SetTexture("_Emission", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 2]]);
         }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
@@ -314,6 +317,7 @@ public class Druid : MonoBehaviour
 
     private void LoadTextures()
     {
+        Texture2D texture;
         for (int i = 0; i < textures.Length; i++)
         {
             int file = LoadTexture(Model.Textures[i], i);
@@ -323,14 +327,23 @@ public class Druid : MonoBehaviour
             }
             else
             {
-                Texture2D texture = TextureFromBLP(file);
+                texture = TextureFromBLP(file);
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
+                textures[i].alphaIsTransparency = true;
+                if (Model.Textures[i].Flags == 0)
+                {
+                    textures[i].wrapMode = TextureWrapMode.Clamp;
+                }
+                else
+                {
+                    textures[i].wrapMode = TextureWrapMode.Repeat;
+                }
                 textures[i].Apply();
             }
         }
-
     }
+
     public IEnumerator LoadPrefab(string modelfile, CASCHandler casc)
     {
         DestroyImmediate(mesh);

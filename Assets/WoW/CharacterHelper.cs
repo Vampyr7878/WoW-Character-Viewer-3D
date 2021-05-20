@@ -120,6 +120,15 @@ namespace WoW
                     Texture2D texture = TextureFromBLP(file);
                     textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                     textures[i].SetPixels32(texture.GetPixels32());
+                    textures[i].alphaIsTransparency = true;
+                    if (Model.Textures[i].Flags == 0)
+                    {
+                        textures[i].wrapMode = TextureWrapMode.Clamp;
+                    }
+                    else
+                    {
+                        textures[i].wrapMode = TextureWrapMode.Repeat;
+                    }
                     if (skin)
                     {
                         LayeredTexture(textures[i]);

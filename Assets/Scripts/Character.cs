@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.UI;
 using WoW;
 using WoW.Characters;
 
@@ -1343,9 +1342,9 @@ public class Character : MonoBehaviour
                 case 28:
                     helper = new HighmountainMale(Model, this, casc);
                     break;
-                //case 29:
-                //    helper = new VoidElfMale(Model, this, casc);
-                //    break;
+                case 29:
+                    helper = new VoidElfMale(Model, this, casc);
+                    break;
                 //case 30:
                 //    helper = new LightforgedMale(Model, this, casc);
                 //    break;

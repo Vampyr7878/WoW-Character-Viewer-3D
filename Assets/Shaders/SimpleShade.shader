@@ -3,7 +3,7 @@ Shader "Custom/SimpleShader"
 	Properties
 	{
 		_Texture1("Texture1", 2D) = "white" {}
-		_Texture2("Texture1", 2D) = "white" {}
+		_Texture2("Texture2", 2D) = "white" {}
 		_Emission("Emission", 2D) = "black" {}
 		_Color("Color", Color) = (1,1,1,1)
 		_AlphaCut("Alpha Cutout", Range(0,1)) = 0.0
