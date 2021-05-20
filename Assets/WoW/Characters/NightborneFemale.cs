@@ -115,6 +115,13 @@ namespace WoW.Characters
                 //Character.BlackFeet(Emission);
                 Emission.Apply();
             }
+            index = Array.FindIndex(Character.Options, o => o.Name == "Hair Style");
+            index2 = Array.FindIndex(Character.Options, o => o.Name == "Hair Color");
+            if (Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1 >= 0)
+            {
+                Texture2D scalp = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+                DrawTexture(texture, scalp, 512, 0);
+            }
             //Character.TextureShirt(texture);
             //if (!(Character.Items[4] != null && Character.Items[4].Geoset1 != 0))
             //{
