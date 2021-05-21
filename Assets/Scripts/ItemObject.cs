@@ -79,7 +79,7 @@ public class ItemObject : MonoBehaviour
         }
         else
         {
-            material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
+            material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
         }
         if (material == null)
         {

@@ -89,7 +89,7 @@ namespace WoW.Characters
                 else
                 {
                     Color c;
-                    ColorUtility.TryParseHtmlString("#" + colors[i].ToString("X8").Substring(2), out c);
+                    ColorUtility.TryParseHtmlString($"#{colors[i].ToString("X8").Substring(2)}", out c);
                     Character.Choices[index2][i].Color1 = c;
                 }
             }

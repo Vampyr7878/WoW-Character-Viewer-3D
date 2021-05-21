@@ -89,7 +89,7 @@ public class ScreenInput : MonoBehaviour
         classes = new Dictionary<int, string>();
         druidModels = new Dictionary<int, string>();
         customizationOptions = new List<GameObject>();
-        dbPath = "URI=file:" + Application.streamingAssetsPath + "/database.sqlite";
+        dbPath = $"URI=file:{Application.streamingAssetsPath}/database.sqlite";
         connection = new SqliteConnection(dbPath);
         connection.Open();
         using (SqliteCommand command = connection.CreateCommand())
@@ -298,13 +298,13 @@ public class ScreenInput : MonoBehaviour
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT * FROM Customization WHERE Option = " + character.Options[i].ID + ";";
+                command.CommandText = $"SELECT * FROM Customization WHERE Option = {character.Options[i].ID};";
                 SqliteDataReader reader = command.ExecuteReader();
                 int j = 1;
                 while (reader.Read())
                 {
                     int index = reader.GetInt32(0);
-                    string name = reader.IsDBNull(2) ? j.ToString() : j.ToString() + ": " + reader.GetString(2);
+                    string name = reader.IsDBNull(2) ? j.ToString() : $"{j}: {reader.GetString(2)}";
                     int color;
                     Color color1, color2;
                     if (reader.IsDBNull(3))
@@ -315,7 +315,7 @@ public class ScreenInput : MonoBehaviour
                     else
                     {
                         color = reader.GetInt32(3);
-                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color1);
+                        ColorUtility.TryParseHtmlString($"#{color.ToString("X8").Substring(2)}", out color1);
                     }
                     if (reader.IsDBNull(4))
                     {
@@ -325,11 +325,11 @@ public class ScreenInput : MonoBehaviour
                     else
                     {
                         color = reader.GetInt32(4);
-                        ColorUtility.TryParseHtmlString("#" + color.ToString("X8").Substring(2), out color2);
+                        ColorUtility.TryParseHtmlString($"#{color.ToString("X8").Substring(2)}", out color2);
                     }
                     if (color1 != Color.clear)
                     {
-                        name += ": ";
+                        name = $"{name}: ";
                     }
                     int model = reader.IsDBNull(5) ? -1 : reader.GetInt32(5);
                     int bone = reader.IsDBNull(6) ? -1 : reader.GetInt32(6);
@@ -348,7 +348,7 @@ public class ScreenInput : MonoBehaviour
                 {
                     List<CustomizationGeosets> geosets = new List<CustomizationGeosets>();
                     command.CommandType = CommandType.Text;
-                    command.CommandText = "SELECT * FROM CustomizationGeosets WHERE Customization = " + choice.Index + ";";
+                    command.CommandText = $"SELECT * FROM CustomizationGeosets WHERE Customization = {choice.Index};";
                     SqliteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -363,7 +363,7 @@ public class ScreenInput : MonoBehaviour
                 {
                     List<CustomizationTextures> textures = new List<CustomizationTextures>();
                     command.CommandType = CommandType.Text;
-                    command.CommandText = "SELECT * FROM CustomizationTextures WHERE Customization = " + choice.Index + ";";
+                    command.CommandText = $"SELECT * FROM CustomizationTextures WHERE Customization = {choice.Index};";
                     SqliteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -456,7 +456,7 @@ public class ScreenInput : MonoBehaviour
         {
             List<CustomizationOption> options = new List<CustomizationOption>();
             command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM CustomizationOptions WHERE Race = " + character.Race + " AND Gender = " + character.Gender + ";";
+            command.CommandText = $"SELECT * FROM CustomizationOptions WHERE Race = {character.Race} AND Gender = {character.Gender};";
             SqliteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -760,7 +760,7 @@ public class ScreenInput : MonoBehaviour
         using (SqliteCommand command = connection.CreateCommand())
         {
             command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM RaceModels WHERE Race = 23 AND Gender = " + character.Gender + ";";
+            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = 23 AND Gender = {character.Gender};";
             SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
             model = reader.GetString(3);
@@ -788,7 +788,7 @@ public class ScreenInput : MonoBehaviour
         using (SqliteCommand command = connection.CreateCommand())
         {
             command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + character.Race + " AND Gender = " + gender + ";";
+            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {character.Race} AND Gender = {gender};";
             SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
             model = reader.GetString(3);
@@ -848,7 +848,7 @@ public class ScreenInput : MonoBehaviour
         using (SqliteCommand command = connection.CreateCommand())
         {
             command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM RaceClassCombos WHERE Race = " + race + ";";
+            command.CommandText = $"SELECT * FROM RaceClassCombos WHERE Race = {race};";
             SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
             for (int i = 0; i < classButtons.Length; i++)
@@ -860,7 +860,7 @@ public class ScreenInput : MonoBehaviour
         using (SqliteCommand command = connection.CreateCommand())
         {
             command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM RaceModels WHERE Race = " + race + " AND Gender = " + character.Gender + ";";
+            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {race} AND Gender = {character.Gender};";
             SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
             model = reader.GetString(3);
@@ -1016,7 +1016,7 @@ public class ScreenInput : MonoBehaviour
             {
                 int start, mid, end;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT * FROM ParticleColors WHERE ID = " + character.Choices[index][character.Customization[index]].Textures[0].Texture4 + ";";
+                command.CommandText = $"SELECT * FROM ParticleColors WHERE ID = {character.Choices[index][character.Customization[index]].Textures[0].Texture4};";
                 SqliteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {

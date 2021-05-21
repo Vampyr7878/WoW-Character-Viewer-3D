@@ -1,5 +1,4 @@
-﻿using BLPLib;
-using CASCLib;
+﻿using CASCLib;
 using M2Lib;
 using System;
 using System.Collections;
@@ -8,33 +7,18 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class Druid : MonoBehaviour
+//Class to render druid forms models
+public class Druid : ModelRenderer
 {
+    //Reference to the character
     public Character character;
 
-    private GameObject mesh;
-    private Color[] colors;
-    private string modelsPath;
-    private Texture2D[] textures;
-    private float[] time;
-    private int[] frame;
-    //Reference to loaded casc data
-    private CASCHandler casc;
-    //Image converter for loading textures
-    private System.Drawing.ImageConverter converter;
-    private Thread loadBinaries;
-
-    public M2 Model { get; private set; }
-
+    //Particle colors from database
     public ParticleColor[] ParticleColors { get; set; }
-    public string OptionName { get; set; }
-    public bool Change { get; set; }
-    public bool Loaded { get; set; }
-    public int TextureIndex { get; private set; }
-    public string[] TextureFiles { get; set; }
 
     private void Start()
     {
+        //Initiazlie path
         modelsPath = @"creature\";
     }
 
@@ -44,6 +28,7 @@ public class Druid : MonoBehaviour
         Transform camera = Camera.main.transform;
         if (Loaded)
         {
+            //Steup and render model
             if (Change)
             {
                 try
@@ -63,6 +48,7 @@ public class Druid : MonoBehaviour
                 }
                 Change = false;
             }
+            //Rotate billboards
             for (int i = 0; i < Model.Skeleton.Bones.Length; i++)
             {
                 if ((Model.Skeleton.Bones[i].Flags & 0x8) != 0)
@@ -70,6 +56,7 @@ public class Druid : MonoBehaviour
                     renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x, camera.eulerAngles.y - 90, camera.eulerAngles.z);
                 }
             }
+            //Animate textures
             if (character.Loaded)
             {
                 for (int i = 0; i < Model.Skin.Textures.Length; i++)
@@ -84,7 +71,8 @@ public class Druid : MonoBehaviour
         }
     }
 
-    private void AnimateTextures(SkinnedMeshRenderer renderer, int i)
+    //Animate current texture unit if it has any animations
+    private new void AnimateTextures(SkinnedMeshRenderer renderer, int i)
     {
         int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
         string texture = "_Texture1";
@@ -108,35 +96,10 @@ public class Druid : MonoBehaviour
         }
     }
 
-    private Vector2 AnimateTexture(int index, Vector2 offset)
+    //Set material with proper shader
+    protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
-        if (index >= Model.TextureAnimations.Length)
-        {
-            return offset;
-        }
-        TextureAnimation animation = Model.TextureAnimations[index];
-        if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
-        {
-            frame[index]++;
-            if (frame[index] == animation.Translation.Timestamps[0].Length - 1)
-            {
-                frame[index] = 0;
-                time[index] = 0f;
-            }
-        }
-        float timestamp = (animation.Translation.Timestamps[0][frame[index] + 1] - animation.Translation.Timestamps[0][frame[index]]) / 1000f;
-        offset.x += (animation.Translation.Values[0][frame[index]].X - animation.Translation.Values[0][frame[index] + 1].X) / timestamp * Time.deltaTime;
-        offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
-        offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
-        offset.y += (animation.Translation.Values[0][frame[index]].Y - animation.Translation.Values[0][frame[index] + 1].Y) / timestamp * Time.deltaTime;
-        offset.y = offset.y > 1 ? offset.y - 1 : offset.y;
-        offset.y = offset.y < -1 ? offset.y + 1 : offset.y;
-        return offset;
-    }
-
-    private void SetMaterial(SkinnedMeshRenderer renderer, int i)
-    {
-        Material material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
+        Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
         if (material == null)
         {
             Debug.LogError(Model.Skin.Textures[i].Shader);
@@ -147,6 +110,7 @@ public class Druid : MonoBehaviour
         SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
     }
 
+    //Setup particle effects for rendering
     private void ParticleEffects()
     {
         ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
@@ -200,57 +164,8 @@ public class Druid : MonoBehaviour
         }
     }
 
-    private BlendMode SrcBlend(short value)
-    {
-        BlendMode blend = BlendMode.One;
-        switch (value)
-        {
-            case 0:
-            case 1:
-            case 7:
-                blend = BlendMode.One;
-                break;
-            case 2:
-            case 4:
-                blend = BlendMode.SrcAlpha;
-                break;
-            case 3:
-                blend = BlendMode.SrcColor;
-                break;
-            case 5:
-            case 6:
-                blend = BlendMode.DstColor;
-                break;
-        }
-        return blend;
-    }
-
-    private BlendMode DstBlend(short value)
-    {
-        BlendMode blend = BlendMode.Zero;
-        switch (value)
-        {
-            case 0:
-            case 1:
-            case 5:
-                blend = BlendMode.Zero;
-                break;
-            case 2:
-            case 7:
-                blend = BlendMode.OneMinusSrcAlpha;
-                break;
-            case 3:
-            case 4:
-                blend = BlendMode.One;
-                break;
-            case 6:
-                blend = BlendMode.SrcColor;
-                break;
-        }
-        return blend;
-    }
-
-    private void SetTexture(Material material, int i)
+    //Setup all the material properties
+    protected override void SetTexture(Material material, int i)
     {
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
         if (Model.Skin.Textures[i].TextureCount > 1)
@@ -272,27 +187,8 @@ public class Druid : MonoBehaviour
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
     }
-
-    private void LoadColors()
-    {
-        colors = new Color[Model.Colors.Length];
-        for (int i = 0; i < colors.Length; i++)
-        {
-            colors[i] = new Color(Model.Colors[i].R / 255f, Model.Colors[i].G / 255f, Model.Colors[i].B / 255f, 1.0f);
-        }
-    }
-
-    //Create texture from BLP file
-    protected Texture2D TextureFromBLP(int file)
-    {
-        BLP blp = new BLP(casc.OpenFile(file));
-        System.Drawing.Bitmap image = blp.GetImage();
-        Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
-        texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
-        texture.alphaIsTransparency = true;
-        return texture;
-    }
-
+    
+    //Load specific texture
     private int LoadTexture(M2Texture texture, int i)
     {
         int file = -1;
@@ -315,6 +211,7 @@ public class Druid : MonoBehaviour
         return file;
     }
 
+    //Load and prepare all model textures
     private void LoadTextures()
     {
         Texture2D texture;
@@ -344,6 +241,7 @@ public class Druid : MonoBehaviour
         }
     }
 
+    //Load and setup model prefab
     public IEnumerator LoadPrefab(string modelfile, CASCHandler casc)
     {
         DestroyImmediate(mesh);
@@ -354,7 +252,7 @@ public class Druid : MonoBehaviour
         bool done = false;
         converter = new System.Drawing.ImageConverter();
         this.casc = casc;
-        GameObject prefab = Resources.Load<GameObject>(modelsPath + modelfile + "_prefab");
+        GameObject prefab = Resources.Load<GameObject>($"{modelsPath}{modelfile}_prefab");
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
         M2Model m2 = GetComponentInChildren<M2Model>();
@@ -382,7 +280,7 @@ public class Druid : MonoBehaviour
                     particles[i] = ParticleEffect(Model.Particles[i]);
                     particles[i].transform.parent = bones[Model.Particles[i].Bone];
                     particles[i].transform.localPosition = Vector3.zero;
-                    particles[i].name = "Particle" + i;
+                    particles[i].name = $"Particle{i}";
                     yield return null;
                 }
             }
@@ -399,6 +297,7 @@ public class Druid : MonoBehaviour
         }
     }
 
+    //Load druid form model
     public void LoadModel(string modelfile, CASCHandler casc)
     {
         Loaded = false;

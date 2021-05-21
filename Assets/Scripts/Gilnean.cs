@@ -1,5 +1,4 @@
 ﻿using CASCLib;
-using M2Lib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,30 +8,17 @@ using UnityEngine.Rendering;
 using WoW;
 using WoW.Characters;
 
-public class Gilnean : MonoBehaviour
+public class Gilnean : ModelRenderer
 {
-    public Material hiddenMaterial;
     public Character worgen;
 
     private CharacterHelper helper;
-    private GameObject mesh;
-    private Color[] colors;
     private List<int> activeGeosets;
-    private string modelsPath;
-    private Texture2D[] textures;
-    private float[] time;
-    private int[] frame;
-    private Thread loadBinaries;
-
-    public M2 Model { get; private set; }
-
-    public bool Loaded { get; private set; }
 
     public string Suffix1 { get; set; }
     public string Suffix2 { get; set; }
     public string RacePath { get; set; }
     public bool Gender { get; set; }
-    public bool Change { get; set; }
 
     private void Start()
     {
@@ -73,56 +59,11 @@ public class Gilnean : MonoBehaviour
         }
     }
 
-    private void AnimateTextures(SkinnedMeshRenderer renderer, int i)
-    {
-        if (renderer.materials[Model.Skin.Textures[i].Id].shader != hiddenMaterial.shader)
-        {
-            int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
-            string texture = "_Texture1";
-            if (index >= 0)
-            {
-                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, offset);
-                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
-            }
-            index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
-            texture = "_Texture2";
-            if (index >= 0)
-            {
-                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, offset);
-                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
-            }
-        }
-    }
-
-    private Vector2 AnimateTexture(int index, Vector2 offset)
-    {
-        TextureAnimation animation = Model.TextureAnimations[index];
-        if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
-        {
-            frame[index]++;
-            if (frame[index] == animation.Translation.Timestamps[0].Length - 1)
-            {
-                frame[index] = 0;
-                time[index] = 0f;
-            }
-        }
-        float timestamp = (animation.Translation.Timestamps[0][frame[index] + 1] - animation.Translation.Timestamps[0][frame[index]]) / 1000f;
-        offset.x += (animation.Translation.Values[0][frame[index]].X - animation.Translation.Values[0][frame[index] + 1].X) / timestamp * Time.deltaTime;
-        offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
-        offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
-        offset.y += (animation.Translation.Values[0][frame[index]].Y - animation.Translation.Values[0][frame[index] + 1].Y) / timestamp * Time.deltaTime;
-        offset.y = offset.y > 1 ? offset.y - 1 : offset.y;
-        offset.y = offset.y < -1 ? offset.y + 1 : offset.y;
-        return offset;
-    }
-
-    private void SetMaterial(SkinnedMeshRenderer renderer, int i)
+    protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
         if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            Material material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
+            Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
             renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
             renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
             renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
@@ -136,57 +77,7 @@ public class Gilnean : MonoBehaviour
         }
     }
 
-    private BlendMode SrcBlend(short value)
-    {
-        BlendMode blend = BlendMode.One;
-        switch (value)
-        {
-            case 0:
-            case 1:
-            case 7:
-                blend = BlendMode.One;
-                break;
-            case 2:
-            case 4:
-                blend = BlendMode.SrcAlpha;
-                break;
-            case 3:
-                blend = BlendMode.SrcColor;
-                break;
-            case 5:
-            case 6:
-                blend = BlendMode.DstColor;
-                break;
-        }
-        return blend;
-    }
-
-    private BlendMode DstBlend(short value)
-    {
-        BlendMode blend = BlendMode.Zero;
-        switch (value)
-        {
-            case 0:
-            case 1:
-            case 5:
-                blend = BlendMode.Zero;
-                break;
-            case 2:
-            case 7:
-                blend = BlendMode.OneMinusSrcAlpha;
-                break;
-            case 3:
-            case 4:
-                blend = BlendMode.One;
-                break;
-            case 6:
-                blend = BlendMode.SrcColor;
-                break;
-        }
-        return blend;
-    }
-
-    private void SetTexture(Material material, int i)
+    protected override void SetTexture(Material material, int i)
     {
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
         if (Model.Skin.Textures[i].TextureCount > 1)
@@ -213,15 +104,6 @@ public class Gilnean : MonoBehaviour
         material.SetFloat("_DepthTest", depth);
     }
 
-    private void LoadColors()
-    {
-        colors = new Color[Model.Colors.Length];
-        for (int i = 0; i < colors.Length; i++)
-        {
-            colors[i] = new Color(Model.Colors[i].R / 255f, Model.Colors[i].G / 255f, Model.Colors[i].B / 255f, 1.0f);
-        }
-    }
-
     public void UnloadModel()
     {
         DestroyImmediate(mesh);
@@ -236,7 +118,7 @@ public class Gilnean : MonoBehaviour
     {
         bool done = false;
         DestroyImmediate(mesh);
-        GameObject prefab = Resources.Load<GameObject>(modelsPath + RacePath + modelfile + "_prefab");
+        GameObject prefab = Resources.Load<GameObject>($"{modelsPath}{RacePath}{modelfile}_prefab");
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
         M2Model m2 = GetComponentInChildren<M2Model>();

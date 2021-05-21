@@ -8,30 +8,20 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class Collection : MonoBehaviour
+//Class to render any collection system models
+public class Collection : ModelRenderer
 {
-    public Material hiddenMaterial;
+    //Reference to the character wearing that collection
     public Character character;
 
-    private GameObject mesh;
-    private Color[] colors;
-    private Texture2D[] textures;
-    private float[] time;
-    private int[] frame;
-    //Reference to loaded casc data
-    private CASCHandler casc;
-    //Image converter for loading textures
-    private System.Drawing.ImageConverter converter;
-    private Thread loadBinaries;
-
-    public M2 Model { get; protected set; }
-
+    //List of geosets that are enabled for loading
     public List<int> ActiveGeosets { get; set; }
-    public bool Change { get; set; }
-    public bool Loaded { get; set; }
+    //Path where the model is located
     public string Path { get; set; }
+    //Changable texture from database
     public int Texture { get; set; }
 
+    //Set the model to not loaded at start
     private void Start()
     {
         Change = false;
@@ -43,6 +33,7 @@ public class Collection : MonoBehaviour
         SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
         if (Loaded)
         {
+            //Render the model
             if (Change)
             {
                 Resources.UnloadUnusedAssets();
@@ -53,6 +44,7 @@ public class Collection : MonoBehaviour
                 }
                 Change = false;
             }
+            //Animate textures
             if (character.Loaded)
             {
                 for (int i = 0; i < Model.Skin.Textures.Length; i++)
@@ -71,56 +63,12 @@ public class Collection : MonoBehaviour
         }
     }
 
-    private void AnimateTextures(SkinnedMeshRenderer renderer, int i)
-    {
-        if (renderer.materials[Model.Skin.Textures[i].Id].shader != hiddenMaterial.shader)
-        {
-            int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
-            string texture = "_Texture1";
-            if (index >= 0)
-            {
-                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, offset);
-                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
-            }
-            index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
-            texture = "_Texture2";
-            if (index >= 0)
-            {
-                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, offset);
-                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
-            }
-        }
-    }
-
-    private Vector2 AnimateTexture(int index, Vector2 offset)
-    {
-        TextureAnimation animation = Model.TextureAnimations[index];
-        if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
-        {
-            frame[index]++;
-            if (frame[index] == animation.Translation.Timestamps[0].Length - 1)
-            {
-                frame[index] = 0;
-                time[index] = 0f;
-            }
-        }
-        float timestamp = (animation.Translation.Timestamps[0][frame[index] + 1] - animation.Translation.Timestamps[0][frame[index]]) / 1000f;
-        offset.x += (animation.Translation.Values[0][frame[index]].X - animation.Translation.Values[0][frame[index] + 1].X) / timestamp * Time.deltaTime;
-        offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
-        offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
-        offset.y += (animation.Translation.Values[0][frame[index]].Y - animation.Translation.Values[0][frame[index] + 1].Y) / timestamp * Time.deltaTime;
-        offset.y = offset.y > 1 ? offset.y - 1 : offset.y;
-        offset.y = offset.y < -1 ? offset.y + 1 : offset.y;
-        return offset;
-    }
-
-    private void SetMaterial(SkinnedMeshRenderer renderer, int i)
+    //Set material with proper shader
+    protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
         if (ActiveGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            Material material = Resources.Load<Material>(@"Materials\" + Model.Skin.Textures[i].Shader);
+            Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
             if (material == null)
             {
                 Debug.LogError(Model.Skin.Textures[i].Shader);
@@ -138,57 +86,8 @@ public class Collection : MonoBehaviour
         }
     }
 
-    private BlendMode SrcBlend(short value)
-    {
-        BlendMode blend = BlendMode.One;
-        switch (value)
-        {
-            case 0:
-            case 1:
-            case 7:
-                blend = BlendMode.One;
-                break;
-            case 2:
-            case 4:
-                blend = BlendMode.SrcAlpha;
-                break;
-            case 3:
-                blend = BlendMode.SrcColor;
-                break;
-            case 5:
-            case 6:
-                blend = BlendMode.DstColor;
-                break;
-        }
-        return blend;
-    }
-
-    private BlendMode DstBlend(short value)
-    {
-        BlendMode blend = BlendMode.Zero;
-        switch (value)
-        {
-            case 0:
-            case 1:
-            case 5:
-                blend = BlendMode.Zero;
-                break;
-            case 2:
-            case 7:
-                blend = BlendMode.OneMinusSrcAlpha;
-                break;
-            case 3:
-            case 4:
-                blend = BlendMode.One;
-                break;
-            case 6:
-                blend = BlendMode.SrcColor;
-                break;
-        }
-        return blend;
-    }
-
-    private void SetTexture(Material material, int i)
+    //Setup all the material properties
+    protected override void SetTexture(Material material, int i)
     {
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
         if (Model.Skin.Textures[i].TextureCount > 1)
@@ -207,26 +106,7 @@ public class Collection : MonoBehaviour
         material.SetFloat("_DepthTest", depth);
     }
 
-    private void LoadColors()
-    {
-        colors = new Color[Model.Colors.Length];
-        for (int i = 0; i < colors.Length; i++)
-        {
-            colors[i] = new Color(Model.Colors[i].R / 255f, Model.Colors[i].G / 255f, Model.Colors[i].B / 255f, 1.0f);
-        }
-    }
-
-    //Create texture from BLP file
-    protected Texture2D TextureFromBLP(int file)
-    {
-        BLP blp = new BLP(casc.OpenFile(file));
-        System.Drawing.Bitmap image = blp.GetImage();
-        Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
-        texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
-        texture.alphaIsTransparency = true;
-        return texture;
-    }
-
+    //Load specific texture
     private int LoadTexture(M2Texture texture, int i)
     {
         int file = -1;
@@ -247,6 +127,7 @@ public class Collection : MonoBehaviour
         return file;
     }
 
+    //Load and prepare all model textures
     public void LoadTextures()
     {
         for (int i = 0; i < textures.Length; i++)
@@ -275,6 +156,7 @@ public class Collection : MonoBehaviour
         }
     }
 
+    //Unload the model
     public void UnloadModel()
     {
         DestroyImmediate(mesh);
@@ -285,13 +167,14 @@ public class Collection : MonoBehaviour
         }
     }
 
+    //Load the model
     public IEnumerator LoadModel(string collectionfile, CASCHandler casc)
     {
         UnloadModel();
         bool done = false;
         converter = new System.Drawing.ImageConverter();
         this.casc = casc;
-        GameObject prefab = Resources.Load<GameObject>(Path + collectionfile);
+        GameObject prefab = Resources.Load<GameObject>($"{Path}{collectionfile}");
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
         M2Model m2 = GetComponentInChildren<M2Model>();

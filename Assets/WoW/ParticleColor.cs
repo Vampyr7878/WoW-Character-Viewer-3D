@@ -14,11 +14,11 @@ public class ParticleColor
     public ParticleColor(int start, int mid, int end)
     {
         Color color;
-        ColorUtility.TryParseHtmlString("#" + start.ToString("X8").Substring(2), out color);
+        ColorUtility.TryParseHtmlString($"#{start.ToString("X8").Substring(2)}", out color);
         Start = color;
-        ColorUtility.TryParseHtmlString("#" + mid.ToString("X8").Substring(2), out color);
+        ColorUtility.TryParseHtmlString($"#{mid.ToString("X8").Substring(2)}", out color);
         Mid = color;
-        ColorUtility.TryParseHtmlString("#" + end.ToString("X8").Substring(2), out color);
+        ColorUtility.TryParseHtmlString($"#{end.ToString("X8").Substring(2)}", out color);
         End = color;
     }
 }
