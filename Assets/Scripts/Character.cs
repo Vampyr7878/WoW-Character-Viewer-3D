@@ -1308,9 +1308,9 @@ public class Character : ModelRenderer
                 case 31:
                     helper = new ZandalariFemale(Model, this, casc);
                     break;
-                //case 32:
-                //    helper = new KulTiranFemale(Model, this, casc);
-                //    break;
+                case 32:
+                    helper = new KulTiranFemale(Model, this, casc);
+                    break;
                 //case 34:
                 //    helper = new DarkIronFemale(Model, this, casc);
                 //    break;
