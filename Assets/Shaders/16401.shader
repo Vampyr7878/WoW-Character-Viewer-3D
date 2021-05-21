@@ -17,14 +17,14 @@ Shader "Custom/16401"
 
 	SubShader
 	{
-		Tags { "Queue" = "AlphaTest" "RenderType" = "TransparentCutout" }
+		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
 		ZWrite[_DepthTest]
-		Blend[_SrcBlend][_DstBlend]
+		Blend SrcAlpha One
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard alphatest:_AlphaCut fullforwardshadows
+			#pragma surface surfaceFunction Standard fullforwardshadows keepalpha
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF
@@ -48,7 +48,7 @@ Shader "Custom/16401"
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
 				OUT.Albedo = color.rgb;
 				color *= emission;
-				OUT.Alpha = color.a;
+				OUT.Alpha = mask.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
 				OUT.Emission = emission;

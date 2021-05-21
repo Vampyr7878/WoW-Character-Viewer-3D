@@ -170,7 +170,6 @@ public class Collection : ModelRenderer
     //Load the model
     public IEnumerator LoadModel(string collectionfile, CASCHandler casc)
     {
-        UnloadModel();
         bool done = false;
         converter = new System.Drawing.ImageConverter();
         this.casc = casc;

@@ -70,9 +70,9 @@ namespace WoW.Characters
             Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
             DrawTexture(texture, face, 512, 0);
             index = Array.FindIndex(Character.Options, o => o.Name == "Tattoo");
-            if (Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1 >= 0)
+            if (Character.Choices[index][Character.Customization[index]].Textures[0].Texture1 >= 0)
             {
-                Texture2D tattoo = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+                Texture2D tattoo = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture1);
                 DrawTexture(texture, tattoo, 0, 0);
             }
             index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");

@@ -1315,9 +1315,9 @@ public class Character : ModelRenderer
                 case 32:
                     helper = new KulTiranFemale(Model, this, casc);
                     break;
-                //case 34:
-                //    helper = new DarkIronFemale(Model, this, casc);
-                //    break;
+                case 34:
+                    helper = new DarkIronFemale(Model, this, casc);
+                    break;
                 //case 35:
                 //    helper = new VulperaFemale(Model, this, casc);
                 //    break;
@@ -1335,6 +1335,7 @@ public class Character : ModelRenderer
     {
         bool done = false;
         DestroyImmediate(mesh);
+        demonHunter.UnloadModel();
         GameObject prefab = Resources.Load<GameObject>($"{modelsPath}{RacePath}{modelfile}_prefab");
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
