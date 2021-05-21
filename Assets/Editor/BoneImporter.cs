@@ -52,7 +52,7 @@ public class BoneImporter : ScriptedImporter
             }
             matrix = new Matrix4x4(columns[0], columns[1], columns[2], columns[3]);
             value = -matrix.m03 / 2 + bones[file.Bones[i]].localPosition.x;
-            curve = AnimationCurve.Linear(0f, value, 0.1f, value); ;
+            curve = AnimationCurve.Linear(0f, value, 0.1f, value);
             clip.SetCurve(path, typeof(Transform), "localPosition.x", curve);
             value = matrix.m23 / 2 + bones[file.Bones[i]].localPosition.y;
             curve = AnimationCurve.Linear(0f, value, 0.1f, value);
