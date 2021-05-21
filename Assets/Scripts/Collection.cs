@@ -231,6 +231,7 @@ public class Collection : ModelRenderer
                 yield return null;
             }
             Loaded = !loadBinaries.IsAlive;
+            Change = true;
             yield return null;
         }
     }

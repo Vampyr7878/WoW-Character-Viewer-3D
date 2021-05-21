@@ -82,7 +82,6 @@ public class Druid : ModelRenderer
             offset = AnimateTexture(index, offset);
             renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
         }
-
         if (Model.Skin.Textures[i].TextureCount > 1)
         {
             index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];

@@ -62,23 +62,26 @@ public abstract class ModelRenderer : MonoBehaviour
     //Animate current texture
     protected Vector2 AnimateTexture(int index, Vector2 offset)
     {
-        TextureAnimation animation = Model.TextureAnimations[index];
-        if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
+        if (index < Model.TextureAnimations.Length)
         {
-            frame[index]++;
-            if (frame[index] == animation.Translation.Timestamps[0].Length - 1)
+            TextureAnimation animation = Model.TextureAnimations[index];
+            if (time[index] >= animation.Translation.Timestamps[0][frame[index] + 1] / 1000f)
             {
-                frame[index] = 0;
-                time[index] = 0f;
+                frame[index]++;
+                if (frame[index] == animation.Translation.Timestamps[0].Length - 1)
+                {
+                    frame[index] = 0;
+                    time[index] = 0f;
+                }
             }
+            float timestamp = (animation.Translation.Timestamps[0][frame[index] + 1] - animation.Translation.Timestamps[0][frame[index]]) / 1000f;
+            offset.x += (animation.Translation.Values[0][frame[index]].X - animation.Translation.Values[0][frame[index] + 1].X) / timestamp * Time.deltaTime;
+            offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
+            offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
+            offset.y += (animation.Translation.Values[0][frame[index]].Y - animation.Translation.Values[0][frame[index] + 1].Y) / timestamp * Time.deltaTime;
+            offset.y = offset.y > 1 ? offset.y - 1 : offset.y;
+            offset.y = offset.y < -1 ? offset.y + 1 : offset.y;
         }
-        float timestamp = (animation.Translation.Timestamps[0][frame[index] + 1] - animation.Translation.Timestamps[0][frame[index]]) / 1000f;
-        offset.x += (animation.Translation.Values[0][frame[index]].X - animation.Translation.Values[0][frame[index] + 1].X) / timestamp * Time.deltaTime;
-        offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
-        offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
-        offset.y += (animation.Translation.Values[0][frame[index]].Y - animation.Translation.Values[0][frame[index] + 1].Y) / timestamp * Time.deltaTime;
-        offset.y = offset.y > 1 ? offset.y - 1 : offset.y;
-        offset.y = offset.y < -1 ? offset.y + 1 : offset.y;
         return offset;
     }
 
