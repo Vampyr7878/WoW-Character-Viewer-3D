@@ -17,14 +17,14 @@ Shader "Custom/16401"
 
 	SubShader
 	{
-		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" }
+		Tags { "Queue" = "AlphaTest" "RenderType" = "TransparentCutout" }
 		LOD 200
 		ZWrite[_DepthTest]
 		Blend[_SrcBlend][_DstBlend]
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard alpha:blend fullforwardshadows
+			#pragma surface surfaceFunction Standard alphatest:_AlphaCut fullforwardshadows
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF

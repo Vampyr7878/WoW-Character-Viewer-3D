@@ -12,7 +12,7 @@ Shader "Custom/HiddenShader"
 		Blend Zero One
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard fullforwardshadows
+			#pragma surface surfaceFunction Standard noshadow
 			#pragma target 3.0
 
 			struct Input

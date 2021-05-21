@@ -1151,6 +1151,10 @@ public class Character : ModelRenderer
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
         if (Model.Skin.Textures[i].TextureCount > 1)
         {
+            if (material.shader.name == "Custom/32783")
+            {
+                textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]].wrapMode = TextureWrapMode.Clamp;
+            }
             material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
         }
         if (helper.Emission == null)
@@ -1236,9 +1240,9 @@ public class Character : ModelRenderer
                 case 32:
                     helper = new KulTiranMale(Model, this, casc);
                     break;
-                //case 34:
-                //    helper = new DarkIronMale(Model, this, casc);
-                //    break;
+                case 34:
+                    helper = new DarkIronMale(Model, this, casc);
+                    break;
                 //case 35:
                 //    helper = new VulperaMale(Model, this, casc);
                 //    break;
