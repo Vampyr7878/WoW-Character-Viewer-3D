@@ -1246,9 +1246,9 @@ public class Character : ModelRenderer
                 case 35:
                     helper = new VulperaMale(Model, this, casc);
                     break;
-                //case 36:
-                //    helper = new MagharMale(Model, this, casc);
-                //    break;
+                case 36:
+                    helper = new MagharMale(Model, this, casc);
+                    break;
                 //case 37:
                 //    helper = new MechagnomeMale(Model, this, casc);
                 //    break;
