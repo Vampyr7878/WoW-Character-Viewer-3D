@@ -21,11 +21,11 @@ namespace WoW.Characters
         {
             ChangeSkinColor();
             ChangeEars(activeGeosets);
+            ChangeFaceShape(activeGeosets);
             ChangeHairStyle(activeGeosets);
             ChangeMustache(activeGeosets);
             ChangeBeard(activeGeosets);
             ChangeSideburns(activeGeosets);
-            ChangeFaceShape(activeGeosets);
             ChangeEyebrows(activeGeosets);
             ChangeEyeColor(activeGeosets);
         }
@@ -54,10 +54,10 @@ namespace WoW.Characters
             activeGeosets.Add(702);
         }
 
-        private void ChangeSideburns(List<int> activeGeosets)
+        private void ChangeFaceShape(List<int> activeGeosets)
         {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Sideburns" && o.Form == 7);
-            activeGeosets.RemoveAll(x => x > 199 && x < 300);
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Face Shape" && o.Form == 7);
+            activeGeosets.RemoveAll(x => x > 3199 && x < 3300);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 
@@ -125,10 +125,10 @@ namespace WoW.Characters
             Character.ChangeDropdown(index, index2);
         }
 
-        private void ChangeFaceShape(List<int> activeGeosets)
+        private void ChangeSideburns(List<int> activeGeosets)
         {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Face Shape" && o.Form == 7);
-            activeGeosets.RemoveAll(x => x > 3199 && x < 3300);
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Sideburns" && o.Form == 7);
+            activeGeosets.RemoveAll(x => x > 199 && x < 300);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 

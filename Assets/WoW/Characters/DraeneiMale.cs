@@ -94,13 +94,6 @@ namespace WoW.Characters
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset2);
         }
 
-        private void ChangeTendrils(List<int> activeGeosets)
-        {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Tendrils");
-            activeGeosets.RemoveAll(x => x > 199 && x < 300);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
-        }
-
         private void ChangeCirclet(List<int> activeGeosets)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Circlet");
@@ -143,6 +136,13 @@ namespace WoW.Characters
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Horn Decoration");
             activeGeosets.RemoveAll(x => x > 3899 && x < 4000);
+            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
+        }
+
+        private void ChangeTendrils(List<int> activeGeosets)
+        {
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Tendrils");
+            activeGeosets.RemoveAll(x => x > 199 && x < 300);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 
