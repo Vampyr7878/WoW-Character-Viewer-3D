@@ -52,15 +52,6 @@ public class CustomDropdown : Dropdown
         captionText.text = text;
     }
 
-    //Remove Number from option that contains text on Validation
-    protected override void OnValidate()
-    {
-        base.OnValidate();
-        string text = captionText.text;
-        text = text.Substring(text.IndexOf(':') + 1);
-        captionText.text = text;
-    }
-
     //Get current dropdown value index
     public int GetValue()
     {

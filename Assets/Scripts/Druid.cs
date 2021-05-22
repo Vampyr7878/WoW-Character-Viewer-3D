@@ -226,7 +226,7 @@ public class Druid : ModelRenderer
                 texture = TextureFromBLP(file);
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
-                textures[i].alphaIsTransparency = true;
+                //textures[i].alphaIsTransparency = true;
                 if (Model.Textures[i].Flags == 0)
                 {
                     textures[i].wrapMode = TextureWrapMode.Clamp;

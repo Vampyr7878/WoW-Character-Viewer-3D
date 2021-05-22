@@ -100,7 +100,7 @@ namespace WoW
             System.Drawing.Bitmap image = blp.GetImage();
             Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
             texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
-            texture.alphaIsTransparency = true;
+            //texture.alphaIsTransparency = true;
             return texture;
         }
 
@@ -120,7 +120,7 @@ namespace WoW
                     Texture2D texture = TextureFromBLP(file);
                     textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                     textures[i].SetPixels32(texture.GetPixels32());
-                    textures[i].alphaIsTransparency = true;
+                    //textures[i].alphaIsTransparency = true;
                     if (Model.Textures[i].Flags == 0)
                     {
                         textures[i].wrapMode = TextureWrapMode.Clamp;

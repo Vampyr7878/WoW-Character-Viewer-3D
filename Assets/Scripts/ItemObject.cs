@@ -214,20 +214,20 @@ public class ItemObject : MonoBehaviour
         {
             material.SetTexture("_Second", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
         }
-        if (((Texture2D)(material.GetTexture("_MainTex"))).alphaIsTransparency)
-        {
-            material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-            material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-            float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
-            material.SetFloat("_DepthTest", depth);
-        }
-        else
-        {
-            material.SetInt("_SrcBlend", (int)SrcBlend(0));
-            material.SetInt("_DstBlend", (int)DstBlend(0));
-            float depth = 1f;
-            material.SetFloat("_DepthTest", depth);
-        }
+        //if (((Texture2D)(material.GetTexture("_MainTex"))).alphaIsTransparency)
+        //{
+        //    material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        //    material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        //    float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
+        //    material.SetFloat("_DepthTest", depth);
+        //}
+        //else
+        //{
+        //    material.SetInt("_SrcBlend", (int)SrcBlend(0));
+        //    material.SetInt("_DstBlend", (int)DstBlend(0));
+        //    float depth = 1f;
+        //    material.SetFloat("_DepthTest", depth);
+        //}
         float alpha = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
         material.SetFloat("_Alpha", alpha);
         if (Model.Materials[Model.Skin.Textures[i].Material].Blend > 1)
@@ -284,7 +284,7 @@ public class ItemObject : MonoBehaviour
                 }
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
-                textures[i].alphaIsTransparency = texture.alphaIsTransparency;
+                //textures[i].alphaIsTransparency = texture.alphaIsTransparency;
                 textures[i].wrapMode = texture.wrapMode;
                 textures[i].Apply();
             }
