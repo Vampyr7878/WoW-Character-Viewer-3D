@@ -3,7 +3,7 @@ using Crosstales.FB;
 using Mono.Data.Sqlite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-//using Serializable;
+using Serializable;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -74,7 +74,12 @@ public class ScreenInput : MonoBehaviour
 
     private void Start()
     {
-        casc = CASCHandler.OpenLocalStorage(@"D:\Program Files\World of Warcraft", "wow");
+        string path;
+        using (StreamReader reader = new StreamReader("config.ini"))
+        {
+            path = reader.ReadLine();
+        }
+        casc = CASCHandler.OpenLocalStorage(path, "wow");
         casc.Root.SetFlags(LocaleFlags.enGB, true, false);
         translate = true;
         rotate = true;
@@ -126,8 +131,8 @@ public class ScreenInput : MonoBehaviour
         //items = new List<Item>();
         scrollItems = new List<GameObject>();
         customize = false;
-        RaceButton(race);
-        GenderButton(gender);
+        //RaceButton(race);
+        //GenderButton(gender);
     }
 
     private void Update()
@@ -163,7 +168,7 @@ public class ScreenInput : MonoBehaviour
         }
         if (Input.GetKeyUp(KeyCode.F12))
         {
-            //StartCoroutine(TakeScreenshot());
+            StartCoroutine(TakeScreenshot());
         }
         //if (c < coreRaceNames.Count && screenshot)
         //{
@@ -205,17 +210,17 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //private IEnumerator TakeScreenshot()
-    //{
-    //    if (!Directory.Exists("Screenshots"))
-    //    {
-    //        Directory.CreateDirectory("Screenshots");
-    //    }
-    //    yield return new WaitForEndOfFrame();
-    //    openButton.transform.parent.gameObject.SetActive(false);
-    //    zzTransparencyCapture.captureScreenshot(@"Screenshots\" + (character.Gender ? "Male" : "Female") + races[character.Race].Replace(" ", "").Replace("'", "") + classes[character.Class].Replace(" ", "") + ".png");
-    //    openButton.transform.parent.gameObject.SetActive(true);
-    //}
+    private IEnumerator TakeScreenshot()
+    {
+        if (!Directory.Exists("Screenshots"))
+        {
+            Directory.CreateDirectory("Screenshots");
+        }
+        yield return new WaitForEndOfFrame();
+        openButton.transform.parent.gameObject.SetActive(false);
+        zzTransparencyCapture.captureScreenshot(@"Screenshots\" + (character.Gender ? "Male" : "Female") + races[character.Race].Replace(" ", "").Replace("'", "") + classes[character.Class].Replace(" ", "") + ".png");
+        openButton.transform.parent.gameObject.SetActive(true);
+    }
 
     //private IEnumerator TakeScreenshot(string filename)
     //{
@@ -1301,7 +1306,7 @@ public class ScreenInput : MonoBehaviour
         }
         else
         {
-            //Save();
+            Save();
         }
         customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
         exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
@@ -1310,10 +1315,10 @@ public class ScreenInput : MonoBehaviour
     public void Gear()
     {
         gear = !gear;
-        //if (character.Race == 22 || character.Race == 23)
-        //{
-        //    formPanel.gameObject.SetActive(!gear);
-        //}
+        if (character.Race == 22 || character.Race == 23)
+        {
+            formPanel.gameObject.SetActive(!gear);
+        }
         customizationPanel.gameObject.SetActive(!gear);
         gearPanel.gameObject.SetActive(gear);
         if (!gear)
@@ -1323,205 +1328,197 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //public void Open(string file)
-    //{
-    //    if (!Directory.Exists("Save"))
-    //    {
-    //        Directory.CreateDirectory("Save");
-    //    }
-    //    string path = file == "" ? FileBrowser.OpenSingleFile("Open character", "Save", "chr") : file;
-    //    if (path != "")
-    //    {
-    //        SerializableCharacter sCharacter;
-    //        using (StreamReader reader = new StreamReader(path))
-    //        {
-    //            sCharacter = JsonConvert.DeserializeObject<SerializableCharacter>(reader.ReadToEnd());
-    //        }
-    //        bool temp1 = customize;
-    //        bool temp2 = gear;
-    //        if (gear)
-    //        {
-    //            Gear();
-    //        }
-    //        if (customize)
-    //        {
-    //            Exit();
-    //        }
-    //        EventSystem.current.SetSelectedGameObject(GameObject.Find(races[sCharacter.raceid].ToLower()).GetComponentInChildren<Button>().gameObject);
-    //        RaceButton(sCharacter.raceid);
-    //        EventSystem.current.SetSelectedGameObject(GameObject.Find(sCharacter.gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
-    //        GenderButton(sCharacter.gender);
-    //        EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[sCharacter.classid].ToLower()).GetComponentInChildren<Button>().gameObject);
-    //        ClassButton(sCharacter.classid);
-    //        for (int i = 0; i < sCharacter.customization.Length; i++)
-    //        {
-    //            character.Customization[i] = sCharacter.customization[i];
-    //            customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = character.Customization[i];
-    //        }
-    //        connection.Open();
-    //        gearPanel.gameObject.SetActive(true);
-    //        int icon;
-    //        for (int i = 0; i < sCharacter.items.Length; i++)
-    //        {
-    //            if (sCharacter.items[i].id != 0)
-    //            {
-    //                using (SqliteCommand command = connection.CreateCommand())
-    //                {
-    //                    command.CommandType = CommandType.Text;
-    //                    command.CommandText = "SELECT [Display ID], Icon, Slot FROM Items WHERE ID = " + sCharacter.items[i].id + " AND Version = " + sCharacter.items[i].version + ";";
-    //                    SqliteDataReader reader = command.ExecuteReader();
-    //                    reader.Read();
-    //                    character.Items[i] = new ItemModel(sCharacter.items[i].id, sCharacter.items[i].version, reader.GetInt32(2), reader.GetInt32(0), character.Race, character.Gender);
-    //                    icon = reader.GetInt32(1);
-    //                }
-    //                using (SqliteCommand command = connection.CreateCommand())
-    //                {
-    //                    command.CommandType = CommandType.Text;
-    //                    command.CommandText = "SELECT File FROM Files WHERE ID = " + icon + ";";
-    //                    SqliteDataReader reader = command.ExecuteReader();
-    //                    reader.Read();
-    //                    GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = WoWHelper.GetIcon(reader.GetString(0));
-    //                }
-    //            }
-    //            else
-    //            {
-    //                character.Items[i] = null;
-    //                GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + WoWHelper.SlotName(i));
-    //            }
-    //        }
-    //        gearPanel.gameObject.SetActive(false);
-    //        connection.Close();
-    //        if (temp1)
-    //        {
-    //            Customize();
-    //        }
-    //        if (temp2)
-    //        {
-    //            Gear();
-    //        }
-    //        character.Change = true;
-    //    }
-    //}
+    public void Open(string file)
+    {
+        if (!Directory.Exists("Save"))
+        {
+            Directory.CreateDirectory("Save");
+        }
+        string path = file == "" ? FileBrowser.OpenSingleFile("Open character", "Save", "chr") : file;
+        if (path != "")
+        {
+            SerializableCharacter sCharacter;
+            using (StreamReader reader = new StreamReader(path))
+            {
+                sCharacter = JsonConvert.DeserializeObject<SerializableCharacter>(reader.ReadToEnd());
+            }
+            bool temp1 = customize;
+            bool temp2 = gear;
+            if (gear)
+            {
+                Gear();
+            }
+            if (customize)
+            {
+                Exit();
+            }
+            EventSystem.current.SetSelectedGameObject(GameObject.Find(races[sCharacter.raceid].ToLower()).GetComponentInChildren<Button>().gameObject);
+            RaceButton(sCharacter.raceid);
+            EventSystem.current.SetSelectedGameObject(GameObject.Find(sCharacter.gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
+            GenderButton(sCharacter.gender);
+            EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[sCharacter.classid].ToLower()).GetComponentInChildren<Button>().gameObject);
+            ClassButton(sCharacter.classid);
+            for (int i = 0; i < sCharacter.customization.Length; i++)
+            {
+                character.Customization[i] = sCharacter.customization[i];
+                customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = character.Customization[i];
+            }
+            connection.Open();
+            gearPanel.gameObject.SetActive(true);
+            int icon;
+            //for (int i = 0; i < sCharacter.items.Length; i++)
+            //{
+            //    if (sCharacter.items[i].id != 0)
+            //    {
+            //        using (SqliteCommand command = connection.CreateCommand())
+            //        {
+            //            command.CommandType = CommandType.Text;
+            //            command.CommandText = "SELECT [Display ID], Icon, Slot FROM Items WHERE ID = " + sCharacter.items[i].id + " AND Version = " + sCharacter.items[i].version + ";";
+            //            SqliteDataReader reader = command.ExecuteReader();
+            //            reader.Read();
+            //            character.Items[i] = new ItemModel(sCharacter.items[i].id, sCharacter.items[i].version, reader.GetInt32(2), reader.GetInt32(0), character.Race, character.Gender);
+            //            icon = reader.GetInt32(1);
+            //        }
+            //        using (SqliteCommand command = connection.CreateCommand())
+            //        {
+            //            command.CommandType = CommandType.Text;
+            //            command.CommandText = "SELECT File FROM Files WHERE ID = " + icon + ";";
+            //            SqliteDataReader reader = command.ExecuteReader();
+            //            reader.Read();
+            //            GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = WoWHelper.GetIcon(reader.GetString(0));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        character.Items[i] = null;
+            //        GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + WoWHelper.SlotName(i));
+            //    }
+            //}
+            gearPanel.gameObject.SetActive(false);
+            connection.Close();
+            if (temp1)
+            {
+                Customize();
+            }
+            if (temp2)
+            {
+                Gear();
+            }
+            character.Change = true;
+        }
+    }
 
     public void Import()
     {
         importPanel.SetActive(true);
     }
 
-    //public void OKImportButton()
-    //{
-    //    using (HttpClient client = new HttpClient())
-    //    {
-    //        InputField[] boxes = importPanel.GetComponentsInChildren<InputField>();
-    //        string name = boxes[0].text.ToLower();
-    //        string realm = boxes[1].text.ToLower().Replace(' ', '-');
-    //        Dropdown dropdown = importPanel.GetComponentInChildren<Dropdown>();
-    //        string region = "";
-    //        switch(dropdown.value)
-    //        {
-    //            case 0:
-    //                region = "us";
-    //                break;
-    //            case 1:
-    //                region = "eu";
-    //                break;
-    //            case 2:
-    //                region = "kr";
-    //                break;
-    //            case 3:
-    //                region = "tw";
-    //                break;
-    //            case 4:
-    //                region = "cn";
-    //                break;
-    //        }
-    //        using (HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("GET"), "https://" + region + ".api.blizzard.com/profile/wow/character/" + realm + "/" + name + "/appearance?namespace=profile-" + region + "&locale=en_us&access_token=" + token))
-    //        {
-    //            request.Headers.TryAddWithoutValidation("Accept", "application/json");
-    //            HttpResponseMessage response = client.SendAsync(request).Result;
-    //            string resp = response.Content.ReadAsStringAsync().Result;
-    //            Debug.Log(response.StatusCode);
-    //            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-    //            {
-    //                bool temp1 = customize;
-    //                bool temp2 = gear;
-    //                if (gear)
-    //                {
-    //                    Gear();
-    //                }
-    //                if (customize)
-    //                {
-    //                    Exit();
-    //                }
-    //                JObject character = JObject.Parse(resp);
-    //                int race = character["playable_race"].Value<int>("id");
-    //                bool gender = character["gender"].Value<string>("name") == "Male";
-    //                int id = character["playable_class"].Value<int>("id");
-    //                if (race == 25 || race == 26)
-    //                {
-    //                    race = 24;
-    //                }
-    //                EventSystem.current.SetSelectedGameObject(GameObject.Find(races[race].ToLower()).GetComponentInChildren<Button>().gameObject);
-    //                RaceButton(race);
-    //                EventSystem.current.SetSelectedGameObject(GameObject.Find(gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
-    //                GenderButton(gender);
-    //                EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[id].ToLower()).GetComponentInChildren<Button>().gameObject);
-    //                ClassButton(id);
-    //                List<JToken> list = character["customizations"].Children().ToList();
-    //                foreach (JToken custom in list)
-    //                {
-    //                    int index = Array.FindIndex(this.character.Options, o => o.Blizzard == custom["option"].Value<int>("id"));
-    //                    int value;
-    //                    if (index != -1)
-    //                    {
-    //                        value = Array.FindIndex(this.character.Choices[index], o => o.ID == custom["choice"].Value<int>("id"));
-    //                        if (value == -1)
-    //                        {
-    //                            value = Array.FindIndex(this.character.Choices[index], o => o.Texture2 == "$" + custom["choice"].Value<string>("id"));
-    //                        }
-    //                        if (value == -1)
-    //                        {
-    //                            value = Array.FindIndex(this.character.Choices[index], o => o.Texture3 == "$" + custom["choice"].Value<string>("id"));
-    //                        }
-    //                        if (value == -1)
-    //                        {
-    //                            value = Array.FindIndex(this.character.Choices[index], o => o.Geoset1 == custom["choice"].Value<int>("id"));
-    //                        }
-    //                        if (value == -1)
-    //                        {
-    //                            value = Array.FindIndex(this.character.Choices[index], o => o.Geoset2 == custom["choice"].Value<int>("id"));
-    //                        }
-    //                        if (value == -1)
-    //                        {
-    //                            value = 0;
-    //                        }
-    //                        this.character.CustomizationDropdowns[index].value = value;
-    //                    }
-    //                }
-    //                list = character["items"].Children().ToList();
-    //                connection.Open();
-    //                gearPanel.gameObject.SetActive(true);
-    //                foreach(JToken item in list)
-    //                {
-    //                    EquipItem(item);
-    //                }
-    //                if (temp1)
-    //                {
-    //                    Customize();
-    //                }
-    //                if (temp2)
-    //                {
-    //                    Gear();
-    //                }
-    //                gearPanel.gameObject.SetActive(false);
-    //                connection.Close();
-    //                this.character.Change = true;
-    //            }
-    //        }
-    //    }
-    //    importPanel.SetActive(false);
-    //    PointerExit();
-    //}
+    public void OKImportButton()
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            InputField[] boxes = importPanel.GetComponentsInChildren<InputField>();
+            string name = boxes[0].text.ToLower();
+            string realm = boxes[1].text.ToLower().Replace(' ', '-');
+            Dropdown dropdown = importPanel.GetComponentInChildren<Dropdown>();
+            string region = "";
+            switch (dropdown.value)
+            {
+                case 0:
+                    region = "us";
+                    break;
+                case 1:
+                    region = "eu";
+                    break;
+                case 2:
+                    region = "kr";
+                    break;
+                case 3:
+                    region = "tw";
+                    break;
+                case 4:
+                    region = "cn";
+                    break;
+            }
+            using (HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("GET"), "https://" + region + ".api.blizzard.com/profile/wow/character/" + realm + "/" + name + "/appearance?namespace=profile-" + region + "&locale=en_us&access_token=" + token))
+            {
+                request.Headers.TryAddWithoutValidation("Accept", "application/json");
+                HttpResponseMessage response = client.SendAsync(request).Result;
+                string resp = response.Content.ReadAsStringAsync().Result;
+                Debug.Log(response.StatusCode);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    bool temp1 = customize;
+                    bool temp2 = gear;
+                    if (gear)
+                    {
+                        Gear();
+                    }
+                    if (customize)
+                    {
+                        Exit();
+                    }
+                    JObject character = JObject.Parse(resp);
+                    int race = character["playable_race"].Value<int>("id");
+                    bool gender = character["gender"].Value<string>("name") == "Male";
+                    int id = character["playable_class"].Value<int>("id");
+                    if (race == 25 || race == 26)
+                    {
+                        race = 24;
+                    }
+                    EventSystem.current.SetSelectedGameObject(GameObject.Find(races[race].ToLower()).GetComponentInChildren<Button>().gameObject);
+                    RaceButton(race);
+                    EventSystem.current.SetSelectedGameObject(GameObject.Find(gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
+                    GenderButton(gender);
+                    EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[id].ToLower()).GetComponentInChildren<Button>().gameObject);
+                    ClassButton(id);
+                    List<JToken> list = character["customizations"].Children().ToList();
+                    foreach (JToken custom in list)
+                    {
+                        int index = Array.FindIndex(this.character.Options, o => o.Blizzard == custom["option"].Value<int>("id"));
+                        int value;
+                        if (index != -1)
+                        {
+                            value = Array.FindIndex(this.character.Choices[index], o => o.ID == custom["choice"].Value<int>("id"));
+                            if (value == -1)
+                            {
+                                value = Array.FindIndex(this.character.Choices[index], o => o.Model == custom["choice"].Value<int>("id"));
+                            }
+                            if (value == -1)
+                            {
+                                value = Array.FindIndex(this.character.Choices[index], o => o.Bone == custom["choice"].Value<int>("id"));
+                            }
+                            if (value == -1)
+                            {
+                                value = 0;
+                            }
+                            this.character.CustomizationDropdowns[index].SetValue(value);
+                        }
+                    }
+                    list = character["items"].Children().ToList();
+                    connection.Open();
+                    gearPanel.gameObject.SetActive(true);
+                    foreach (JToken item in list)
+                    {
+                        //EquipItem(item);
+                    }
+                    if (temp1)
+                    {
+                        Customize();
+                    }
+                    if (temp2)
+                    {
+                        Gear();
+                    }
+                    gearPanel.gameObject.SetActive(false);
+                    connection.Close();
+                    this.character.Change = true;
+                }
+            }
+        }
+        importPanel.SetActive(false);
+        PointerExit();
+    }
 
     //private void EquipItem(JToken item)
     //{
@@ -1552,43 +1549,43 @@ public class ScreenInput : MonoBehaviour
         PointerExit();
     }
 
-    //public void Save()
-    //{
-    //    if (!Directory.Exists("Save"))
-    //    {
-    //        Directory.CreateDirectory("Save");
-    //    }
-    //    string path = FileBrowser.SaveFile("Save character", "Save", races[character.Race] + " " + classes[character.Class], "chr");
-    //    if (path != "")
-    //    {
-    //        SerializableCharacter sCharacter = new SerializableCharacter();
-    //        sCharacter.raceid = character.Race;
-    //        sCharacter.gender = character.Gender;
-    //        sCharacter.classid = character.Class;
-    //        sCharacter.customization = new int[character.Customization.Length];
-    //        for (int i =0; i < sCharacter.customization.Length; i++)
-    //        {
-    //            sCharacter.customization[i] = character.Customization[i];
-    //        }
-    //        sCharacter.items = new SerializableItems[character.Items.Length];
-    //        for (int i = 0; i < sCharacter.items.Length; i++)
-    //        {
-    //            sCharacter.items[i] = new SerializableItems();
-    //            if (character.Items[i] == null)
-    //            {
-    //                sCharacter.items[i].id = 0;
-    //                sCharacter.items[i].version = 0;
-    //            }
-    //            else
-    //            {
-    //                sCharacter.items[i].id = character.Items[i].ID;
-    //                sCharacter.items[i].version = character.Items[i].Version;
-    //            }
-    //        }
-    //        using (StreamWriter writer = new StreamWriter(path))
-    //        {
-    //            writer.Write(JsonConvert.SerializeObject(sCharacter, Formatting.Indented));
-    //        }
-    //    }
-    //}
+    public void Save()
+    {
+        if (!Directory.Exists("Save"))
+        {
+            Directory.CreateDirectory("Save");
+        }
+        string path = FileBrowser.SaveFile("Save character", "Save", races[character.Race] + " " + classes[character.Class], "chr");
+        if (path != "")
+        {
+            SerializableCharacter sCharacter = new SerializableCharacter();
+            sCharacter.raceid = character.Race;
+            sCharacter.gender = character.Gender;
+            sCharacter.classid = character.Class;
+            sCharacter.customization = new int[character.Customization.Length];
+            for (int i = 0; i < sCharacter.customization.Length; i++)
+            {
+                sCharacter.customization[i] = character.Customization[i];
+            }
+            //sCharacter.items = new SerializableItems[character.Items.Length];
+            for (int i = 0; i < sCharacter.items.Length; i++)
+            {
+                sCharacter.items[i] = new SerializableItems();
+                //if (character.Items[i] == null)
+                //{
+                //    sCharacter.items[i].id = 0;
+                //    sCharacter.items[i].version = 0;
+                //}
+                //else
+                //{
+                //    sCharacter.items[i].id = character.Items[i].ID;
+                //    sCharacter.items[i].version = character.Items[i].Version;
+                //}
+            }
+            using (StreamWriter writer = new StreamWriter(path))
+            {
+                writer.Write(JsonConvert.SerializeObject(sCharacter, Formatting.Indented));
+            }
+        }
+    }
 }

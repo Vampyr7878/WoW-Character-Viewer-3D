@@ -1360,6 +1360,11 @@ public class Character : ModelRenderer
                 yield return null;
             }
         }
+        else
+        {
+            demonHunter.UnloadModel();
+            yield return null;
+        }
         if (Race == 37)
         {
             racial.Path = modelsPath + RacePath;
@@ -1369,6 +1374,11 @@ public class Character : ModelRenderer
             {
                 yield return null;
             }
+        }
+        else
+        {
+            racial.UnloadModel();
+            yield return null;
         }
         if (done)
         {
