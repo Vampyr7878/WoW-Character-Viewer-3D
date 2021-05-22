@@ -1,5 +1,4 @@
-﻿using BLPLib;
-using CASCLib;
+﻿using CASCLib;
 using M2Lib;
 using System;
 using System.Collections;
@@ -171,6 +170,7 @@ public class Collection : ModelRenderer
     //Load the model
     public IEnumerator LoadModel(string collectionfile, CASCHandler casc)
     {
+        UnloadModel();
         bool done = false;
         converter = new System.Drawing.ImageConverter();
         this.casc = casc;

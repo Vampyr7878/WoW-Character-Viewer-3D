@@ -810,7 +810,6 @@ public class ScreenInput : MonoBehaviour
         ChangeButtonColors();
         ClassButton(c);
         gilnean.gameObject.SetActive(true);
-        character.racial.UnloadModel();
         character.LoadModel(model, casc);
         if (character.Race == 22)
         {
@@ -880,7 +879,6 @@ public class ScreenInput : MonoBehaviour
         ResetBorder();
         LinkDropdowns();
         ChangeButtonColors();
-        character.racial.UnloadModel();
         character.LoadModel(model, casc);
         gilnean.gameObject.SetActive(true);
         if (race == 22)

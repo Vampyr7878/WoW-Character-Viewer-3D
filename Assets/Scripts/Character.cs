@@ -1324,9 +1324,9 @@ public class Character : ModelRenderer
                 case 36:
                     helper = new MagharFemale(Model, this, casc);
                     break;
-                //case 37:
-                //    helper = new MechagnomeFemale(Model, this, casc);
-                //    break;
+                case 37:
+                    helper = new MechagnomeFemale(Model, this, casc);
+                    break;
             }
         }
     }
@@ -1335,7 +1335,6 @@ public class Character : ModelRenderer
     {
         bool done = false;
         DestroyImmediate(mesh);
-        demonHunter.UnloadModel();
         GameObject prefab = Resources.Load<GameObject>($"{modelsPath}{RacePath}{modelfile}_prefab");
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
