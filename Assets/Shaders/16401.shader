@@ -19,7 +19,7 @@ Shader "Custom/16401"
 	{
 		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
-		ZWrite[_DepthTest]
+		ZWrite Off
 		Blend SrcAlpha One
 		Cull[_Cull]
 
@@ -48,7 +48,7 @@ Shader "Custom/16401"
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
 				OUT.Albedo = color.rgb;
 				color *= emission;
-				OUT.Alpha = mask.a;
+				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
 				OUT.Emission = emission;

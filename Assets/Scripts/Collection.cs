@@ -38,6 +38,7 @@ public class Collection : ModelRenderer
             {
                 Resources.UnloadUnusedAssets();
                 GC.Collect();
+                LoadTextures();
                 for (int i = 0; i < Model.Skin.Textures.Length; i++)
                 {
                     SetMaterial(renderer, i);
@@ -219,7 +220,6 @@ public class Collection : ModelRenderer
             renderer.bones = bones;
             renderer.rootBone = renderer2.rootBone;
             renderer.sharedMesh.bindposes = bind;
-            LoadTextures();
             yield return null;
             time = new float[Model.TextureAnimations.Length];
             frame = new int[Model.TextureAnimations.Length];

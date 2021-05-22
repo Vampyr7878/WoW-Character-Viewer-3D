@@ -12,7 +12,7 @@ public class Character : ModelRenderer
 {
     //public Collection[] collections;
     public Collection demonHunter;
-    //public Collection racial;
+    public Collection racial;
     public ScreenInput input;
 
     private CharacterHelper helper;
@@ -65,7 +65,7 @@ public class Character : ModelRenderer
                     int index = Array.FindIndex(Options, o => o.Name == "Face");
                     animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
                     demonHunter.Change = true;
-                    //racial.Change = true;
+                    racial.Change = true;
                     //foreach (Collection collection in collections)
                     //{
                     //    collection.Change = true;
@@ -1249,9 +1249,9 @@ public class Character : ModelRenderer
                 case 36:
                     helper = new MagharMale(Model, this, casc);
                     break;
-                //case 37:
-                //    helper = new MechagnomeMale(Model, this, casc);
-                //    break;
+                case 37:
+                    helper = new MechagnomeMale(Model, this, casc);
+                    break;
             }
         }
         else
@@ -1361,11 +1361,16 @@ public class Character : ModelRenderer
                 yield return null;
             }
         }
-        //if (Race == 37)
-        //{
-        //    racial.Path = modelsPath + RacePath;
-        //    racial.LoadModel(RacialCollection);
-        //}
+        if (Race == 37)
+        {
+            racial.Path = modelsPath + RacePath;
+            StartCoroutine(racial.LoadModel(RacialCollection, casc));
+            yield return null;
+            while (!racial.Loaded)
+            {
+                yield return null;
+            }
+        }
         if (done)
         {
             LoadColors();
