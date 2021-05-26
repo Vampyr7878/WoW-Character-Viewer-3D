@@ -100,7 +100,6 @@ namespace WoW
             System.Drawing.Bitmap image = blp.GetImage();
             Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
             texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
-            //texture.alphaIsTransparency = true;
             return texture;
         }
 

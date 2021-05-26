@@ -21,7 +21,7 @@ public class Character : ModelRenderer
     public List<CustomDropdown> CustomizationDropdowns { get; set; }
     public string DemonHunterFile { get; set; }
     public string RacialCollection { get; set; }
-    //public ItemModel[] Items { get; set; }
+    public ItemModel[] Items { get; set; }
     public string Suffix1 { get; set; }
     public string Suffix2 { get; set; }
     public string RacePath { get; set; }
@@ -35,7 +35,7 @@ public class Character : ModelRenderer
 
     private void Start()
     {
-        //Items = new ItemModel[13];
+        Items = new ItemModel[13];
         modelsPath = @"character\";
         CustomizationDropdowns = new List<CustomDropdown>();
         Gender = true;

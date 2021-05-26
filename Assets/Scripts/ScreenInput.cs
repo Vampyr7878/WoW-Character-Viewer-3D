@@ -1,4 +1,5 @@
-﻿using CASCLib;
+﻿using BLPLib;
+using CASCLib;
 using Crosstales.FB;
 using Mono.Data.Sqlite;
 using Newtonsoft.Json;
@@ -56,8 +57,9 @@ public class ScreenInput : MonoBehaviour
     private Dictionary<int, string> classes;
     private Dictionary<int, string> druidModels;
     private CASCHandler casc;
-    //private List<Item> items;
+    private List<Item> items;
     private List<GameObject> scrollItems;
+    protected System.Drawing.ImageConverter converter;
     private string slotName;
     private bool customize;
     private bool gear;
@@ -79,6 +81,7 @@ public class ScreenInput : MonoBehaviour
         {
             path = reader.ReadLine();
         }
+        converter = new System.Drawing.ImageConverter();
         casc = CASCHandler.OpenLocalStorage(path, "wow");
         casc.Root.SetFlags(LocaleFlags.enGB, true, false);
         translate = true;
@@ -128,7 +131,7 @@ public class ScreenInput : MonoBehaviour
             }
         }
         connection.Close();
-        //items = new List<Item>();
+        items = new List<Item>();
         scrollItems = new List<GameObject>();
         customize = false;
         //RaceButton(race);
@@ -137,7 +140,10 @@ public class ScreenInput : MonoBehaviour
 
     private void Update()
     {
-        loading.gameObject.SetActive(!character.Loaded);
+        if (character.Race > 0)
+        {
+            loading.gameObject.SetActive(!character.Loaded);
+        }
         customizeButton.gameObject.SetActive(!gear);
         if (screenshot && ((!allied && r >= coreRaceNames.Count) || r >= coreRaceNames.Count + alliedRaceNames.Count))
         {
@@ -222,43 +228,43 @@ public class ScreenInput : MonoBehaviour
         openButton.transform.parent.gameObject.SetActive(true);
     }
 
-    //private IEnumerator TakeScreenshot(string filename)
-    //{
-    //    if (!Directory.Exists("Screenshots"))
-    //    {
-    //        Directory.CreateDirectory("Screenshots");
-    //    }
-    //    screenshot = false;
-    //    yield return new WaitForEndOfFrame();
-    //    openButton.transform.parent.gameObject.SetActive(false);
-    //    zzTransparencyCapture.captureScreenshot(filename);
-    //    openButton.transform.parent.gameObject.SetActive(true);
-    //    c++;
-    //    if (c == classNames.Count)
-    //    {
-    //        c = 0;
-    //        r++;
-    //    }
-    //    string folder = character.Gender ? "Male" : "Female";
-    //    if (r < coreRaceNames.Count)
-    //    {
-    //        if (c < classNames.Count && File.Exists(@"Save\" + folder + @"\" + itemSet + @"\" + coreRaceNames[r] + @"\" + coreRaceNames[r] + classNames[c] + ".chr"))
-    //        {
-    //            Open(@"Save\" + folder + @"\" + itemSet + @"\" + coreRaceNames[r] + @"\" + coreRaceNames[r] + classNames[c] + ".chr");
-    //        }
-    //    }
-    //    else if (allied && r < coreRaceNames.Count + alliedRaceNames.Count)
-    //    {
-    //        if (c < classNames.Count && File.Exists(@"Save\" + folder + @"\" + itemSet + @"\" + alliedRaceNames[r - coreRaceNames.Count] + @"\" + alliedRaceNames[r - coreRaceNames.Count] + classNames[c] + ".chr"))
-    //        {
-    //            Open(@"Save\" + folder + @"\" + itemSet + @"\" + alliedRaceNames[r - coreRaceNames.Count] + @"\" + alliedRaceNames[r - coreRaceNames.Count] + classNames[c] + ".chr");
-    //        }
-    //    }
-    //    yield return new WaitForSeconds(1);
-    //    character.Change = true;
-    //    yield return new WaitForSeconds(1);
-    //    screenshot = true;
-    //}
+    private IEnumerator TakeScreenshot(string filename)
+    {
+        if (!Directory.Exists("Screenshots"))
+        {
+            Directory.CreateDirectory("Screenshots");
+        }
+        screenshot = false;
+        yield return new WaitForEndOfFrame();
+        openButton.transform.parent.gameObject.SetActive(false);
+        zzTransparencyCapture.captureScreenshot(filename);
+        openButton.transform.parent.gameObject.SetActive(true);
+        c++;
+        if (c == classNames.Count)
+        {
+            c = 0;
+            r++;
+        }
+        string folder = character.Gender ? "Male" : "Female";
+        if (r < coreRaceNames.Count)
+        {
+            if (c < classNames.Count && File.Exists(@"Save\" + folder + @"\" + itemSet + @"\" + coreRaceNames[r] + @"\" + coreRaceNames[r] + classNames[c] + ".chr"))
+            {
+                Open(@"Save\" + folder + @"\" + itemSet + @"\" + coreRaceNames[r] + @"\" + coreRaceNames[r] + classNames[c] + ".chr");
+            }
+        }
+        else if (allied && r < coreRaceNames.Count + alliedRaceNames.Count)
+        {
+            if (c < classNames.Count && File.Exists(@"Save\" + folder + @"\" + itemSet + @"\" + alliedRaceNames[r - coreRaceNames.Count] + @"\" + alliedRaceNames[r - coreRaceNames.Count] + classNames[c] + ".chr"))
+            {
+                Open(@"Save\" + folder + @"\" + itemSet + @"\" + alliedRaceNames[r - coreRaceNames.Count] + @"\" + alliedRaceNames[r - coreRaceNames.Count] + classNames[c] + ".chr");
+            }
+        }
+        yield return new WaitForSeconds(1);
+        character.Change = true;
+        yield return new WaitForSeconds(1);
+        screenshot = true;
+    }
 
     private void TranslateCamera()
     {
@@ -510,80 +516,85 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //private void FillItems(int slot, GameObject panel)
-    //{
-    //    panel.GetComponentInChildren<InputField>().text = "";
-    //    connection.Open();
-    //    string condition;
-    //    switch (slot)
-    //    {
-    //        case 5:
-    //            condition = "Slot = 5 OR Slot = 20";
-    //            break;
-    //        case 21:
-    //            condition = "Slot = 21 OR Slot = 13 OR Slot = 15 OR Slot = 17 OR Slot = 26";
-    //            break;
-    //        case 22:
-    //            condition = "Slot = 22 OR Slot = 13 OR Slot = 14 OR Slot = 17 OR Slot = 23";
-    //            break;
-    //        default:
-    //            condition = "Slot = " + slot;
-    //            break;
-    //    }
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT ID, Version, Name, [Display ID], Icon, Quality, Slot FROM Items WHERE (" + condition + ");";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        while (reader.Read())
-    //        {
-    //            items.Add(new Item(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4).ToString(), reader.GetInt32(5), reader.GetInt32(6)));
-    //        }
-    //    }
-    //    foreach (Item item in items)
-    //    {
-    //        using (SqliteCommand command = connection.CreateCommand())
-    //        {
-    //            command.CommandType = CommandType.Text;
-    //            command.CommandText = "SELECT File FROM Files WHERE ID = " + item.Icon + ";";
-    //            SqliteDataReader reader = command.ExecuteReader();
-    //            while (reader.Read())
-    //            {
-    //                item.Icon = reader.GetString(0);
-    //            }
-    //        }
-    //    }
-    //    connection.Close();
-    //    Toggle none = panel.GetComponentInChildren<Toggle>();
-    //    for (int i = 0; i < 100; i++)
-    //    {
-    //        scrollItems.Add(Instantiate(scrollItem, panel.GetComponentInChildren<VerticalLayoutGroup>().transform));
-    //        scrollItems[i].name = i.ToString();
-    //        scrollItems[i].GetComponent<Toggle>().group = panel.GetComponentInChildren<ToggleGroup>();
-    //        scrollItems[i].GetComponentInChildren<Text>().text = items[i].Name;
-    //        scrollItems[i].GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
-    //        scrollItems[i].GetComponentInChildren<Image>().sprite = WoWHelper.GetIcon(items[i].Icon);
-    //        scrollItems[i].GetComponentsInChildren<Image>()[1].color = WoWHelper.QualityColor(items[i].Quality);
-    //        Image tooltip = Array.Find(scrollItems[i].GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
-    //        tooltip.gameObject.SetActive(true);
-    //        tooltip.GetComponentInChildren<Text>().text = items[i].Name;
-    //        tooltip.GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
-    //        tooltip.gameObject.SetActive(false);
-    //    }
-    //    none.isOn = true;
-    //}
+    private void FillItems(int slot, GameObject panel)
+    {
+        panel.GetComponentInChildren<InputField>().text = "";
+        connection.Open();
+        string condition;
+        switch (slot)
+        {
+            case 5:
+                condition = "Slot = 5 OR Slot = 20";
+                break;
+            case 21:
+                condition = "Slot = 21 OR Slot = 13 OR Slot = 15 OR Slot = 17 OR Slot = 26";
+                break;
+            case 22:
+                condition = "Slot = 22 OR Slot = 13 OR Slot = 14 OR Slot = 17 OR Slot = 23";
+                break;
+            default:
+                condition = "Slot = " + slot;
+                break;
+        }
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT ID, Version, Name, [Display ID], Icon, Quality, Slot FROM Items WHERE (" + condition + ");";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                items.Add(new Item(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(5), reader.GetInt32(6)));
+            }
+        }
+        connection.Close();
+        Toggle none = panel.GetComponentInChildren<Toggle>();
+        for (int i = 0; i < 100; i++)
+        {
+            scrollItems.Add(Instantiate(scrollItem, panel.GetComponentInChildren<VerticalLayoutGroup>().transform));
+            scrollItems[i].name = i.ToString();
+            scrollItems[i].GetComponent<Toggle>().group = panel.GetComponentInChildren<ToggleGroup>();
+            scrollItems[i].GetComponentInChildren<Text>().text = items[i].Name;
+            scrollItems[i].GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
+            scrollItems[i].GetComponentInChildren<Image>().sprite = IconFromBLP(items[i].Icon);
+            scrollItems[i].GetComponentsInChildren<Image>()[1].color = WoWHelper.QualityColor(items[i].Quality);
+            Image tooltip = Array.Find(scrollItems[i].GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
+            tooltip.gameObject.SetActive(true);
+            tooltip.GetComponentInChildren<Text>().text = items[i].Name;
+            tooltip.GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
+            tooltip.gameObject.SetActive(false);
+        }
+        none.isOn = true;
+    }
 
-    //private void ClearItems()
-    //{
-    //    foreach (Button button in gearPanel.GetComponentsInChildren<Button>())
-    //    {
-    //        if (button.CompareTag("equippable"))
-    //        {
-    //            button.GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + button.name);
-    //        }
-    //    }
-    //    character.ClearItems();
-    //}
+    //Create texture from BLP file
+    private Sprite IconFromBLP(int file)
+    {
+        try
+        {
+            BLP blp = new BLP(casc.OpenFile(file));
+            System.Drawing.Bitmap image = blp.GetImage();
+            Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
+            texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
+        }
+        catch
+        {
+            Debug.LogError(file);
+            return null;
+        }
+    }
+
+    private void ClearItems()
+    {
+        foreach (Button button in gearPanel.GetComponentsInChildren<Button>())
+        {
+            if (button.CompareTag("equippable"))
+            {
+                button.GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + button.name);
+            }
+        }
+        character.ClearItems();
+    }
 
     private void ChangeButtonColors()
     {
@@ -774,7 +785,7 @@ public class ScreenInput : MonoBehaviour
             gilnean.RacePath = reader.GetString(6);
         }
         connection.Close();
-        //ClearItems();
+        ClearItems();
         gilnean.Gender = character.Gender;
         gilnean.LoadModel(model, casc);
     }
@@ -804,7 +815,7 @@ public class ScreenInput : MonoBehaviour
             character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
         }
         connection.Close();
-        //ClearItems();
+        ClearItems();
         int c = character.Class;
         character.Class = 1;
         character.Gender = gender;
@@ -875,7 +886,7 @@ public class ScreenInput : MonoBehaviour
             character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
         }
         connection.Close();
-        //ClearItems();
+        ClearItems();
         character.Race = race;
         character.Class = 1;
         character.Form = 0;
@@ -1105,157 +1116,157 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //public void LeftButton(int slot)
-    //{
-    //    rightPanel.gameObject.SetActive(false);
-    //    items.Clear();
-    //    foreach (GameObject item in scrollItems)
-    //    {
-    //        Destroy(item);
-    //    }
-    //    scrollItems.Clear();
-    //    slotName = WoWHelper.Slot(slot);
-    //    leftPanel.gameObject.SetActive(true);
-    //    leftPanel.GetComponentInChildren<InputField>().text = "";
-    //    FillItems(slot, leftPanel);
-    //    EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(null);
-    //}
+    public void LeftButton(int slot)
+    {
+        rightPanel.gameObject.SetActive(false);
+        items.Clear();
+        foreach (GameObject item in scrollItems)
+        {
+            Destroy(item);
+        }
+        scrollItems.Clear();
+        slotName = WoWHelper.Slot(slot);
+        leftPanel.gameObject.SetActive(true);
+        leftPanel.GetComponentInChildren<InputField>().text = "";
+        FillItems(slot, leftPanel);
+        EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(null);
+    }
 
-    //public void RightButton(int slot)
-    //{
-    //    leftPanel.gameObject.SetActive(false);
-    //    items.Clear();
-    //    foreach (GameObject item in scrollItems)
-    //    {
-    //        Destroy(item);
-    //    }
-    //    scrollItems.Clear();
-    //    slotName = WoWHelper.Slot(slot);
-    //    rightPanel.gameObject.SetActive(true);
-    //    rightPanel.GetComponentInChildren<InputField>().text = "";
-    //    FillItems(slot, rightPanel);
-    //    EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(null);
-    //}
+    public void RightButton(int slot)
+    {
+        leftPanel.gameObject.SetActive(false);
+        items.Clear();
+        foreach (GameObject item in scrollItems)
+        {
+            Destroy(item);
+        }
+        scrollItems.Clear();
+        slotName = WoWHelper.Slot(slot);
+        rightPanel.gameObject.SetActive(true);
+        rightPanel.GetComponentInChildren<InputField>().text = "";
+        FillItems(slot, rightPanel);
+        EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(null);
+    }
 
-    //public void OkButton()
-    //{
-    //    rotate = false;
-    //    translate = false;
-    //    bool none = true;
-    //    GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
-    //    for (int i = 0; i < scrollItems.Count; i++)
-    //    {
-    //        if (scrollItems[i].GetComponent<Toggle>().isOn)
-    //        {
-    //            none = false;
-    //            GameObject.Find(slotName).GetComponent<Image>().sprite = scrollItems[i].GetComponentInChildren<Image>().sprite;
-    //            int j = int.Parse(scrollItems[i].name);
-    //            character.Items[WoWHelper.Slot(slotName)] = new ItemModel(items[j].ID, items[j].Version, items[j].Slot, items[j].Display, character.Race, character.Gender);
-    //            if (character.Items[7] != null && (character.Items[7].Slot == 15))
-    //            {
-    //                character.Items[12] = null;
-    //                GameObject.Find("offhand").GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-offhand");
-    //            }
-    //            break;
-    //        }
-    //    }
-    //    if (none)
-    //    {
-    //        character.Items[WoWHelper.Slot(slotName)] = null;
-    //        GameObject.Find(slotName).GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + slotName);
-    //    }
-    //    panel.GetComponentInChildren<InputField>().text = "";
-    //    panel.SetActive(false);
-    //    items.Clear();
-    //    if (scrollItems.Count > 0)
-    //    {
-    //        foreach (GameObject item in scrollItems)
-    //        {
-    //            DestroyImmediate(item);
-    //        }
-    //        scrollItems.Clear();
-    //    }
-    //    character.Change = true;
-    //    PointerExit();
-    //}
+    public void OkButton()
+    {
+        rotate = false;
+        translate = false;
+        bool none = true;
+        GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
+        for (int i = 0; i < scrollItems.Count; i++)
+        {
+            if (scrollItems[i].GetComponent<Toggle>().isOn)
+            {
+                none = false;
+                GameObject.Find(slotName).GetComponent<Image>().sprite = scrollItems[i].GetComponentInChildren<Image>().sprite;
+                int j = int.Parse(scrollItems[i].name);
+                character.Items[WoWHelper.Slot(slotName)] = new ItemModel(items[j].ID, items[j].Version, items[j].Slot, items[j].Display, character.Race, character.Gender);
+                if (character.Items[7] != null && (character.Items[7].Slot == 15))
+                {
+                    character.Items[12] = null;
+                    GameObject.Find("offhand").GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-offhand");
+                }
+                break;
+            }
+        }
+        if (none)
+        {
+            character.Items[WoWHelper.Slot(slotName)] = null;
+            GameObject.Find(slotName).GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + slotName);
+        }
+        panel.GetComponentInChildren<InputField>().text = "";
+        panel.SetActive(false);
+        items.Clear();
+        if (scrollItems.Count > 0)
+        {
+            foreach (GameObject item in scrollItems)
+            {
+                DestroyImmediate(item);
+            }
+            scrollItems.Clear();
+        }
+        character.Change = true;
+        PointerExit();
+    }
 
-    //public void CancelButton()
-    //{
-    //    rotate = false;
-    //    translate = false;
-    //    GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
-    //    panel.GetComponentInChildren<InputField>().text = "";
-    //    EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject.SetActive(false);
-    //    items.Clear();
-    //    if (scrollItems.Count > 0)
-    //    {
-    //        foreach (GameObject item in scrollItems)
-    //        {
-    //            DestroyImmediate(item);
-    //        }
-    //        scrollItems.Clear();
-    //    }
-    //    PointerExit();
-    //}
+    public void CancelButton()
+    {
+        rotate = false;
+        translate = false;
+        GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
+        panel.GetComponentInChildren<InputField>().text = "";
+        EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject.SetActive(false);
+        items.Clear();
+        if (scrollItems.Count > 0)
+        {
+            foreach (GameObject item in scrollItems)
+            {
+                DestroyImmediate(item);
+            }
+            scrollItems.Clear();
+        }
+        PointerExit();
+    }
 
-    //public void Filter(string text)
-    //{
-    //    Transform parent = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.GetComponentInChildren<VerticalLayoutGroup>().transform;
-    //    if (scrollItems.Count > 0)
-    //    {
-    //        foreach (GameObject item in scrollItems)
-    //        {
-    //            DestroyImmediate(item);
-    //        }
-    //        scrollItems.Clear();
-    //    }
-    //    Toggle none = parent.parent.GetComponentInChildren<Toggle>();
-    //    if (text == "")
-    //    {
-    //        for (int i = 0; i < 100; i++)
-    //        {
-    //            scrollItems.Add(Instantiate(scrollItem, parent));
-    //            scrollItems[i].name = i.ToString();
-    //            scrollItems[i].GetComponent<Toggle>().group = parent.parent.GetComponentInChildren<ToggleGroup>();
-    //            scrollItems[i].GetComponentInChildren<Text>().text = items[i].Name;
-    //            scrollItems[i].GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
-    //            scrollItems[i].GetComponentInChildren<Image>().sprite = WoWHelper.GetIcon(items[i].Icon);
-    //            scrollItems[i].GetComponentsInChildren<Image>()[1].color = WoWHelper.QualityColor(items[i].Quality);
-    //            Image tooltip = Array.Find(scrollItems[i].GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
-    //            tooltip.gameObject.SetActive(true);
-    //            tooltip.GetComponentInChildren<Text>().text = items[i].Name;
-    //            tooltip.GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
-    //            tooltip.gameObject.SetActive(false);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        for (int i = 0, j = 0; i < 100; j++)
-    //        {
-    //            if (j >= items.Count)
-    //            {
-    //                break;
-    //            }
-    //            if (items[j].Name.ToLower().Contains(text.ToLower()))
-    //            {
-    //                scrollItems.Add(Instantiate(scrollItem, parent));
-    //                scrollItems[i].name = j.ToString();
-    //                scrollItems[i].GetComponent<Toggle>().group = parent.parent.GetComponentInChildren<ToggleGroup>();
-    //                scrollItems[i].GetComponentInChildren<Text>().text = items[j].Name;
-    //                scrollItems[i].GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[j].Quality);
-    //                scrollItems[i].GetComponentInChildren<Image>().sprite = WoWHelper.GetIcon(items[j].Icon);
-    //                scrollItems[i].GetComponentsInChildren<Image>()[1].color = WoWHelper.QualityColor(items[j].Quality);
-    //                Image tooltip = Array.Find(scrollItems[i].GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
-    //                tooltip.gameObject.SetActive(true);
-    //                tooltip.GetComponentInChildren<Text>().text = items[j].Name;
-    //                tooltip.GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[j].Quality);
-    //                tooltip.gameObject.SetActive(false);
-    //                i++;
-    //            }
-    //        }
-    //    }
-    //    none.isOn = true;
-    //}
+    public void Filter(string text)
+    {
+        Transform parent = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.GetComponentInChildren<VerticalLayoutGroup>().transform;
+        if (scrollItems.Count > 0)
+        {
+            foreach (GameObject item in scrollItems)
+            {
+                DestroyImmediate(item);
+            }
+            scrollItems.Clear();
+        }
+        Toggle none = parent.parent.GetComponentInChildren<Toggle>();
+        if (text == "")
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                scrollItems.Add(Instantiate(scrollItem, parent));
+                scrollItems[i].name = i.ToString();
+                scrollItems[i].GetComponent<Toggle>().group = parent.parent.GetComponentInChildren<ToggleGroup>();
+                scrollItems[i].GetComponentInChildren<Text>().text = items[i].Name;
+                scrollItems[i].GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
+                scrollItems[i].GetComponentInChildren<Image>().sprite = IconFromBLP(items[i].Icon);
+                scrollItems[i].GetComponentsInChildren<Image>()[1].color = WoWHelper.QualityColor(items[i].Quality);
+                Image tooltip = Array.Find(scrollItems[i].GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
+                tooltip.gameObject.SetActive(true);
+                tooltip.GetComponentInChildren<Text>().text = items[i].Name;
+                tooltip.GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
+                tooltip.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            for (int i = 0, j = 0; i < 100; j++)
+            {
+                if (j >= items.Count)
+                {
+                    break;
+                }
+                if (items[j].Name.ToLower().Contains(text.ToLower()))
+                {
+                    scrollItems.Add(Instantiate(scrollItem, parent));
+                    scrollItems[i].name = j.ToString();
+                    scrollItems[i].GetComponent<Toggle>().group = parent.parent.GetComponentInChildren<ToggleGroup>();
+                    scrollItems[i].GetComponentInChildren<Text>().text = items[j].Name;
+                    scrollItems[i].GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[j].Quality);
+                    scrollItems[i].GetComponentInChildren<Image>().sprite = IconFromBLP(items[j].Icon);
+                    scrollItems[i].GetComponentsInChildren<Image>()[1].color = WoWHelper.QualityColor(items[j].Quality);
+                    Image tooltip = Array.Find(scrollItems[i].GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
+                    tooltip.gameObject.SetActive(true);
+                    tooltip.GetComponentInChildren<Text>().text = items[j].Name;
+                    tooltip.GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[j].Quality);
+                    tooltip.gameObject.SetActive(false);
+                    i++;
+                }
+            }
+        }
+        none.isOn = true;
+    }
 
     public void Exit()
     {
@@ -1292,21 +1303,24 @@ public class ScreenInput : MonoBehaviour
 
     public void Customize()
     {
-        if (!customize)
+        if (character.Loaded)
         {
-            customize = true;
-            genderPanel.gameObject.SetActive(!customize);
-            alliancePanel.gameObject.SetActive(!customize);
-            hordePanel.gameObject.SetActive(!customize);
-            classPanel.gameObject.SetActive(!customize);
-            customizationPanel.gameObject.SetActive(customize);
-            gearButton.gameObject.SetActive(customize);
-            formPanel.gameObject.SetActive(true);
-            SetupFormPanel();
-        }
-        else
-        {
-            Save();
+            if (!customize)
+            {
+                customize = true;
+                genderPanel.gameObject.SetActive(!customize);
+                alliancePanel.gameObject.SetActive(!customize);
+                hordePanel.gameObject.SetActive(!customize);
+                classPanel.gameObject.SetActive(!customize);
+                customizationPanel.gameObject.SetActive(customize);
+                gearButton.gameObject.SetActive(customize);
+                formPanel.gameObject.SetActive(true);
+                SetupFormPanel();
+            }
+            else
+            {
+                Save();
+            }
         }
         customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
         exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
@@ -1342,8 +1356,6 @@ public class ScreenInput : MonoBehaviour
             {
                 sCharacter = JsonConvert.DeserializeObject<SerializableCharacter>(reader.ReadToEnd());
             }
-            bool temp1 = customize;
-            bool temp2 = gear;
             if (gear)
             {
                 Gear();
@@ -1366,44 +1378,29 @@ public class ScreenInput : MonoBehaviour
             connection.Open();
             gearPanel.gameObject.SetActive(true);
             int icon;
-            //for (int i = 0; i < sCharacter.items.Length; i++)
-            //{
-            //    if (sCharacter.items[i].id != 0)
-            //    {
-            //        using (SqliteCommand command = connection.CreateCommand())
-            //        {
-            //            command.CommandType = CommandType.Text;
-            //            command.CommandText = "SELECT [Display ID], Icon, Slot FROM Items WHERE ID = " + sCharacter.items[i].id + " AND Version = " + sCharacter.items[i].version + ";";
-            //            SqliteDataReader reader = command.ExecuteReader();
-            //            reader.Read();
-            //            character.Items[i] = new ItemModel(sCharacter.items[i].id, sCharacter.items[i].version, reader.GetInt32(2), reader.GetInt32(0), character.Race, character.Gender);
-            //            icon = reader.GetInt32(1);
-            //        }
-            //        using (SqliteCommand command = connection.CreateCommand())
-            //        {
-            //            command.CommandType = CommandType.Text;
-            //            command.CommandText = "SELECT File FROM Files WHERE ID = " + icon + ";";
-            //            SqliteDataReader reader = command.ExecuteReader();
-            //            reader.Read();
-            //            GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = WoWHelper.GetIcon(reader.GetString(0));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        character.Items[i] = null;
-            //        GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + WoWHelper.SlotName(i));
-            //    }
-            //}
+            for (int i = 0; i < sCharacter.items.Length; i++)
+            {
+                if (sCharacter.items[i].id != 0)
+                {
+                    using (SqliteCommand command = connection.CreateCommand())
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = "SELECT [Display ID], Icon, Slot FROM Items WHERE ID = " + sCharacter.items[i].id + " AND Version = " + sCharacter.items[i].version + ";";
+                        SqliteDataReader reader = command.ExecuteReader();
+                        reader.Read();
+                        character.Items[i] = new ItemModel(sCharacter.items[i].id, sCharacter.items[i].version, reader.GetInt32(2), reader.GetInt32(0), character.Race, character.Gender);
+                        icon = reader.GetInt32(1);
+                    }
+                    GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = IconFromBLP(icon);
+                }
+                else
+                {
+                    character.Items[i] = null;
+                    GameObject.Find(WoWHelper.SlotName(i)).GetComponent<Image>().sprite = Resources.Load<Sprite>(@"Icons\ui-paperdoll-slot-" + WoWHelper.SlotName(i));
+                }
+            }
             gearPanel.gameObject.SetActive(false);
             connection.Close();
-            if (temp1)
-            {
-                Customize();
-            }
-            if (temp2)
-            {
-                Gear();
-            }
             character.Change = true;
         }
     }
@@ -1448,8 +1445,6 @@ public class ScreenInput : MonoBehaviour
                 Debug.Log(response.StatusCode);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    bool temp1 = customize;
-                    bool temp2 = gear;
                     if (gear)
                     {
                         Gear();
@@ -1500,15 +1495,7 @@ public class ScreenInput : MonoBehaviour
                     gearPanel.gameObject.SetActive(true);
                     foreach (JToken item in list)
                     {
-                        //EquipItem(item);
-                    }
-                    if (temp1)
-                    {
-                        Customize();
-                    }
-                    if (temp2)
-                    {
-                        Gear();
+                        EquipItem(item);
                     }
                     gearPanel.gameObject.SetActive(false);
                     connection.Close();
@@ -1520,28 +1507,21 @@ public class ScreenInput : MonoBehaviour
         PointerExit();
     }
 
-    //private void EquipItem(JToken item)
-    //{
-    //    int icon;
-    //    int slot = WoWHelper.Slot(item["slot"].Value<string>("type").Replace("_", ""));
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT [Display ID], Icon, Slot FROM Items WHERE ID = " + item.Value<int>("id") + " AND Version = " + item.Value<int>("item_appearance_modifier_id") + "; ";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        reader.Read();
-    //        character.Items[slot] = new ItemModel(item.Value<int>("id"), item.Value<int>("item_appearance_modifier_id"), reader.GetInt32(2), reader.GetInt32(0), character.Race, character.Gender);
-    //        icon = reader.GetInt32(1);
-    //    }
-    //    using (SqliteCommand command = connection.CreateCommand())
-    //    {
-    //        command.CommandType = CommandType.Text;
-    //        command.CommandText = "SELECT File FROM Files WHERE ID = " + icon + ";";
-    //        SqliteDataReader reader = command.ExecuteReader();
-    //        reader.Read();
-    //        GameObject.Find(WoWHelper.SlotName(slot)).GetComponent<Image>().sprite = WoWHelper.GetIcon(reader.GetString(0));
-    //    }
-    //}
+    private void EquipItem(JToken item)
+    {
+        int icon;
+        int slot = WoWHelper.Slot(item["slot"].Value<string>("type").Replace("_", ""));
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT [Display ID], Icon, Slot FROM Items WHERE ID = " + item.Value<int>("id") + " AND Version = " + item.Value<int>("item_appearance_modifier_id") + "; ";
+            SqliteDataReader reader = command.ExecuteReader();
+            reader.Read();
+            character.Items[slot] = new ItemModel(item.Value<int>("id"), item.Value<int>("item_appearance_modifier_id"), reader.GetInt32(2), reader.GetInt32(0), character.Race, character.Gender);
+            icon = reader.GetInt32(1);
+        }
+        GameObject.Find(WoWHelper.SlotName(slot)).GetComponent<Image>().sprite = IconFromBLP(icon);
+    }
 
     public void CancelImportButton()
     {
@@ -1567,20 +1547,20 @@ public class ScreenInput : MonoBehaviour
             {
                 sCharacter.customization[i] = character.Customization[i];
             }
-            //sCharacter.items = new SerializableItems[character.Items.Length];
+            sCharacter.items = new SerializableItems[character.Items.Length];
             for (int i = 0; i < sCharacter.items.Length; i++)
             {
                 sCharacter.items[i] = new SerializableItems();
-                //if (character.Items[i] == null)
-                //{
-                //    sCharacter.items[i].id = 0;
-                //    sCharacter.items[i].version = 0;
-                //}
-                //else
-                //{
-                //    sCharacter.items[i].id = character.Items[i].ID;
-                //    sCharacter.items[i].version = character.Items[i].Version;
-                //}
+                if (character.Items[i] == null)
+                {
+                    sCharacter.items[i].id = 0;
+                    sCharacter.items[i].version = 0;
+                }
+                else
+                {
+                    sCharacter.items[i].id = character.Items[i].ID;
+                    sCharacter.items[i].version = character.Items[i].Version;
+                }
             }
             using (StreamWriter writer = new StreamWriter(path))
             {

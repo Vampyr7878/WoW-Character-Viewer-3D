@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using BLPLib;
+using CASCLib;
+using UnityEngine;
 
 namespace WoW
 {
@@ -45,13 +47,6 @@ namespace WoW
                     break;
             }
             return color;
-        }
-
-        //Load icon
-        public static Sprite GetIcon(string icon)
-        {
-            Texture2D texture = Resources.Load<Texture2D>(icon.Replace(".blp", ""));
-            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
         }
 
         //Return slot name
