@@ -18,81 +18,134 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using WoW;
 
+//Class handling main UI input in the scene
 public class ScreenInput : MonoBehaviour
 {
+    //Reference to the camera
     public Camera mainCamera;
+    //Reference to prefeb for element on list of items to equip
     public GameObject scrollItem;
+    //Reference to prefab that is used to create customization UI
     public GameObject customizationDropdown;
+    //Reference to the panel containing gender options
     public GameObject genderPanel;
+    //Reference to the panel containig Alliance races
     public GameObject alliancePanel;
+    //Reference to the panel containing Horde races
     public GameObject hordePanel;
+    //Reference to the pane containing class options
     public GameObject classPanel;
+    //Reference to teh panel for shapeshift forms
     public GameObject formPanel;
+    //Reference to the panel containing all the customization options
     public GameObject customizationPanel;
+    //Reference to the panel containing equipment slots
     public GameObject gearPanel;
+    //Reference to the panel that lets you choose items on the left side
     public GameObject leftPanel;
+    //Reference to the panel that lets you choose items on the right side
     public GameObject rightPanel;
+    //Reference to the panel that handle character import options
     public GameObject importPanel;
+    //References to all class buttons
     public Button[] classButtons;
+    //Reference to the button for main character form
     public Button mainFormButton;
+    //Reference to the left bottom button: Exit/Back
     public Button exitButton;
+    //Reference to the right bottom button: Customize/Save
     public Button customizeButton;
+    //Referenec to the the button that toggles goear panel
     public Button gearButton;
+    //Reference to the button that allows opening saved character from file
     public Button openButton;
+    //Referene to the button that opens import panel
     public Button importButton;
+    //Reference to the "Loading..." text
     public Text loading;
+    //Reference to the main character object
     public Character character;
+    //Reference to the Gilenan form for Worgen characters
     public Gilnean gilnean;
+    //Reference for object that handles rendering of druid forms
     public Druid druid;
-    public int race;
+    //Name of item set to equip in autoscreenshot mode
     public string itemSet;
+    //Toggle on autoscreenshot mode
     public bool screenshot;
-    public bool gender;
+    //Autoscreenshot core races
     public bool core;
+    //Autoscreenshot allied races
     public bool allied;
 
+    //List of all customization option dropdowns
     private List<GameObject> customizationOptions;
+    //Reference to the database connection object
     private SqliteConnection connection;
+    //Dictionary mapping id to race name
     private Dictionary<int, string> races;
+    //Dictionary mapping id to class name
     private Dictionary<int, string> classes;
+    //Dictionary mapping id to druid form model
     private Dictionary<int, string> druidModels;
+    //Referenec to the opened CASC storage
     private CASCHandler casc;
+    //List of all items for opened slot
     private List<Item> items;
+    //List of all items displayed on the equipment panel, max 100
     private List<GameObject> scrollItems;
+    //Reference to teh ImageConverter object for converting Bitmaps into Textures
     protected System.Drawing.ImageConverter converter;
+    //Name for currently oepned equipment slot
     private string slotName;
+    //Is UI in ucstomize mode?
     private bool customize;
+    //Is gear panel opened?
     private bool gear;
+    //This allows to block camera movement when using UI
     private bool translate;
+    //This allows to block model rotation when using UI
     private bool rotate;
+    //This allows to block camera zoom when using UI
     private bool zoom;
+    //Path to the database file
     private string dbPath;
+    //API access token
     private string token;
+    //List of all the core races names
     private List<string> coreRaceNames;
+    //List of all the allied races names
     private List<string> alliedRaceNames;
+    //List of all class names
     private List<string> classNames;
+    //Index of a current race in autoscreenshot mode
     private int r;
+    //Index of a current class in autoscreenshot mode
     private int c;
 
     private void Start()
     {
+        //Open wow CASC storage
         string path;
         using (StreamReader reader = new StreamReader("config.ini"))
         {
             path = reader.ReadLine();
         }
-        converter = new System.Drawing.ImageConverter();
         casc = CASCHandler.OpenLocalStorage(path, "wow");
         casc.Root.SetFlags(LocaleFlags.enGB, true, false);
+        converter = new System.Drawing.ImageConverter();
+        //Allow for translation, rotation and zoom
         translate = true;
         rotate = true;
         zoom = true;
+        //Prepare for autoscreemshot mode
         r = core ? 0 : 12;
         c = -1;
         classNames = new List<string> { "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid", "Monk", "DeathKnight", "DemonHunter" };
         coreRaceNames = new List<string> { "Human", "Orc", "Dwarf", "Undead", "NightElf", "Tauren", "Gnome", "Troll", "Draenei", "BloodElf", "Worgen", "Goblin" };
         alliedRaceNames = new List<string> { "Tushui", "Huojin", "VoidElf", "Nightborne", "Lightforged", "Highmountain", "DarkIron", "Maghar", "KulTiran", "Zandalari", "Mechagnome", "Vulpera" };
         token = GetToken();
+        //Load initialize race, class and druid form dictionaries and load data into them
         races = new Dictionary<int, string>();
         classes = new Dictionary<int, string>();
         druidModels = new Dictionary<int, string>();
@@ -134,17 +187,17 @@ public class ScreenInput : MonoBehaviour
         items = new List<Item>();
         scrollItems = new List<GameObject>();
         customize = false;
-        //RaceButton(race);
-        //GenderButton(gender);
     }
 
     private void Update()
     {
+        //Displayt "Loading..," text when characrter is being loaded
         if (character.Race > 0)
         {
             loading.gameObject.SetActive(!character.Loaded);
         }
         customizeButton.gameObject.SetActive(!gear);
+        //Exit when autoscreenshotting is done
         if (screenshot && ((!allied && r >= coreRaceNames.Count) || r >= coreRaceNames.Count + alliedRaceNames.Count))
         {
             #if UNITY_EDITOR
@@ -153,6 +206,7 @@ public class ScreenInput : MonoBehaviour
                    Application.Quit();
             #endif
         }
+        //Tranlate, rotate and zoom
         mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, mainCamera.transform.position.y, Mathf.Clamp(mainCamera.transform.position.z, -5f, -0.5f));
         if (!screenshot)
         {
@@ -160,6 +214,7 @@ public class ScreenInput : MonoBehaviour
             RotateCamera();
             ZoomCamera();
         }
+        //Select next ui element with Tab key
         if (Input.GetKeyUp(KeyCode.Tab))
         {
             Selectable next = EventSystem.current.currentSelectedGameObject.GetComponent<Selectable>().FindSelectableOnDown();
@@ -168,29 +223,32 @@ public class ScreenInput : MonoBehaviour
                 EventSystem.current.SetSelectedGameObject(next.gameObject);
             }
         }
+        //Exit with Escape key
         if (Input.GetKeyUp(KeyCode.Escape))
         {
             Exit();
         }
+        //Screenshot with F12 key
         if (Input.GetKeyUp(KeyCode.F12))
         {
             StartCoroutine(TakeScreenshot());
         }
-        //if (c < coreRaceNames.Count && screenshot)
-        //{
-        //    string g = character.Gender ? "Male" : "Female";
-        //    if (r >= coreRaceNames.Count && allied && r < coreRaceNames.Count + alliedRaceNames.Count)
-        //    {
-        //        StartCoroutine(TakeScreenshot(@"Screenshots\" + g + alliedRaceNames[r - coreRaceNames.Count] + classes[character.Class].Replace(" ", "") + ".png"));
-        //    }
-        //    else if (r < coreRaceNames.Count)
-        //    {
-        //        StartCoroutine(TakeScreenshot(@"Screenshots\" + g + coreRaceNames[r] + classes[character.Class].Replace(" ", "") + ".png"));
-        //    }
-        //}
-        //GeosetPanel();
+        //Autoscreenshot if enabled
+        if (c < coreRaceNames.Count && screenshot)
+        {
+            string g = character.Gender ? "Male" : "Female";
+            if (r >= coreRaceNames.Count && allied && r < coreRaceNames.Count + alliedRaceNames.Count)
+            {
+                StartCoroutine(TakeScreenshot(@"Screenshots\" + g + alliedRaceNames[r - coreRaceNames.Count] + classes[character.Class].Replace(" ", "") + ".png"));
+            }
+            else if (r < coreRaceNames.Count)
+            {
+                StartCoroutine(TakeScreenshot(@"Screenshots\" + g + coreRaceNames[r] + classes[character.Class].Replace(" ", "") + ".png"));
+            }
+        }
     }
 
+    //Get API access token
     string GetToken()
     {
         using (HttpClient client = new HttpClient())
@@ -216,6 +274,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Make screenshot
     private IEnumerator TakeScreenshot()
     {
         if (!Directory.Exists("Screenshots"))
@@ -228,6 +287,7 @@ public class ScreenInput : MonoBehaviour
         openButton.transform.parent.gameObject.SetActive(true);
     }
 
+    //Make autoscreenshot
     private IEnumerator TakeScreenshot(string filename)
     {
         if (!Directory.Exists("Screenshots"))
@@ -266,6 +326,7 @@ public class ScreenInput : MonoBehaviour
         screenshot = true;
     }
 
+    //Translate camera
     private void TranslateCamera()
     {
         if (translate && Input.GetMouseButton(1))
@@ -278,6 +339,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Rotate model
     private void RotateCamera()
     {
         if (rotate && Input.GetMouseButton(0))
@@ -288,6 +350,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Zoom camare
     private void ZoomCamera()
     {
         if (zoom)
@@ -299,6 +362,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Get all customization choices from database
     private void GetCustomizationOptions()
     {
         character.Choices = new CustomizationChoice[character.Options.Length][];
@@ -395,6 +459,7 @@ public class ScreenInput : MonoBehaviour
         Category(0);
     }
 
+    //Setup UI for current customization
     public void SetCustomizationNamesAndColors(int i)
     {
         Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color");
@@ -439,6 +504,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Hide unused categories for customization
     private void SetupCategories()
     {
         Button[] categories = customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().GetComponentsInChildren<Button>(true);
@@ -455,6 +521,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Load customization options and prepare UI for them
     private void SetupCustomizationPanel()
     {
         foreach (GameObject customizaionOption in customizationOptions)
@@ -516,6 +583,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Load all the items matching the opened equipment slot
     private void FillItems(int slot, GameObject panel)
     {
         panel.GetComponentInChildren<InputField>().text = "";
@@ -566,7 +634,7 @@ public class ScreenInput : MonoBehaviour
         none.isOn = true;
     }
 
-    //Create texture from BLP file
+    //Create icon from BLP file
     private Sprite IconFromBLP(int file)
     {
         try
@@ -584,6 +652,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Clear all the equipped items
     private void ClearItems()
     {
         foreach (Button button in gearPanel.GetComponentsInChildren<Button>())
@@ -596,6 +665,7 @@ public class ScreenInput : MonoBehaviour
         character.ClearItems();
     }
 
+    //Change colors for ui buttons for hero classes
     private void ChangeButtonColors()
     {
         Color color;
@@ -626,6 +696,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Setup shadpeshift forms panel
     private void SetupFormPanel()
     {
         Mask[] buttons = formPanel.GetComponentsInChildren<Mask>(true);
@@ -651,6 +722,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Change circle button's border so only selected one glows
     private void ChangeBorder(GameObject selected)
     {
         if (selected != null)
@@ -675,6 +747,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Reset round buttons borders
     private void ResetBorder()
     {
         Image[] images = classPanel.GetComponentsInChildren<Image>(true);
@@ -694,6 +767,7 @@ public class ScreenInput : MonoBehaviour
         images.Single(i => i.name == "glow").gameObject.SetActive(true);
     }
 
+    //Change border for race buttons so only one is glowing
     private void ChangeRaceBorder(GameObject selected)
     {
         if (selected != null)
@@ -729,6 +803,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Swap race buttons icons depending on the gender
     private void SwapIcons(bool gender)
     {
         Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
@@ -760,6 +835,7 @@ public class ScreenInput : MonoBehaviour
         formPanel.SetActive(false);
     }
 
+    //Link customization dropdowns to customization options stored in Character object
     private void LinkDropdowns()
     {
         character.CustomizationDropdowns.Clear();
@@ -769,6 +845,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Load Gilenan model
     private void LoadGilnean()
     {
         string model;
@@ -790,6 +867,7 @@ public class ScreenInput : MonoBehaviour
         gilnean.LoadModel(model, casc);
     }
 
+    //Set gender and load current race model for that gender
     public void GenderButton(bool gender)
     {
         if (character.Gender == gender)
@@ -837,6 +915,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Set Race and load current gender model for that race
     public void RaceButton(int race)
     {
         Button current;
@@ -908,6 +987,7 @@ public class ScreenInput : MonoBehaviour
         druid.gameObject.SetActive(false);
     }
 
+    //Toggle different shapeshift form
     public void FormButton(int form)
     {
         if (character.Form == form)
@@ -946,6 +1026,7 @@ public class ScreenInput : MonoBehaviour
         Dropdown(Array.FindIndex(character.Options, o => o.Form == character.Form));
     }
 
+    //Set class
     public void ClassButton(int id)
     {
         if (id == character.Class)
@@ -970,6 +1051,7 @@ public class ScreenInput : MonoBehaviour
         character.Change = true;
     }
 
+    //Select customization category
     public void Category(int index)
     {
         string icon;
@@ -998,6 +1080,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Setup display for newly selected dropdown value and load new druid form when applicable
     public void Dropdown(int index)
     {
         CustomDropdown dropdown = customizationOptions[index].GetComponentInChildren<CustomDropdown>();
@@ -1056,6 +1139,7 @@ public class ScreenInput : MonoBehaviour
         druid.Change = true;
     }
 
+    //When mouse enters UI element block translation, rotation and zoom
     public void PointerEnter()
     {
         translate = false;
@@ -1063,6 +1147,7 @@ public class ScreenInput : MonoBehaviour
         zoom = false;
     }
 
+    //When mouse leaves UI element allow translation, rotation and zoom
     public void PointerExit()
     {
         translate = true;
@@ -1070,6 +1155,7 @@ public class ScreenInput : MonoBehaviour
         zoom = true;
     }
 
+    //Select previous customization option in Dropdown
     public void PrevButton(int index)
     {
         Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
@@ -1093,6 +1179,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Select next customization option in Dropdown
     public void NextButton(int index)
     {
         Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
@@ -1116,6 +1203,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Equipment button on the left toggles equipement panel on the left side
     public void LeftButton(int slot)
     {
         rightPanel.gameObject.SetActive(false);
@@ -1132,6 +1220,7 @@ public class ScreenInput : MonoBehaviour
         EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(null);
     }
 
+    //Equipment button on the right toggles equipement panel on the righ side
     public void RightButton(int slot)
     {
         leftPanel.gameObject.SetActive(false);
@@ -1148,6 +1237,7 @@ public class ScreenInput : MonoBehaviour
         EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(null);
     }
 
+    //Equip selected item when pressed OK on equipment panel
     public void OkButton()
     {
         rotate = false;
@@ -1190,6 +1280,7 @@ public class ScreenInput : MonoBehaviour
         PointerExit();
     }
 
+    //Close equipment panel without equiping anything with Cancel button
     public void CancelButton()
     {
         rotate = false;
@@ -1209,6 +1300,7 @@ public class ScreenInput : MonoBehaviour
         PointerExit();
     }
 
+    //Filter displayed items using filter box
     public void Filter(string text)
     {
         Transform parent = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.GetComponentInChildren<VerticalLayoutGroup>().transform;
@@ -1268,6 +1360,7 @@ public class ScreenInput : MonoBehaviour
         none.isOn = true;
     }
 
+    //If in customize mode go back, else exit the application
     public void Exit()
     {
         if (!customize)
@@ -1301,6 +1394,7 @@ public class ScreenInput : MonoBehaviour
         customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
     }
 
+    //If in customize mode open save file window, else go into customzie mode
     public void Customize()
     {
         if (character.Loaded)
@@ -1326,6 +1420,7 @@ public class ScreenInput : MonoBehaviour
         exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
     }
 
+    //Toggle gear panel
     public void Gear()
     {
         gear = !gear;
@@ -1342,6 +1437,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Open saved character json file
     public void Open(string file)
     {
         if (!Directory.Exists("Save"))
@@ -1405,11 +1501,13 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
+    //Show import panel
     public void Import()
     {
         importPanel.SetActive(true);
     }
 
+    //Import character from armory when pressed OK button
     public void OKImportButton()
     {
         using (HttpClient client = new HttpClient())
@@ -1507,6 +1605,7 @@ public class ScreenInput : MonoBehaviour
         PointerExit();
     }
 
+    //Equip item for imported character
     private void EquipItem(JToken item)
     {
         int icon;
@@ -1523,12 +1622,14 @@ public class ScreenInput : MonoBehaviour
         GameObject.Find(WoWHelper.SlotName(slot)).GetComponent<Image>().sprite = IconFromBLP(icon);
     }
 
+    //Close import panel without importing with Cancel button
     public void CancelImportButton()
     {
         importPanel.SetActive(false);
         PointerExit();
     }
 
+    //Save character as json file
     public void Save()
     {
         if (!Directory.Exists("Save"))

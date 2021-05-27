@@ -8,20 +8,29 @@ using UnityEngine.Rendering;
 using WoW;
 using WoW.Characters;
 
+//Class to handle Gilnean models
 public class Gilnean : ModelRenderer
 {
+    //Reference to the main character model
     public Character worgen;
 
+    //Reference to the laoded character helper
     private CharacterHelper helper;
+    //List of geosets that are enabled for loading
     private List<int> activeGeosets;
 
+    //First gear model suffix
     public string Suffix1 { get; set; }
+    //Second gear model suffix
     public string Suffix2 { get; set; }
+    //Path from where the model is loaded
     public string RacePath { get; set; }
+    //Character's gender
     public bool Gender { get; set; }
 
     private void Start()
     {
+        //Initialize character
         modelsPath = @"character\";
         Gender = true;
         Change = false;
@@ -30,10 +39,9 @@ public class Gilnean : ModelRenderer
 
     private void FixedUpdate()
     {
-        SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
-        Animator animator = GetComponentInChildren<Animator>();
         if (Loaded)
         {
+            //Render the model
             if (Change)
             {
                 Resources.UnloadUnusedAssets();
@@ -48,6 +56,7 @@ public class Gilnean : ModelRenderer
                 animator.SetInteger("Face", worgen.Choices[index][worgen.Customization[index]].Bone);
                 Change = false;
             }
+            //Animate textures
             for (int i = 0; i < Model.Skin.Textures.Length; i++)
             {
                 AnimateTextures(renderer, i);
@@ -59,6 +68,7 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Set material with proper shader
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
         if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
@@ -77,6 +87,7 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Setup all the material properties
     protected override void SetTexture(Material material, int i)
     {
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
@@ -104,6 +115,7 @@ public class Gilnean : ModelRenderer
         material.SetFloat("_DepthTest", depth);
     }
 
+    //Unload the model
     public void UnloadModel()
     {
         DestroyImmediate(mesh);
@@ -114,7 +126,8 @@ public class Gilnean : ModelRenderer
         }
     }
 
-    private IEnumerator LoadPrefab(string modelfile, CASCHandler casc)
+    //Load and setup model prefab
+    private IEnumerator LoadPrefab(string modelfile)
     {
         bool done = false;
         DestroyImmediate(mesh);
@@ -140,11 +153,11 @@ public class Gilnean : ModelRenderer
             textures = new Texture2D[Model.Textures.Length];
             if (worgen.Gender)
             {
-                helper = new GilneanMale(Model, worgen, casc);
+                helper = new GilneanMale(Model, worgen);
             }
             else
             {
-                helper = new GilneanFemale(Model, worgen, casc);
+                helper = new GilneanFemale(Model, worgen);
             }
             yield return null;
             time = new float[Model.TextureAnimations.Length];
@@ -155,13 +168,15 @@ public class Gilnean : ModelRenderer
                 frame[i] = 0;
                 yield return null;
             }
+            renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+            animator = GetComponentInChildren<Animator>();
             Change = true;
             Loaded = !loadBinaries.IsAlive;
-            yield return null;
         }
         gameObject.SetActive(false);
     }
 
+    //Load the model
     public void LoadModel(string modelfile, CASCHandler casc)
     {
         Loaded = false;
@@ -169,6 +184,6 @@ public class Gilnean : ModelRenderer
         {
             loadBinaries.Abort();
         }
-        StartCoroutine(LoadPrefab(modelfile, casc));
+        StartCoroutine(LoadPrefab(modelfile));
     }
 }

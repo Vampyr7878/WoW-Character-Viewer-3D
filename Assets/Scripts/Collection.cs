@@ -20,16 +20,15 @@ public class Collection : ModelRenderer
     //Changable texture from database
     public int Texture { get; set; }
 
-    //Set the model to not loaded at start
     private void Start()
     {
+        //Set the model to not loaded at start
         Change = false;
         Loaded = false;
     }
 
     private void FixedUpdate()
     {
-        SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
         if (Loaded)
         {
             //Render the model
@@ -194,7 +193,7 @@ public class Collection : ModelRenderer
             LoadColors();
             yield return null;
             textures = new Texture2D[Model.Textures.Length];
-            SkinnedMeshRenderer renderer = mesh.GetComponentInChildren<SkinnedMeshRenderer>();
+            renderer = mesh.GetComponentInChildren<SkinnedMeshRenderer>();
             SkinnedMeshRenderer renderer2 = character.GetComponentInChildren<SkinnedMeshRenderer>();
             Dictionary<int, int> boneMap = new Dictionary<int, int>();
             for (int i = 0, j = 0; i < Model.Skeleton.Bones.Length; i++, j++)
@@ -231,7 +230,6 @@ public class Collection : ModelRenderer
             }
             Loaded = !loadBinaries.IsAlive;
             Change = true;
-            yield return null;
         }
     }
 }

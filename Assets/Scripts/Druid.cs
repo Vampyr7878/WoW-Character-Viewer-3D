@@ -13,19 +13,21 @@ public class Druid : ModelRenderer
     //Reference to the character
     public Character character;
 
+    //Reference to the main camera
+    private Transform camera;
+    
     //Particle colors from database
     public ParticleColor[] ParticleColors { get; set; }
 
     private void Start()
     {
-        //Initiazlie path
+        //Initiazlie
         modelsPath = @"creature\";
+        camera = Camera.main.transform;
     }
 
     private void FixedUpdate()
     {
-        SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
-        Transform camera = Camera.main.transform;
         if (Loaded)
         {
             //Steup and render model
@@ -291,6 +293,7 @@ public class Druid : ModelRenderer
                 frame[i] = 0;
                 yield return null;
             }
+            renderer = GetComponentInChildren<SkinnedMeshRenderer>();
             Change = true;
             Loaded = !loadBinaries.IsAlive;
         }

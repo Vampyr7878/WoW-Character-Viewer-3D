@@ -16,13 +16,8 @@ namespace WoW
         //Reference to a main class that handles character models
         public Character Character { get; protected set; }
 
-        //Reference to loaded casc data
-        protected CASCHandler casc;
-        //Image converter for loading textures
-        protected System.Drawing.ImageConverter converter;
-
         //Draw Texture on top of another
-        protected void DrawTexture(Texture2D texture, Texture2D layer, int i, int j, float cover = 1f)
+        public void DrawTexture(Texture2D texture, Texture2D layer, int i, int j, float cover = 1f)
         {
             for (int x = 0; x < layer.width; x++)
             {
@@ -93,16 +88,6 @@ namespace WoW
             }
         }
 
-        //Create texture from BLP file
-        protected Texture2D TextureFromBLP(int file)
-        {
-            BLP blp = new BLP(casc.OpenFile(file));
-            System.Drawing.Bitmap image = blp.GetImage();
-            Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
-            texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
-            return texture;
-        }
-
         //Load textures and store them to be used while rendering
         public void LoadTextures(Texture2D[] textures)
         {
@@ -116,10 +101,9 @@ namespace WoW
                 }
                 else
                 {
-                    Texture2D texture = TextureFromBLP(file);
+                    Texture2D texture = Character.TextureFromBLP(file);
                     textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                     textures[i].SetPixels32(texture.GetPixels32());
-                    //textures[i].alphaIsTransparency = true;
                     if (Model.Textures[i].Flags == 0)
                     {
                         textures[i].wrapMode = TextureWrapMode.Clamp;

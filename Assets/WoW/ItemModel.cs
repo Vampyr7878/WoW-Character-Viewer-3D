@@ -56,7 +56,7 @@ namespace WoW
             ID = id;
             Version = version;
             Slot = slot;
-            SqliteConnection connection = new SqliteConnection("URI=file:" + Application.streamingAssetsPath + "/database.sqlite");
+            SqliteConnection connection = new SqliteConnection($"URI=file:{Application.streamingAssetsPath}/database.sqlite");
             connection.Open();
             if (display == 0)
             {
@@ -104,7 +104,7 @@ namespace WoW
                 using (SqliteCommand command = connection.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
-                    command.CommandText = "SELECT * FROM DisplayInfo WHERE ID = " + display + ";";
+                    command.CommandText = $"SELECT * FROM DisplayInfo WHERE ID = {display};";
                     SqliteDataReader reader = command.ExecuteReader();
                     reader.Read();
                     leftModel = reader.GetInt32(1);
@@ -137,45 +137,40 @@ namespace WoW
                 }
                 //LeftModel = GetFilePath(connection, leftModel).Replace("rshoulder", "lshoulder").Replace("_r.", "_l.");
                 //RightModel = GetFilePath(connection, rightModel).Replace("lshoulder", "rshoulder").Replace("_l.", "_r.");
-                //UpperArm = GetFilePath(connection, upperArm).Replace("_f.", "_u.").Replace("_m.", "_u.").Replace("_m.", "_u.");
-                //LowerArm = GetFilePath(connection, lowerArm).Replace("_f.", "_u.").Replace("_m.", "_u.");
-                //Hand = GetFilePath(connection, hand).Replace("_f.", "_u.").Replace("_m.", "_u.");
-                //UpperTorso = GetFilePath(connection, upperTorso).Replace("_f.", "_u.").Replace("_m.", "_u.");
-                //LowerTorso = GetFilePath(connection, lowerTorso).Replace("_f.", "_u.").Replace("_m.", "_u.");
-                //UpperLeg = GetFilePath(connection, upperLeg).Replace("_f.", "_u.").Replace("_m.", "_u.");
-                //LowerLeg = GetFilePath(connection, lowerLeg).Replace("_f.", "_u.").Replace("_m.", "_u.");
-                //Foot = GetFilePath(connection, foot).Replace("_f.", "_u.").Replace("_m.", "_u.");
-                if (gender)
-                {
-                    Helmet = HelmetGeosets(connection, maleHelmet, race);
-                }
-                else
-                {
-                    Helmet = HelmetGeosets(connection, femaleHelmet, race);
-                }
+                UpperArm = GetMaterial(connection, upperArm, gender);
+                LowerArm = GetMaterial(connection, lowerArm, gender);
+                Hand = GetMaterial(connection, hand, gender);
+                UpperTorso = GetMaterial(connection, upperTorso, gender);
+                LowerTorso = GetMaterial(connection, lowerTorso, gender);
+                UpperLeg = GetMaterial(connection, upperLeg, gender);
+                LowerLeg = GetMaterial(connection, lowerLeg, gender);
+                Foot = GetMaterial(connection, foot, gender);
+                Helmet = gender ? HelmetGeosets(connection, maleHelmet, race) : HelmetGeosets(connection, femaleHelmet, race);
                 ParticleColors = GetParticleColors(connection, particleColor);
             }
             connection.Close();
         }
 
-        string GetFilePath(SqliteConnection connection, int index)
+        //Get proper texture ID based on gender
+        int GetMaterial(SqliteConnection connection, int index, bool gender)
         {
             if (index == 0)
             {
-                return "";
+                return 0;
             }
-            string result;
+            int result;
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT File FROM Files WHERE ID = " + index + ";";
+                command.CommandText = $"SELECT Female, Male FROM ItemMaterials WHERE ID = {index};";
                 SqliteDataReader reader = command.ExecuteReader();
                 reader.Read();
-                result = reader.GetString(0);
+                result = gender ? reader.GetInt32(1) : reader.GetInt32(0);
             }
             return result;
         }
 
+        //Load geosets to be hidden with the helmet
         List<int> HelmetGeosets(SqliteConnection connection, int index, int race)
         {
             List<int> helmet = new List<int>();
@@ -196,6 +191,7 @@ namespace WoW
             return helmet;
         }
 
+        //Load particle colors for given item
         ParticleColor[] GetParticleColors(SqliteConnection connection, int id)
         {
             ParticleColor[] particleColors = new ParticleColor[3];

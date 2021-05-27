@@ -1,5 +1,4 @@
-﻿using CASCLib;
-using M2Lib;
+﻿using M2Lib;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,12 +8,10 @@ namespace WoW.Characters
     //Class to handle gilnean female customization
     public class GilneanFemale : CharacterHelper
     {
-        public GilneanFemale(M2 model, Character character, CASCHandler casc)
+        public GilneanFemale(M2 model, Character character)
         {
             Model = model;
             Character = character;
-            converter = new System.Drawing.ImageConverter();
-            this.casc = casc;
         }
 
         public override void ChangeGeosets(List<int> activeGeosets)
@@ -131,65 +128,65 @@ namespace WoW.Characters
             int index, index2;
             index = Array.FindIndex(Character.Options, o => o.Name == "Face" && o.Form == 7);
             index2 = Array.FindIndex(Character.Options, o => o.Name == "Skin Color" && o.Form == 7);
-            Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+            Texture2D face = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
             DrawTexture(texture, face, 512, 0);
             index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color" && o.Form == 7);
             if (Character.Choices[index][Character.Customization[index]].Textures[0].Texture2 >= 0)
             {
-                Texture2D texture2 = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
+                Texture2D texture2 = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
                 OverlayTexture(texture, texture2, 0, 0);
             }
-            //if (Character.Items[3] == null && Character.Items[4] == null && Character.Items[5] == null)
-            //{
-                Texture2D bra = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture4);
+            if (Character.Items[3] == null && Character.Items[4] == null && Character.Items[5] == null)
+            {
+                Texture2D bra = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture4);
                 DrawTexture(texture, bra, 256, 384);
-            //}
-            //if (!(Character.Items[3] != null && Character.Items[3].UpperLeg != "") && Character.Items[10] == null)
-            //{
-                Texture2D underwear = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture3);
+            }
+            if (!(Character.Items[3] != null && Character.Items[3].UpperLeg !> 0) && Character.Items[10] == null)
+            {
+                Texture2D underwear = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture3);
                 DrawTexture(texture, underwear, 256, 192);
-            //}
+            }
             index = Array.FindIndex(Character.Options, o => o.Name == "Makeup" && o.Form == 7);
             if (Character.Choices[index][Character.Customization[index]].Textures[0].Texture1 >= 0)
             {
-                Texture2D makeup = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture1);
+                Texture2D makeup = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture1);
                 DrawTexture(texture, makeup, 512, 0);
             }
             index = Array.FindIndex(Character.Options, o => o.Name == "Eye Color" && o.Form == 7);
             if (Character.Choices[index][Character.Customization[index]].Textures[0].Texture2 >= 0)
             {
-                Texture2D eyeglow = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
+                Texture2D eyeglow = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
                 DrawTexture(texture, eyeglow, 512, 0, 0.5f);
             }
             index = Array.FindIndex(Character.Options, o => o.Name == "Hair Style" && o.Form == 7);
             index2 = Array.FindIndex(Character.Options, o => o.Name == "Hair Color" && o.Form == 7);
             if (Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1 >= 0)
             {
-                Texture2D scalp = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+                Texture2D scalp = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
                 DrawTexture(texture, scalp, 512, 0);
             }
             index = Array.FindIndex(Character.Options, o => o.Name == "Eyebrows" && o.Form == 7);
-            Texture2D facial = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+            Texture2D facial = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
             DrawTexture(texture, facial, 512, 0);
-            //Character.TextureShirt(texture);
-            //if (!(Character.Items[4] != null && Character.Items[4].Geoset1 != 0))
-            //{
-            //    Character.TextureWrist(texture);
-            //}
-            //Character.TextureLegs(texture);
-            //Character.TextureFeet(texture);
-            //Character.TextureChest(texture);
-            //if (!(Character.Items[3] != null && Character.Items[3].Geoset1 != 0))
-            //{
-            //    Character.TextureWrist(texture);
-            //}
-            //Character.TextureHands(texture);
-            //if (!(Character.Items[8] != null && Character.Items[8].Geoset1 != 0))
-            //{
-            //    Character.TextureChest(texture);
-            //}
-            //Character.TextureTabard(texture);
-            //Character.TextureWaist(texture);
+            Character.TextureShirt(texture);
+            if (!(Character.Items[4] != null && Character.Items[4].Geoset1 != 0))
+            {
+                Character.TextureWrist(texture);
+            }
+            Character.TextureLegs(texture);
+            Character.TextureFeet(texture);
+            Character.TextureChest(texture);
+            if (!(Character.Items[3] != null && Character.Items[3].Geoset1 != 0))
+            {
+                Character.TextureWrist(texture);
+            }
+            Character.TextureHands(texture);
+            if (!(Character.Items[8] != null && Character.Items[8].Geoset1 != 0))
+            {
+                Character.TextureChest(texture);
+            }
+            Character.TextureTabard(texture);
+            Character.TextureWaist(texture);
         }
 
         protected override int LoadTexture(M2Texture texture, int i, out bool skin)
@@ -207,16 +204,9 @@ namespace WoW.Characters
                     file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
                     skin = true;
                     break;
-                //case 2:
-                //    if (Character.Items[2] != null)
-                //    {
-                //        file = Character.Items[2].LeftTexture;
-                //    }
-                //    else
-                //    {
-                //        file = "";
-                //    }
-                //    break;
+                case 2:
+                    file = Character.Items[2] != null ? Character.Items[2].LeftTexture : -1;
+                    break;
                 case 6:
                     index = Array.FindIndex(Character.Options, o => o.Name == "Hair Style" && o.Form == 7);
                     index2 = Array.FindIndex(Character.Options, o => o.Name == "Hair Color" && o.Form == 7);

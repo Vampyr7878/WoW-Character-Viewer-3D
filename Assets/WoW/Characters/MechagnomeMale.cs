@@ -1,5 +1,4 @@
-﻿using CASCLib;
-using M2Lib;
+﻿using M2Lib;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,12 +8,10 @@ namespace WoW.Characters
     //Class to handle mechagnome male customization
     public class MechagnomeMale : CharacterHelper
     {
-        public MechagnomeMale(M2 model, Character character, CASCHandler casc)
+        public MechagnomeMale(M2 model, Character character)
         {
             Model = model;
             Character = character;
-            converter = new System.Drawing.ImageConverter();
-            this.casc = casc;
         }
 
         public override void ChangeGeosets(List<int> activeGeosets)
@@ -104,28 +101,28 @@ namespace WoW.Characters
             index2 = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
             if (Character.Class == 6)
             {
-                Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture2);
+                Texture2D face = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture2);
                 DrawTexture(texture, face, 512, 0);
             }
             else
             {
-                Texture2D face = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
+                Texture2D face = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
                 DrawTexture(texture, face, 512, 0);
             }
             index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
-            //if (!(Character.Items[3] != null && Character.Items[3].UpperLeg != "") && Character.Items[10] == null)
-            //{
-                Texture2D underwear = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture3);
+            if (!(Character.Items[3] != null && Character.Items[3].UpperLeg !> 0) && Character.Items[10] == null)
+            {
+                Texture2D underwear = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture3);
                 DrawTexture(texture, underwear, 256, 192);
-            //}
+            }
             index = Array.FindIndex(Character.Options, o => o.Name == "Hair Color");
-            Texture2D facial = TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
+            Texture2D facial = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
             DrawTexture(texture, facial, 512, 0);
-            //Character.TextureShirt(texture);
-            //Character.TextureLegs(texture);
-            //Character.TextureChest(texture);
-            //Character.TextureTabard(texture);
-            //Character.TextureWaist(texture);
+            Character.TextureShirt(texture);
+            Character.TextureLegs(texture);
+            Character.TextureChest(texture);
+            Character.TextureTabard(texture);
+            Character.TextureWaist(texture);
         }
 
         protected override int LoadTexture(M2Texture texture, int i, out bool skin)
@@ -143,16 +140,9 @@ namespace WoW.Characters
                     file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
                     skin = true;
                     break;
-                //case 2:
-                //    if (Character.Items[2] != null)
-                //    {
-                //        file = Character.Items[2].LeftTexture;
-                //    }
-                //    else
-                //    {
-                //        file = "";
-                //    }
-                //    break;
+                case 2:
+                    file = Character.Items[2] != null ? Character.Items[2].LeftTexture : -1;
+                    break;
                 case 6:
                     index = Array.FindIndex(Character.Options, o => o.Name == "Hair Color");
                     file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;

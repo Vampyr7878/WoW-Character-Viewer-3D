@@ -27,6 +27,10 @@ public abstract class ModelRenderer : MonoBehaviour
     protected int[] frame;
     //Thread to load binary data
     protected Thread loadBinaries;
+    //Renderer object for this model
+    protected new SkinnedMeshRenderer renderer;
+    //Animator object for this model
+    protected Animator animator;
 
     //Reference to the binary data
     public M2 Model { get; protected set; }
@@ -148,7 +152,7 @@ public abstract class ModelRenderer : MonoBehaviour
     }
 
     //Create texture from BLP file
-    protected Texture2D TextureFromBLP(int file)
+    public Texture2D TextureFromBLP(int file)
     {
         BLP blp = new BLP(casc.OpenFile(file));
         System.Drawing.Bitmap image = blp.GetImage();
