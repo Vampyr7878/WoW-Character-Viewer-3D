@@ -1,35 +1,37 @@
-﻿using M2Lib;
+﻿using CASCLib;
+using M2Lib;
 using System;
+using System.Collections;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
+using WoW;
 
-public class ItemObject : MonoBehaviour
+//Class to render item 3d models
+public class ItemObject : ModelRenderer
 {
-    private GameObject mesh;
-    private Color[] colors;
-    private Texture2D[] textures;
-    private bool loaded;
+    //Reference to the main camera
+    private new Transform camera;
+    //Swappable item texture
+    private int mainTexture;
 
-    public M2 Model { get; protected set; }
-    public Material hidden;
-
-    public string Path { get; set; }
-    public string Texture { get; set; }
+    //Particle colors from database
     public ParticleColor[] ParticleColors { get; set; }
-    public bool Change { get; set; }
 
-    void Start()
+    private void Start()
     {
+        //Initiazlie
         Change = false;
-        loaded = false;
+        Loaded = false;
+        camera = Camera.main.transform;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
-        if (loaded)
+        if (Loaded)
         {
+            //Steup and render model
             if (Change)
             {
                 try
@@ -49,12 +51,22 @@ public class ItemObject : MonoBehaviour
                 }
                 Change = false;
             }
+            //Rotate billboards
             for (int i = 0; i < Model.Skeleton.Bones.Length; i++)
             {
                 if ((Model.Skeleton.Bones[i].Flags & 0x8) != 0)
                 {
-                    renderer.bones[i].eulerAngles = new Vector3(Camera.main.transform.eulerAngles.x, Camera.main.transform.eulerAngles.y - 90, Camera.main.transform.eulerAngles.z);
+                    renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x, camera.eulerAngles.y - 90, camera.eulerAngles.z);
                 }
+            }
+            //Animate textures
+            for (int i = 0; i < Model.Skin.Textures.Length; i++)
+            {
+                AnimateTextures(renderer, i);
+            }
+            for (int i = 0; i < time.Length; i++)
+            {
+                time[i] += Time.deltaTime;
             }
         }
         else
@@ -63,7 +75,32 @@ public class ItemObject : MonoBehaviour
         }
     }
 
-    private void SetMaterial(SkinnedMeshRenderer renderer, int i)
+    //Animate current texture unit if it has any animations
+    private new void AnimateTextures(SkinnedMeshRenderer renderer, int i)
+    {
+        int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
+        string texture = "_Texture1";
+        if (index >= 0)
+        {
+            Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
+            offset = AnimateTexture(index, offset);
+            renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+        }
+        if (Model.Skin.Textures[i].TextureCount > 1)
+        {
+            index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
+            texture = "_Texture2";
+            if (index >= 0)
+            {
+                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
+                offset = AnimateTexture(index, offset);
+                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+            }
+        }
+    }
+
+    //Set material with proper shader
+    protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
         Material material;
         //if (Model.Name.ToLower().Contains("offhand_1h_artifactskulloferedar") && i % 2 == 0)
@@ -73,14 +110,14 @@ public class ItemObject : MonoBehaviour
         //    renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(hidden);
         //    return;
         //}
-        if (Model.Skin.Textures[i].Shader == 32783)
-        {
-            material = Resources.Load<Material>(@"Materials\32783s");
-        }
-        else
-        {
-            material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
-        }
+        //if (Model.Skin.Textures[i].Shader == 32783)
+        //{
+        //    material = Resources.Load<Material>(@"Materials\32783s");
+        //}
+        //else
+        //{
+        material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+        //}
         if (material == null)
         {
             Debug.LogError(Model.Skin.Textures[i].Shader);
@@ -92,6 +129,7 @@ public class ItemObject : MonoBehaviour
         SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
     }
 
+    //Setup particle effects for rendering
     private void ParticleEffects()
     {
         ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
@@ -143,7 +181,6 @@ public class ItemObject : MonoBehaviour
             }
             renderer.material.shader = material.shader;
             renderer.material.CopyPropertiesFromMaterial(material);
-            Debug.Log(Model.TextureIDs[Model.Particles[i].Textures[0]]);
             Texture2D temp = textures[Model.Particles[i].Textures[0]];
             Texture2D texture = new Texture2D(temp.width, temp.height, TextureFormat.ARGB32, false);
             texture.SetPixels32(temp.GetPixels32());
@@ -153,167 +190,240 @@ public class ItemObject : MonoBehaviour
         }
     }
 
-    private BlendMode SrcBlend(short value)
+    //Setup all the material properties
+    protected override void SetTexture(Material material, int i)
     {
-        BlendMode blend = BlendMode.One;
-        switch (value)
+        material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
+        if (Model.Skin.Textures[i].TextureCount > 1)
         {
-            case 0:
-            case 1:
-                blend = BlendMode.One;
-                break;
-            case 2:
-            case 4:
-                blend = BlendMode.SrcAlpha;
-                break;
-            case 3:
-            case 7:
-                blend = BlendMode.SrcColor;
-                break;
-            case 5:
-            case 6:
-                blend = BlendMode.DstColor;
-                break;
+            material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
         }
-        return blend;
-    }
-
-    private BlendMode DstBlend(short value)
-    {
-        BlendMode blend = BlendMode.Zero;
-        switch (value)
+        if (Model.Skin.Textures[i].TextureCount > 2)
         {
-            case 0:
-            case 1:
-            case 5:
-                blend = BlendMode.Zero;
-                break;
-            case 2:
-            case 7:
-                blend = BlendMode.OneMinusSrcAlpha;
-                break;
-            case 3:
-            case 4:
-                blend = BlendMode.One;
-                break;
-            case 6:
-                blend = BlendMode.SrcColor;
-                break;
+            material.SetTexture("_Emission", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 2]]);
         }
-        return blend;
-    }
-
-    private void SetTexture(Material material, int i)
-    {
-        material.SetTexture("_MainTex", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
-        if (Model.TextureLookup.Length == Model.Skin.Textures[i].Texture + 1)
-        {
-            material.SetTexture("_Second", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
-        }
-        else
-        {
-            material.SetTexture("_Second", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
-        }
-        //if (((Texture2D)(material.GetTexture("_MainTex"))).alphaIsTransparency)
-        //{
-        //    material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        //    material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        //    float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
-        //    material.SetFloat("_DepthTest", depth);
-        //}
-        //else
-        //{
-        //    material.SetInt("_SrcBlend", (int)SrcBlend(0));
-        //    material.SetInt("_DstBlend", (int)DstBlend(0));
-        //    float depth = 1f;
-        //    material.SetFloat("_DepthTest", depth);
-        //}
-        float alpha = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
-        material.SetFloat("_Alpha", alpha);
-        if (Model.Materials[Model.Skin.Textures[i].Material].Blend > 1)
-        {
-            material.SetFloat("_AlphaCut", 0f);
-        }
+        material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         if (Model.Skin.Textures[i].Color != -1)
         {
             material.SetColor("_Color", colors[Model.Skin.Textures[i].Color]);
         }
         CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Front;
         material.SetInt("_Cull", (int)cull);
+        float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
+        material.SetFloat("_DepthTest", depth);
+        float alpha = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
+        Color color = new Color(1, 1, 1, alpha);
+        material.SetColor("_Color", color);
     }
 
-    private void LoadColors()
+    //Load specific texture
+    private int LoadTexture(M2Texture texture, int i)
     {
-        colors = new Color[Model.Colors.Length];
-        for (int i = 0; i < colors.Length; i++)
-        {
-            colors[i] = new Color(Model.Colors[i].R / 255f, Model.Colors[i].G / 255f, Model.Colors[i].B / 255f, 1.0f);
-        }
-    }
-
-    private string LoadTexture(M2Texture texture, int i)
-    {
-        string file = "";
+        int file = 0;
         switch (texture.Type)
         {
             case 0:
-                file = Path + Model.TextureIDs[i].ToString();
+                file = Model.TextureIDs[i];
                 break;
             case 2:
-                file = Path + Texture;
+                file = mainTexture;
                 break;
         }
         return file;
     }
 
+    //Load and prepare all model textures
     public void LoadTextures()
     {
         for (int i = 0; i < textures.Length; i++)
         {
-            string file = LoadTexture(Model.Textures[i], i);
-            if (file == "")
+            int file = LoadTexture(Model.Textures[i], i);
+            if (file == 0)
             {
                 textures[i] = new Texture2D(200, 200);
             }
             else
             {
-                Texture2D texture = Resources.Load<Texture2D>(file);
+                Texture2D texture = TextureFromBLP(file);
                 if (texture == null)
                 {
                     Debug.LogError(file);
                 }
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
-                //textures[i].alphaIsTransparency = texture.alphaIsTransparency;
-                textures[i].wrapMode = texture.wrapMode;
+                if (Model.Textures[i].Flags == 0)
+                {
+                    textures[i].wrapMode = TextureWrapMode.Clamp;
+                }
+                else
+                {
+                    textures[i].wrapMode = TextureWrapMode.Repeat;
+                }
                 textures[i].Apply();
             }
         }
     }
 
+    //Unload the model
     public void UnloadModel()
     {
         DestroyImmediate(mesh);
-        loaded = false;
+        Loaded = false;
     }
 
-    public void LoadModel(string file)
+    //Load the model
+    public IEnumerator LoadModel(int file, int texture, CASCHandler casc)
     {
-        GameObject prefab = Resources.Load<GameObject>(file.Replace(".m2", ""));
-        mesh = Instantiate(prefab, gameObject.transform);
-        if (mesh == null)
+        mainTexture = texture;
+        this.casc = casc;
+        converter = new System.Drawing.ImageConverter();
+        byte[] bytes;
+        yield return null;
+        using (BinaryReader reader = new BinaryReader(casc.OpenFile(file)))
         {
-            loaded = false;
-            return;
+            bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+        }
+        yield return null;
+        Model = new M2();
+        Model.LoadFile(bytes);
+        yield return null;
+        if (Model.SkelFileID != 0)
+        {
+            using (BinaryReader reader = new BinaryReader(casc.OpenFile(Model.SkelFileID)))
+            {
+                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+            }
+        }
+        yield return null;
+        Model.Skeleton.LoadFile(bytes, Model.SkelFileID);
+        yield return null;
+        using (BinaryReader reader = new BinaryReader(casc.OpenFile(Model.SkinFileID)))
+        {
+            bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+        }
+        yield return null;
+        Model.Skin.LoadFile(bytes);
+        yield return null;
+        //Array.Sort(Model.Skin.Textures, (a, b) => Model.Materials[a.Material].Blend.CompareTo(Model.Materials[b.Material].Blend));
+        LoadColors();
+        yield return null;
+        textures = new Texture2D[Model.Textures.Length];
+        mesh = WoWHelper.Generate3DMesh(Model);
+        mesh.transform.parent = GetComponent<Transform>();
+        mesh.transform.localPosition = Vector3.zero;
+        mesh.transform.localEulerAngles = Vector3.zero;
+        mesh.transform.localScale = Vector3.one;
+        renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        yield return null;
+        Transform[] bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
+        if (Model.Particles.Length > 0)
+        {
+            GameObject[] particles = new GameObject[Model.Particles.Length];
+            for (int i = 0; i < particles.Length; i++)
+            {
+                particles[i] = ParticleEffect(Model.Particles[i]);
+                particles[i].transform.parent = bones[Model.Particles[i].Bone];
+                particles[i].transform.localPosition = Vector3.zero;
+                particles[i].name = $"Particle{i}";
+                yield return null;
+            }
+        }
+        time = new float[Model.TextureAnimations.Length];
+        frame = new int[Model.TextureAnimations.Length];
+        for (int i = 0; i < time.Length; i++)
+        {
+            time[i] = 0f;
+            frame[i] = 0;
+            yield return null;
+        }
+        Loaded = true;
+        Change = true;
+    }
+
+    //Particle shape
+    private ParticleSystemShapeType ParticleShape(byte value)
+    {
+        ParticleSystemShapeType shape = ParticleSystemShapeType.Cone;
+        switch (value)
+        {
+            case 1:
+                shape = ParticleSystemShapeType.Rectangle;
+                break;
+            case 2:
+                shape = ParticleSystemShapeType.Sphere;
+                break;
+            case 3:
+                shape = ParticleSystemShapeType.Circle;
+                break;
+        }
+        return shape;
+    }
+
+    //Generate particle effect system based on the data
+    private GameObject ParticleEffect(M2Particle particle)
+    {
+        //Create gameobject
+        GameObject element = new GameObject();
+        element.AddComponent<ParticleSystem>();
+        ParticleSystem system = element.GetComponent<ParticleSystem>();
+        //Setup lifetime and speed in main module
+        ParticleSystem.MainModule main = system.main;
+        float variation = particle.LifespanVariation * particle.Lifespan;
+        main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2, (particle.Lifespan + variation) / 2);
+        variation = particle.SpeedVariation * particle.Speed;
+        main.startSpeed = new ParticleSystem.MinMaxCurve((particle.Speed - variation) / 2f, (particle.Speed + variation) / 2f);
+        //Setup emission rate in emission module
+        ParticleSystem.EmissionModule emission = system.emission;
+        variation = particle.EmissionVariation * particle.EmissionRate;
+        emission.rateOverTime = new ParticleSystem.MinMaxCurve((particle.EmissionRate - variation) / 2, (particle.EmissionRate + variation) / 2);
+        emission.rateOverDistance = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
+        //Setup shape and scale in shape module
+        ParticleSystem.ShapeModule shape = system.shape;
+        shape.shapeType = ParticleShape(particle.Type);
+        shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionLength, particle.EmissionWidth);
+        //Setup color and alpha gradients in color over lifetime module
+        ParticleSystem.ColorOverLifetimeModule color = system.colorOverLifetime;
+        color.enabled = true;
+        Gradient gradient = new Gradient();
+        GradientColorKey[] colorKeys = new GradientColorKey[particle.Colors.Values.Length];
+        for (int i = 0; i < colorKeys.Length; i++)
+        {
+            colorKeys[i] = new GradientColorKey(new Color(particle.Colors.Values[i].X / 255f, particle.Colors.Values[i].Y / 255f, particle.Colors.Values[i].Z / 255f), particle.Colors.Timestamps[i]);
+        }
+        GradientAlphaKey[] alphaKeys;
+        if (particle.Alpha.Values.Length > 8)
+        {
+            alphaKeys = new GradientAlphaKey[particle.Alpha.Values.Length / 2];
         }
         else
         {
-            loaded = true;
+            alphaKeys = new GradientAlphaKey[particle.Alpha.Values.Length];
         }
-        //GetComponentInChildren<M2Model>().LoadFile();
-        //Model = GetComponentInChildren<M2Model>().m2.model;
-        Array.Sort(Model.Skin.Textures, (a, b) => Model.Materials[a.Material].Blend.CompareTo(Model.Materials[b.Material].Blend));
-        LoadColors();
-        textures = new Texture2D[Model.Textures.Length];
+        for (int i = 0, j = 0; i < alphaKeys.Length; i++, j++)
+        {
+            if (particle.Alpha.Values.Length > 8)
+            {
+                j++;
+            }
+            alphaKeys[i] = new GradientAlphaKey(particle.Alpha.Values[j], particle.Alpha.Timestamps[j]);
+        }
+        gradient.SetKeys(colorKeys, alphaKeys);
+        color.color = gradient;
+        //Setup size in size over lifetime module
+        ParticleSystem.SizeOverLifetimeModule size = system.sizeOverLifetime;
+        size.enabled = true;
+        AnimationCurve curve = new AnimationCurve();
+        for (int i = 0; i < particle.Scale.Values.Length; i++)
+        {
+            curve.AddKey(particle.Scale.Timestamps[i], particle.Scale.Values[i].X);
+        }
+        size.size = new ParticleSystem.MinMaxCurve(1f, curve);
+        //Setup texture sheet in texture sheet animation module
+        ParticleSystem.TextureSheetAnimationModule textureSheet = system.textureSheetAnimation;
+        textureSheet.enabled = true;
+        textureSheet.numTilesX = particle.TileColumns;
+        textureSheet.numTilesY = particle.TileRows;
+        return element;
     }
 }

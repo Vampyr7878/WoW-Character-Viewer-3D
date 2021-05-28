@@ -50,7 +50,7 @@ public class TextureScaler
 	}
 
 	// Internal unility that renders the source texture into the RTT - the scaling method itself.
-	static void _gpu_scale(Texture2D src, int width, int height, FilterMode fmode)
+	private static void _gpu_scale(Texture2D src, int width, int height, FilterMode fmode)
 	{
 		//We need the source texture in VRAM because we render with it
 		src.filterMode = fmode;

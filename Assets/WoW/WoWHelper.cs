@@ -1,5 +1,6 @@
 ﻿using BLPLib;
 using CASCLib;
+using M2Lib;
 using UnityEngine;
 
 namespace WoW
@@ -203,6 +204,87 @@ namespace WoW
                     break;
             }
             return result;
+        }
+
+        public static GameObject Generate3DMesh(M2 file)
+        {
+            GameObject model = new GameObject(file.Name);
+            model.AddComponent<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer renderer = model.GetComponent<SkinnedMeshRenderer>();
+            Mesh mesh = new Mesh();
+            mesh.name = file.Name + "_mesh";
+            //Fill vertex data
+            Vector3[] vertices = new Vector3[file.Vertices.Length];
+            Vector3[] normals = new Vector3[file.Vertices.Length];
+            BoneWeight[] weights = new BoneWeight[file.Vertices.Length];
+            Vector2[] uv = new Vector2[file.Vertices.Length];
+            Vector2[] uv2 = new Vector2[file.Vertices.Length];
+            for (int i = 0; i < file.Vertices.Length; i++)
+            {
+                vertices[i] = new Vector3(-file.Vertices[i].Position.X / 2, file.Vertices[i].Position.Z / 2, -file.Vertices[i].Position.Y / 2);
+                normals[i] = new Vector3(-file.Vertices[i].Normal.X, file.Vertices[i].Normal.Z, -file.Vertices[i].Normal.Y);
+                BoneWeight weight = new BoneWeight
+                {
+                    boneIndex0 = file.Vertices[i].Bones[0],
+                    boneIndex1 = file.Vertices[i].Bones[1],
+                    boneIndex2 = file.Vertices[i].Bones[2],
+                    boneIndex3 = file.Vertices[i].Bones[3],
+                    weight0 = file.Vertices[i].Weights[0] / 255f,
+                    weight1 = file.Vertices[i].Weights[1] / 255f,
+                    weight2 = file.Vertices[i].Weights[2] / 255f,
+                    weight3 = file.Vertices[i].Weights[3] / 255f
+                };
+                weights[i] = weight;
+                uv[i] = new Vector2(file.Vertices[i].UV[0].X, 1 - file.Vertices[i].UV[0].Y);
+                uv2[i] = new Vector2(file.Vertices[i].UV[1].X, 1 - file.Vertices[i].UV[1].Y);
+            }
+            mesh.vertices = vertices;
+            mesh.normals = normals;
+            mesh.boneWeights = weights;
+            mesh.uv = uv;
+            mesh.uv2 = uv2;
+            //Fill Submesh data
+            mesh.subMeshCount = file.Skin.Submeshes.Length;
+            for (int i = 0; i < mesh.subMeshCount; i++)
+            {
+                int[] triangles = new int[file.Skin.Submeshes[i].Count];
+                for (int j = 0; j < triangles.Length; j++)
+                {
+                    triangles[j] = file.Skin.Indices[file.Skin.Submeshes[i].Start + j];
+                }
+                mesh.SetTriangles(triangles, i);
+            }
+            //Generate bones
+            Transform[] bones = new Transform[file.Skeleton.Bones.Length];
+            for (int i = 0; i < bones.Length; i++)
+            {
+                bones[i] = new GameObject("Bone" + i).transform;
+                bones[i].position = new Vector3(-file.Skeleton.Bones[i].Pivot.X / 2, file.Skeleton.Bones[i].Pivot.Z / 2, -file.Skeleton.Bones[i].Pivot.Y / 2);
+            }
+            GameObject skeleton = new GameObject("Skeleton");
+            for (int i = 0; i < bones.Length; i++)
+            {
+                if (file.Skeleton.Bones[i].Parent == -1)
+                {
+                    bones[i].parent = skeleton.transform;
+                }
+                else
+                {
+                    bones[i].parent = bones[file.Skeleton.Bones[i].Parent];
+                }
+            }
+            Matrix4x4[] bind = new Matrix4x4[bones.Length];
+            for (int i = 0; i < bones.Length; i++)
+            {
+                bind[i] = bones[i].worldToLocalMatrix * model.transform.localToWorldMatrix;
+            }
+            skeleton.transform.parent = model.transform;
+            renderer.materials = new Material[mesh.subMeshCount];
+            renderer.sharedMesh = mesh;
+            renderer.bones = bones;
+            renderer.rootBone = bones[0];
+            mesh.bindposes = bind;
+            return model;
         }
     }
 }

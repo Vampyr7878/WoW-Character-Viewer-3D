@@ -38,7 +38,7 @@ public class CustomMenu : MonoBehaviour
         }
     }
 
-    [MenuItem("Assets/Generate *.bytes fioles")]
+    [MenuItem("Assets/Generate *.bytes files")]
     public static void GenerateBytesFilesForFolder()
     {
         string path = AssetDatabase.GetAssetPath(Selection.activeObject);

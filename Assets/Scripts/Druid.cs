@@ -14,7 +14,7 @@ public class Druid : ModelRenderer
     public Character character;
 
     //Reference to the main camera
-    private Transform camera;
+    private new Transform camera;
     
     //Particle colors from database
     public ParticleColor[] ParticleColors { get; set; }
@@ -187,6 +187,9 @@ public class Druid : ModelRenderer
         material.SetInt("_Cull", (int)cull);
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
+        float alpha = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
+        Color color = new Color(1, 1, 1, alpha);
+        material.SetColor("_Color", color);
     }
     
     //Load specific texture
@@ -228,7 +231,6 @@ public class Druid : ModelRenderer
                 texture = TextureFromBLP(file);
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
-                //textures[i].alphaIsTransparency = true;
                 if (Model.Textures[i].Flags == 0)
                 {
                     textures[i].wrapMode = TextureWrapMode.Clamp;

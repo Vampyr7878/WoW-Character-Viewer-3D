@@ -212,69 +212,67 @@ public class Character : ModelRenderer
     private void EquipHead()
     {
         //collections[0].UnloadModel();
-        //ItemObject helm = GameObject.Find("helm").GetComponent<ItemObject>();
-        //helm.UnloadModel();
-        //if (Items[0] != null)
-        //{
-        //    if (Items[0].LeftModel != "")
-        //    {
-        //        string model = Items[0].LeftModel.Substring(0, Items[0].LeftModel.Length - 7) + Suffix1;
-        //        helm.LoadModel(model);
-        //        helm.Texture = Items[0].LeftTexture;
-        //        helm.ParticleColors = Items[0].ParticleColors;
-        //        helm.Path = @"item\objectcomponents\head\";
-        //        helm.Change = true;
-        //    }
-        //    if (Items[0].RightModel != "")
-        //    {
-        //        collections[0].Path = "item/objectcomponents/collections/";
-        //        string model = Items[0].RightModel.Substring(0, Items[0].RightModel.Length - 7) + Suffix2;
-        //        collections[0].Texture = Items[0].RightTexture;
-        //        collections[0].LoadModel(model.Replace(collections[0].Path, ""));
-        //        collections[0].ActiveGeosets.Clear();
-        //        collections[0].ActiveGeosets.Add(2701);
-        //    }
-        //    foreach (int helmet in Items[0].Helmet)
-        //    {
-        //        if (helmet == 0)
-        //        {
-        //            activeGeosets.RemoveAll(x => x > 0 && x < 100);
-        //            activeGeosets.Add(1);
-        //        }
-        //        else if (helmet == 7)
-        //        {
-        //            activeGeosets.RemoveAll(x => x > 699 && x < 800);
-        //            activeGeosets.Add(701);
-        //            if (racial.Loaded)
-        //            {
-        //                racial.ActiveGeosets.RemoveAll(x => x > 699 && x < 800);
-        //                racial.ActiveGeosets.Add(701);
-        //            }
-        //        }
-        //        else if (helmet == 24)
-        //        {
-        //            if (racial.Loaded && !racial.ActiveGeosets.Contains(2400))
-        //            {
-        //                racial.ActiveGeosets.RemoveAll(x => x > 2399 && x < 2500);
-        //                racial.ActiveGeosets.Add(2401);
-        //            }
-        //        }
-        //        else if (helmet == 31)
-        //        {
-        //            continue;
-        //        }
-        //        else
-        //        {
-        //            activeGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
-        //            activeGeosets.Add(helmet * 100);
-        //            if (racial.Loaded)
-        //            {
-        //                racial.ActiveGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
-        //                racial.ActiveGeosets.Add(helmet * 100);
-        //            }
-        //        }
-        //    }
-        //}
+        ItemObject helm = GameObject.Find("helm").GetComponent<ItemObject>();
+        helm.UnloadModel();
+        if (Items[0] != null)
+        {
+            if (Items[0].LeftModel > 0)
+            {
+                int model = Items[0].GetRaceSpecificModel(Items[0].LeftModel, Race, Gender, Class);
+                StartCoroutine(helm.LoadModel(model, Items[0].LeftTexture, casc));
+                helm.ParticleColors = Items[0].ParticleColors;
+                helm.Change = true;
+            }
+            //if (Items[0].RightModel != "")
+            //{
+            //    collections[0].Path = "item/objectcomponents/collections/";
+            //    string model = Items[0].RightModel.Substring(0, Items[0].RightModel.Length - 7) + Suffix2;
+            //    collections[0].Texture = Items[0].RightTexture;
+            //    collections[0].LoadModel(model.Replace(collections[0].Path, ""));
+            //    collections[0].ActiveGeosets.Clear();
+            //    collections[0].ActiveGeosets.Add(2701);
+            //}
+            foreach (int helmet in Items[0].Helmet)
+            {
+                if (helmet == 0)
+                {
+                    activeGeosets.RemoveAll(x => x > 0 && x < 100);
+                    activeGeosets.Add(1);
+                }
+                else if (helmet == 7)
+                {
+                    activeGeosets.RemoveAll(x => x > 699 && x < 800);
+                    activeGeosets.Add(701);
+                    if (racial.Loaded)
+                    {
+                        racial.ActiveGeosets.RemoveAll(x => x > 699 && x < 800);
+                        racial.ActiveGeosets.Add(701);
+                    }
+                }
+                else if (helmet == 24)
+                {
+                    if (racial.Loaded && !racial.ActiveGeosets.Contains(2400))
+                    {
+                        racial.ActiveGeosets.RemoveAll(x => x > 2399 && x < 2500);
+                        racial.ActiveGeosets.Add(2401);
+                    }
+                }
+                else if (helmet == 31)
+                {
+                    continue;
+                }
+                else
+                {
+                    activeGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
+                    activeGeosets.Add(helmet * 100);
+                    if (racial.Loaded)
+                    {
+                        racial.ActiveGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
+                        racial.ActiveGeosets.Add(helmet * 100);
+                    }
+                }
+            }
+        }
     }
 
     private void EquipShoulder()

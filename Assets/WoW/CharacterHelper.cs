@@ -1,6 +1,4 @@
-﻿using BLPLib;
-using CASCLib;
-using M2Lib;
+﻿using M2Lib;
 using System.Collections.Generic;
 using UnityEngine;
 

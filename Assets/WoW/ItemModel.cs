@@ -50,13 +50,15 @@ namespace WoW
         //Particle colors for the item
         public ParticleColor[] ParticleColors { get; private set; }
 
+        private SqliteConnection connection;
+
         //Constructor
         public ItemModel(int id, int version, int slot, int display, int race, bool gender)
         {
             ID = id;
             Version = version;
             Slot = slot;
-            SqliteConnection connection = new SqliteConnection($"URI=file:{Application.streamingAssetsPath}/database.sqlite");
+            connection = new SqliteConnection($"URI=file:{Application.streamingAssetsPath}/database.sqlite");
             connection.Open();
             if (display == 0)
             {
@@ -84,7 +86,7 @@ namespace WoW
                 UpperLeg = 0;
                 LowerLeg = 0;
                 Foot = 0;
-                Helmet = HelmetGeosets(connection, 0, race);
+                Helmet = HelmetGeosets(0, race);
             }
             else
             {
@@ -135,24 +137,24 @@ namespace WoW
                     femaleHelmet = reader.GetInt32(26);
                     particleColor = reader.GetInt32(27);
                 }
-                //LeftModel = GetFilePath(connection, leftModel).Replace("rshoulder", "lshoulder").Replace("_r.", "_l.");
-                //RightModel = GetFilePath(connection, rightModel).Replace("lshoulder", "rshoulder").Replace("_l.", "_r.");
-                UpperArm = GetMaterial(connection, upperArm, gender);
-                LowerArm = GetMaterial(connection, lowerArm, gender);
-                Hand = GetMaterial(connection, hand, gender);
-                UpperTorso = GetMaterial(connection, upperTorso, gender);
-                LowerTorso = GetMaterial(connection, lowerTorso, gender);
-                UpperLeg = GetMaterial(connection, upperLeg, gender);
-                LowerLeg = GetMaterial(connection, lowerLeg, gender);
-                Foot = GetMaterial(connection, foot, gender);
-                Helmet = gender ? HelmetGeosets(connection, maleHelmet, race) : HelmetGeosets(connection, femaleHelmet, race);
-                ParticleColors = GetParticleColors(connection, particleColor);
+                LeftModel = leftModel;
+                RightModel = rightModel;
+                UpperArm = GetMaterial(upperArm, gender);
+                LowerArm = GetMaterial(lowerArm, gender);
+                Hand = GetMaterial(hand, gender);
+                UpperTorso = GetMaterial(upperTorso, gender);
+                LowerTorso = GetMaterial(lowerTorso, gender);
+                UpperLeg = GetMaterial(upperLeg, gender);
+                LowerLeg = GetMaterial(lowerLeg, gender);
+                Foot = GetMaterial(foot, gender);
+                Helmet = gender ? HelmetGeosets(maleHelmet, race) : HelmetGeosets(femaleHelmet, race);
+                ParticleColors = GetParticleColors(particleColor);
             }
             connection.Close();
         }
 
         //Get proper texture ID based on gender
-        int GetMaterial(SqliteConnection connection, int index, bool gender)
+        private int GetMaterial(int index, bool gender)
         {
             if (index == 0)
             {
@@ -170,8 +172,38 @@ namespace WoW
             return result;
         }
 
+        //Get modelf file taht fits specific race, gender and class
+        public int GetRaceSpecificModel(int resource, int race, bool gender, int c)
+        {
+            int result = 0;
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Race = {race} AND Gender = {gender} AND Class = {c};";
+                SqliteDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    result = gender ? reader.GetInt32(1) : reader.GetInt32(0);
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Race = {race} AND Gender = {gender};";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    reader.Read();
+                    result = reader.GetInt32(0);
+                }
+            }
+            connection.Close();
+            return result;
+        }
+
         //Load geosets to be hidden with the helmet
-        List<int> HelmetGeosets(SqliteConnection connection, int index, int race)
+        private List<int> HelmetGeosets(int index, int race)
         {
             List<int> helmet = new List<int>();
             if (index == 0)
@@ -192,7 +224,7 @@ namespace WoW
         }
 
         //Load particle colors for given item
-        ParticleColor[] GetParticleColors(SqliteConnection connection, int id)
+        private ParticleColor[] GetParticleColors(int id)
         {
             ParticleColor[] particleColors = new ParticleColor[3];
             if (id == 0)
