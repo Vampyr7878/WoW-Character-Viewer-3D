@@ -184,7 +184,7 @@ namespace WoW
                 SqliteDataReader reader = command.ExecuteReader();
                 if (reader.Read())
                 {
-                    result = gender ? reader.GetInt32(1) : reader.GetInt32(0);
+                    result = reader.GetInt32(0);
                 }
             }
             if (result == 0)
