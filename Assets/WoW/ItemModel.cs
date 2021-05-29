@@ -202,6 +202,36 @@ namespace WoW
             return result;
         }
 
+        //Get left or right model file depending on chosen side
+        public int GetSideSpecificModel(int resource, bool side, int c)
+        {
+            int result = 0;
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Position = {side} AND Class = {c};";
+                SqliteDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    result = reader.GetInt32(0);
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Position = {side};";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    reader.Read();
+                    result = reader.GetInt32(0);
+                }
+            }
+            connection.Close();
+            return result;
+        }
+
         //Load geosets to be hidden with the helmet
         private List<int> HelmetGeosets(int index, int race)
         {

@@ -277,29 +277,27 @@ public class Character : ModelRenderer
 
     private void EquipShoulder()
     {
-        //ItemObject left = GameObject.Find("left shoulder").GetComponent<ItemObject>();
-        //ItemObject right = GameObject.Find("right shoulder").GetComponent<ItemObject>();
-        //left.UnloadModel();
-        //right.UnloadModel();
-        //if (Items[1] != null)
-        //{
-        //    if (Items[1].LeftModel != "")
-        //    {
-        //        left.LoadModel(Items[1].LeftModel);
-        //        left.Texture = Items[1].LeftTexture;
-        //        left.ParticleColors = Items[1].ParticleColors;
-        //        left.Path = @"item\objectcomponents\shoulder\";
-        //        left.Change = true;
-        //    }
-        //    if (Items[1].RightModel != "")
-        //    {
-        //        right.LoadModel(Items[1].RightModel);
-        //        right.Texture = Items[1].RightTexture;
-        //        right.ParticleColors = Items[1].ParticleColors;
-        //        right.Path = @"item\objectcomponents\shoulder\";
-        //        right.Change = true;
-        //    }
-        //}
+        ItemObject left = GameObject.Find("left shoulder").GetComponent<ItemObject>();
+        ItemObject right = GameObject.Find("right shoulder").GetComponent<ItemObject>();
+        left.UnloadModel();
+        right.UnloadModel();
+        if (Items[1] != null)
+        {
+            if (Items[1].LeftModel > 0)
+            {
+                int model = Items[1].GetSideSpecificModel(Items[1].LeftModel, false, Class);
+                StartCoroutine(left.LoadModel(model, Items[1].LeftTexture, casc));
+                left.ParticleColors = Items[1].ParticleColors;
+                left.Change = true;
+            }
+            if (Items[1].RightModel > 0)
+            {
+                int model = Items[1].GetSideSpecificModel(Items[1].RightModel, true, Class);
+                StartCoroutine(right.LoadModel(model, Items[1].RightTexture, casc));
+                right.ParticleColors = Items[1].ParticleColors;
+                right.Change = true;
+            }
+        }
     }
 
     private void EquipBack()
