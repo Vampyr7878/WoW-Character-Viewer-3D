@@ -303,6 +303,8 @@ public class Character : ModelRenderer
     private void EquipBack()
     {
         //collections[1].UnloadModel();
+        ItemObject backpack = GameObject.Find("backpack").GetComponent<ItemObject>();
+        backpack.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1499 && x < 1600);
         if (Items[2] != null)
         {
@@ -314,6 +316,13 @@ public class Character : ModelRenderer
                 //collections[1].LoadModel(model.Replace(collections[1].Path, ""));
                 //collections[1].ActiveGeosets.Clear();
                 //collections[1].ActiveGeosets.Add(1501);
+            }
+            if (Items[2].RightModel > 0)
+            {
+                int model = Items[2].GetModel(Items[2].RightModel);
+                StartCoroutine(backpack.LoadModel(model, Items[2].RightTexture, casc));
+                backpack.ParticleColors = Items[2].ParticleColors;
+                backpack.Change = true;
             }
             int geoset = Items[2].Geoset1;
             if (Race == 5)

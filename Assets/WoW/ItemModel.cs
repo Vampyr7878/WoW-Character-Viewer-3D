@@ -232,6 +232,25 @@ namespace WoW
             return result;
         }
 
+        //Get model file
+        public int GetModel(int resource)
+        {
+            int result = 0;
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = $"SELECT Model FROM ItemModels WHERE \"Index\" = {resource};";
+                SqliteDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    result = reader.GetInt32(0);
+                }
+            }
+            connection.Close();
+            return result;
+        }
+
         //Load geosets to be hidden with the helmet
         private List<int> HelmetGeosets(int index, int race)
         {

@@ -93,7 +93,7 @@ namespace WoW
             for (int i = 0; i < textures.Length; i++)
             {
                 int file = LoadTexture(Model.Textures[i], i, out skin);
-                if (file == -1)
+                if (file <= 0)
                 {
                     textures[i] = new Texture2D(200, 200);
                 }
