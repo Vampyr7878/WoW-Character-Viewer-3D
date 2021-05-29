@@ -206,6 +206,61 @@ namespace WoW
             return result;
         }
 
+        //Translate race id to base race model id
+        public static int RaceModel(int race)
+        {
+            int result = 0;
+            switch(race)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 22:
+                case 24:
+                case 32:
+                case 35:
+                    result = race;
+                    break;
+                case 23:
+                    result = 1;
+                    break;
+                case 27:
+                    result = 4;
+                    break;
+                case 28:
+                    result = 6;
+                    break;
+                case 29:
+                    result = 10;
+                    break;
+                case 30:
+                    result = 11;
+                    break;
+                case 31:
+                    result = 8;
+                    break;
+                case 34:
+                    result = 3;
+                    break;
+                case 36:
+                    result = 2;
+                    break;
+                case 37:
+                    result = 7;
+                    break;
+            }
+            return result;
+        }
+
+        //Generate 3D Mesh gameobject from m2 file
         public static GameObject Generate3DMesh(M2 file)
         {
             GameObject model = new GameObject(file.Name);

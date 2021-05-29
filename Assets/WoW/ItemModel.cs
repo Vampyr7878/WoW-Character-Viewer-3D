@@ -194,8 +194,23 @@ namespace WoW
                     command.CommandType = CommandType.Text;
                     command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Race = {race} AND Gender = {gender};";
                     SqliteDataReader reader = command.ExecuteReader();
-                    reader.Read();
-                    result = reader.GetInt32(0);
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Race = {WoWHelper.RaceModel(race)} AND Gender = {gender};";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
                 }
             }
             connection.Close();
@@ -224,8 +239,10 @@ namespace WoW
                     command.CommandType = CommandType.Text;
                     command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Position = {side};";
                     SqliteDataReader reader = command.ExecuteReader();
-                    reader.Read();
-                    result = reader.GetInt32(0);
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
                 }
             }
             connection.Close();
@@ -233,18 +250,31 @@ namespace WoW
         }
 
         //Get model file
-        public int GetModel(int resource)
+        public int GetModel(int resource, int c)
         {
             int result = 0;
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
-                command.CommandText = $"SELECT Model FROM ItemModels WHERE \"Index\" = {resource};";
+                command.CommandText = $"SELECT Model FROM ItemModels JOIN ComponentModels ON Model = ComponentModels.ID WHERE \"Index\" = {resource} AND Class = {c};";
                 SqliteDataReader reader = command.ExecuteReader();
                 if (reader.Read())
                 {
                     result = reader.GetInt32(0);
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT Model FROM ItemModels WHERE \"Index\" = {resource};";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
                 }
             }
             connection.Close();

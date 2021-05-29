@@ -319,7 +319,7 @@ public class Character : ModelRenderer
             }
             if (Items[2].RightModel > 0)
             {
-                int model = Items[2].GetModel(Items[2].RightModel);
+                int model = Items[2].GetModel(Items[2].RightModel, Class);
                 StartCoroutine(backpack.LoadModel(model, Items[2].RightTexture, casc));
                 backpack.ParticleColors = Items[2].ParticleColors;
                 backpack.Change = true;
@@ -505,11 +505,10 @@ public class Character : ModelRenderer
             }
             if (Items[9].LeftModel > 0)
             {
-                //buckle.LoadModel(Items[9].LeftModel);
-                //buckle.Texture = Items[9].LeftTexture;
-                //buckle.ParticleColors = Items[9].ParticleColors;
-                //buckle.Path = @"item\objectcomponents\waist\";
-                //buckle.Change = true;
+                int model = Items[9].GetModel(Items[9].LeftModel, Class);
+                StartCoroutine(buckle.LoadModel(model, Items[9].LeftTexture, casc));
+                buckle.ParticleColors = Items[9].ParticleColors;
+                buckle.Change = true;
             }
             activeGeosets.Add(1801 + Items[9].Geoset1);
             if (Items[9].Geoset1 == 1)

@@ -876,6 +876,11 @@ public class ScreenInput : MonoBehaviour
         }
         SwapIcons(gender);
         ChangeBorder(EventSystem.current.currentSelectedGameObject);
+        character.Gender = gender;
+        if (character.Race <= 0)
+        {
+            return;
+        }
         Category(0);
         string model;
         connection.Open();
@@ -896,7 +901,6 @@ public class ScreenInput : MonoBehaviour
         ClearItems();
         int c = character.Class;
         character.Class = 1;
-        character.Gender = gender;
         character.Form = 0;
         SetupCustomizationPanel();
         GetCustomizationOptions();
@@ -1277,6 +1281,7 @@ public class ScreenInput : MonoBehaviour
             scrollItems.Clear();
         }
         character.Change = true;
+        gilnean.Change = true;
         PointerExit();
     }
 
