@@ -3,15 +3,19 @@ using M2Lib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
+using WoW;
 
 //Class to render any collection system models
 public class Collection : ModelRenderer
 {
     //Reference to the character wearing that collection
     public Character character;
+    //Reference to the Gilnean wearing that collection
+    public Gilnean gilnean;
 
     //List of geosets that are enabled for loading
     public List<int> ActiveGeosets { get; set; }
@@ -141,7 +145,6 @@ public class Collection : ModelRenderer
                 Texture2D texture = TextureFromBLP(file);
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
-                //textures[i].alphaIsTransparency = true;
                 if (Model.Textures[i].Flags == 0)
                 {
                     textures[i].wrapMode = TextureWrapMode.Clamp;
@@ -166,7 +169,36 @@ public class Collection : ModelRenderer
         }
     }
 
-    //Load the model
+    //Find matching bones in character model
+    private void MatchBones(ModelRenderer modelRenderer)
+    {
+        renderer = mesh.GetComponentInChildren<SkinnedMeshRenderer>();
+        SkinnedMeshRenderer renderer2 = modelRenderer.GetComponentInChildren<SkinnedMeshRenderer>();
+        Dictionary<int, int> boneMap = new Dictionary<int, int>();
+        for (int i = 0, j = 0; i < Model.Skeleton.Bones.Length; i++, j++)
+        {
+            if (Model.Skeleton.Bones[i].Name == modelRenderer.Model.Skeleton.Bones[j].Name)
+            {
+                boneMap.Add(i, j);
+            }
+            else
+            {
+                i--;
+            }
+        }
+        Transform[] bones = new Transform[boneMap.Count];
+        Matrix4x4[] bind = new Matrix4x4[boneMap.Count];
+        for (int i = 0; i < bones.Length; i++)
+        {
+            bones[i] = renderer2.bones[boneMap[i]];
+            bind[i] = renderer2.sharedMesh.bindposes[boneMap[i]];
+        }
+        renderer.bones = bones;
+        renderer.rootBone = renderer2.rootBone;
+        renderer.sharedMesh.bindposes = bind;
+    }
+
+    //Load the model from assets
     public IEnumerator LoadModel(string collectionfile, CASCHandler casc)
     {
         UnloadModel();
@@ -193,33 +225,7 @@ public class Collection : ModelRenderer
             LoadColors();
             yield return null;
             textures = new Texture2D[Model.Textures.Length];
-            renderer = mesh.GetComponentInChildren<SkinnedMeshRenderer>();
-            SkinnedMeshRenderer renderer2 = character.GetComponentInChildren<SkinnedMeshRenderer>();
-            Dictionary<int, int> boneMap = new Dictionary<int, int>();
-            for (int i = 0, j = 0; i < Model.Skeleton.Bones.Length; i++, j++)
-            {
-                if (Model.Skeleton.Bones[i].Name == character.Model.Skeleton.Bones[j].Name)
-                {
-                    boneMap.Add(i, j);
-                }
-                else
-                {
-                    i--;
-                }
-                yield return null;
-            }
-            Transform[] bones = new Transform[boneMap.Count];
-            Matrix4x4[] bind = new Matrix4x4[boneMap.Count];
-            for (int i = 0; i < bones.Length; i++)
-            {
-                bones[i] = renderer2.bones[boneMap[i]];
-                bind[i] = renderer2.sharedMesh.bindposes[boneMap[i]];
-                yield return null;
-            }
-            renderer.bones = bones;
-            renderer.rootBone = renderer2.rootBone;
-            renderer.sharedMesh.bindposes = bind;
-            yield return null;
+            MatchBones(character);
             time = new float[Model.TextureAnimations.Length];
             frame = new int[Model.TextureAnimations.Length];
             for (int i = 0; i < time.Length; i++)
@@ -229,6 +235,86 @@ public class Collection : ModelRenderer
                 yield return null;
             }
             Loaded = !loadBinaries.IsAlive;
+            Change = true;
+        }
+    }
+
+    //Load the model from CASC
+    public IEnumerator LoadModel(int file, int texture, CASCHandler casc)
+    {
+        if (file != 0)
+        {
+            Texture = texture;
+            this.casc = casc;
+            converter = new System.Drawing.ImageConverter();
+            byte[] bytes;
+            yield return null;
+            using (BinaryReader reader = new BinaryReader(casc.OpenFile(file)))
+            {
+                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+            }
+            yield return null;
+            Model = new M2();
+            Model.LoadFile(bytes);
+            yield return null;
+            if (Model.SkelFileID != 0)
+            {
+                using (BinaryReader reader = new BinaryReader(casc.OpenFile(Model.SkelFileID)))
+                {
+                    bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+                }
+            }
+            yield return null;
+            Model.Skeleton.LoadFile(bytes, Model.SkelFileID);
+            yield return null;
+            using (BinaryReader reader = new BinaryReader(casc.OpenFile(Model.SkinFileID)))
+            {
+                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+            }
+            yield return null;
+            Model.Skin.LoadFile(bytes);
+            yield return null;
+            //Array.Sort(Model.Skin.Textures, (a, b) => Model.Materials[a.Material].Blend.CompareTo(Model.Materials[b.Material].Blend));
+            LoadColors();
+            yield return null;
+            textures = new Texture2D[Model.Textures.Length];
+            mesh = WoWHelper.Generate3DMesh(Model);
+            mesh.transform.parent = GetComponent<Transform>();
+            mesh.transform.localPosition = Vector3.zero;
+            mesh.transform.localEulerAngles = Vector3.zero;
+            mesh.transform.localScale = Vector3.one;
+            renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+            yield return null;
+            Transform[] bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
+            if (Model.Particles.Length > 0)
+            {
+                GameObject[] particles = new GameObject[Model.Particles.Length];
+                for (int i = 0; i < particles.Length; i++)
+                {
+                    particles[i] = WoWHelper.ParticleEffect(Model.Particles[i]);
+                    particles[i].transform.parent = bones[Model.Particles[i].Bone];
+                    particles[i].transform.localPosition = Vector3.zero;
+                    particles[i].name = $"Particle{i}";
+                    yield return null;
+                }
+            }
+            if (character.Form == 7)
+            {
+                MatchBones(gilnean);
+            }
+            else
+            {
+                MatchBones(character);
+            }
+            time = new float[Model.TextureAnimations.Length];
+            frame = new int[Model.TextureAnimations.Length];
+            for (int i = 0; i < time.Length; i++)
+            {
+                time[i] = 0f;
+                frame[i] = 0;
+                yield return null;
+            }
+            Loaded = true;
             Change = true;
         }
     }

@@ -19,10 +19,6 @@ public class Gilnean : ModelRenderer
     //List of geosets that are enabled for loading
     private List<int> activeGeosets;
 
-    //First gear model suffix
-    public string Suffix1 { get; set; }
-    //Second gear model suffix
-    public string Suffix2 { get; set; }
     //Path from where the model is loaded
     public string RacePath { get; set; }
     //Character's gender
@@ -133,9 +129,10 @@ public class Gilnean : ModelRenderer
         //EquipLeftHand();
     }
 
+    //Load head slot item models and geosets
     private void EquipHead()
     {
-        //collections[0].UnloadModel();
+        worgen.collections[0].UnloadModel();
         ItemObject helm = GameObject.Find("helm").GetComponent<ItemObject>();
         helm.UnloadModel();
         if (worgen.Items[0] != null)
@@ -147,15 +144,13 @@ public class Gilnean : ModelRenderer
                 helm.ParticleColors = worgen.Items[0].ParticleColors;
                 helm.Change = true;
             }
-            //if (worgen.Items[0].RightModel != "")
-            //{
-            //    collections[0].Path = "item/objectcomponents/collections/";
-            //    string model = worgen.Items[0].RightModel.Substring(0, worgen.Items[0].RightModel.Length - 7) + Suffix2;
-            //    collections[0].Texture = worgen.Items[0].RightTexture;
-            //    collections[0].LoadModel(model.Replace(collections[0].Path, ""));
-            //    collections[0].ActiveGeosets.Clear();
-            //    collections[0].ActiveGeosets.Add(2701);
-            //}
+            if (worgen.Items[0].RightModel > 0)
+            {
+                int model = worgen.Items[0].GetRaceSpecificModel(worgen.Items[0].RightModel, 23, Gender, worgen.Class);
+                StartCoroutine(worgen.collections[0].LoadModel(model, worgen.Items[0].RightTexture, casc));
+                worgen.collections[0].ActiveGeosets = new List<int>();
+                worgen.collections[0].ActiveGeosets.Add(2701);
+            }
             foreach (int helmet in worgen.Items[0].Helmet)
             {
                 if (helmet == 0)
@@ -181,6 +176,7 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load shoulder slot item models
     private void EquipShoulder()
     {
         ItemObject left = GameObject.Find("left shoulder").GetComponent<ItemObject>();
@@ -206,9 +202,10 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load back slot item models and geosets
     private void EquipBack()
     {
-        //collections[1].UnloadModel();
+        worgen.collections[1].UnloadModel();
         ItemObject backpack = GameObject.Find("backpack").GetComponent<ItemObject>();
         backpack.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1499 && x < 1600);
@@ -216,12 +213,10 @@ public class Gilnean : ModelRenderer
         {
             if (worgen.Items[2].LeftModel > 0)
             {
-                //collections[1].Path = "item/objectcomponents/collections/";
-                //string model = worgen.Items[2].LeftModel.Substring(0, worgen.Items[2].LeftModel.Length - 7) + Suffix2;
-                //collections[1].Texture = worgen.Items[2].LeftTexture;
-                //collections[1].LoadModel(model.Replace(collections[1].Path, ""));
-                //collections[1].ActiveGeosets.Clear();
-                //collections[1].ActiveGeosets.Add(1501);
+                int model = worgen.Items[2].GetRaceSpecificModel(worgen.Items[2].LeftModel, 23, Gender, worgen.Class);
+                StartCoroutine(worgen.collections[1].LoadModel(model, worgen.Items[2].LeftTexture, casc));
+                worgen.collections[1].ActiveGeosets = new List<int>();
+                worgen.collections[1].ActiveGeosets.Add(1501);
             }
             if (worgen.Items[2].RightModel > 0)
             {
@@ -238,9 +233,10 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load chest slot item models and geosets
     private void EquipChest()
     {
-        //collections[2].UnloadModel();
+        worgen.collections[2].UnloadModel();
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
         activeGeosets.RemoveAll(x => x > 999 && x < 1100);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
@@ -249,16 +245,17 @@ public class Gilnean : ModelRenderer
         {
             if (worgen.Items[3].LeftModel > 0)
             {
-                //collections[2].Path = "item/objectcomponents/collections/";
-                //string model = worgen.Items[3].LeftModel.Substring(0, worgen.Items[3].LeftModel.Length - 7) + Suffix2;
-                //collections[2].Texture = worgen.Items[3].LeftTexture;
-                //collections[2].LoadModel(model.Replace(collections[2].Path, ""));
-                //collections[2].ActiveGeosets.Clear();
-                //collections[2].ActiveGeosets.Add(801);
-                //collections[2].ActiveGeosets.Add(1001);
-                //collections[2].ActiveGeosets.Add(1301);
-                //collections[2].ActiveGeosets.Add(2201);
-                //collections[2].ActiveGeosets.Add(2801);
+                int model = worgen.Items[3].GetRaceSpecificModel(worgen.Items[3].LeftModel, 23, Gender, worgen.Class);
+                StartCoroutine(worgen.collections[2].LoadModel(model, worgen.Items[3].LeftTexture, casc));
+                worgen.collections[2].ActiveGeosets = new List<int>();
+                worgen.collections[2].ActiveGeosets.Add(801);
+                worgen.collections[2].ActiveGeosets.Add(1001);
+                if (worgen.Items[3].Slot == 20)
+                {
+                    worgen.collections[2].ActiveGeosets.Add(1301);
+                }
+                worgen.collections[2].ActiveGeosets.Add(2201);
+                worgen.collections[2].ActiveGeosets.Add(2801);
             }
             activeGeosets.Add(801 + worgen.Items[3].Geoset1);
             activeGeosets.Add(1001 + worgen.Items[3].Geoset2);
@@ -272,10 +269,10 @@ public class Gilnean : ModelRenderer
             if (worgen.Items[3].UpperLeg > 0)
             {
                 activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
-                //if (collections[5].Loaded)
-                //{
-                //    collections[5].ActiveGeosets.Clear();
-                //}
+                if (worgen.collections[5].Loaded)
+                {
+                    worgen.collections[5].ActiveGeosets.Clear();
+                }
             }
         }
         else
@@ -296,6 +293,7 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load shirt slot item geosets
     private void EquipShirt()
     {
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
@@ -309,6 +307,7 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load tabard slot item geosets
     private void EquipTabard()
     {
         activeGeosets.RemoveAll(x => x > 1199 && x < 1300);
@@ -329,6 +328,7 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load wrist slot item geosets
     private void EquipWrist()
     {
         if (worgen.Items[6] != null)
@@ -337,27 +337,24 @@ public class Gilnean : ModelRenderer
         }
     }
 
+
+    //Load hands slot item models and geosets
     private void EquipHands()
     {
-        //collections[3].UnloadModel();
+        worgen.collections[3].UnloadModel();
         activeGeosets.RemoveAll(x => x > 399 && x < 500);
         if (worgen.Items[8] != null)
         {
             if (worgen.Items[8].LeftModel > 0)
             {
-                //collections[3].Path = "item/objectcomponents/collections/";
-                //string model = worgen.Items[8].LeftModel.Substring(0, worgen.Items[8].LeftModel.Length - 7) + Suffix2;
-                //collections[3].Texture = worgen.Items[8].LeftTexture;
-                //collections[3].LoadModel(model.Replace(collections[3].Path, ""));
-                //collections[3].ActiveGeosets.Clear();
-                //if (Race != 37)
-                //{
-                //    if (activeGeosets.Contains(801))
-                //    {
-                //        collections[3].ActiveGeosets.Add(401);
-                //        collections[3].ActiveGeosets.Add(2301);
-                //    }
-                //}
+                int model = worgen.Items[8].GetRaceSpecificModel(worgen.Items[8].LeftModel, 23, Gender, worgen.Class);
+                StartCoroutine(worgen.collections[3].LoadModel(model, worgen.Items[8].LeftTexture, casc));
+                worgen.collections[3].ActiveGeosets = new List<int>();
+                if (activeGeosets.Contains(801))
+                {
+                    worgen.collections[3].ActiveGeosets.Add(401);
+                }
+                worgen.collections[3].ActiveGeosets.Add(2301);
             }
             activeGeosets.Add(401 + worgen.Items[8].Geoset1);
             if (worgen.Items[8].Geoset1 != 0)
@@ -371,9 +368,10 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load waist slot item models and geosets
     private void EquipWaist()
     {
-        //collections[4].UnloadModel();
+        worgen.collections[4].UnloadModel();
         ItemObject buckle = GameObject.Find("buckle").GetComponent<ItemObject>();
         buckle.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1799 && x < 1900);
@@ -381,12 +379,10 @@ public class Gilnean : ModelRenderer
         {
             if (worgen.Items[9].RightModel > 0)
             {
-                //collections[4].Path = "item/objectcomponents/collections/";
-                //string model = worgen.Items[9].RightModel.Substring(0, worgen.Items[9].RightModel.Length - 7) + Suffix2;
-                //collections[4].Texture = worgen.Items[9].RightTexture;
-                //collections[4].LoadModel(model.Replace(collections[4].Path, ""));
-                //collections[4].ActiveGeosets.Clear();
-                //collections[4].ActiveGeosets.Add(1801);
+                int model = worgen.Items[9].GetRaceSpecificModel(worgen.Items[9].RightModel, 23, Gender, worgen.Class);
+                StartCoroutine(worgen.collections[4].LoadModel(model, worgen.Items[9].RightTexture, casc));
+                worgen.collections[4].ActiveGeosets = new List<int>();
+                worgen.collections[4].ActiveGeosets.Add(1801);
             }
             if (worgen.Items[9].LeftModel > 0)
             {
@@ -407,9 +403,10 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load legs slot item models and geosets
     private void EquipLegs()
     {
-        //collections[5].UnloadModel();
+        worgen.collections[5].UnloadModel();
         activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
         activeGeosets.RemoveAll(x => x > 899 && x < 1000);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
@@ -417,16 +414,11 @@ public class Gilnean : ModelRenderer
         {
             if (worgen.Items[10].LeftModel > 0)
             {
-                //collections[5].Path = "item/objectcomponents/collections/";
-                //string model = worgen.Items[10].LeftModel.Substring(0, worgen.Items[10].LeftModel.Length - 7) + Suffix2;
-                //collections[5].Texture = worgen.Items[10].LeftTexture;
-                //collections[5].LoadModel(model.Replace(collections[5].Path, ""));
-                //collections[5].ActiveGeosets.Clear();
-                //collections[5].ActiveGeosets.Add(901);
-                //if (Race != 37)
-                //{
-                //    collections[5].ActiveGeosets.Add(1101);
-                //}
+                int model = worgen.Items[10].GetRaceSpecificModel(worgen.Items[10].LeftModel, 23, Gender, worgen.Class);
+                StartCoroutine(worgen.collections[5].LoadModel(model, worgen.Items[10].LeftTexture, casc));
+                worgen.collections[5].ActiveGeosets = new List<int>();
+                worgen.collections[5].ActiveGeosets.Add(901);
+                worgen.collections[5].ActiveGeosets.Add(1101);
             }
             activeGeosets.Add(1101 + worgen.Items[10].Geoset1);
             activeGeosets.Add(901 + worgen.Items[10].Geoset2);
@@ -447,26 +439,24 @@ public class Gilnean : ModelRenderer
         }
     }
 
+    //Load feet slot item models and geosets
     private void EquipFeet()
     {
-        //collections[6].UnloadModel();
+        worgen.collections[6].UnloadModel();
         activeGeosets.RemoveAll(x => x > 499 && x < 600);
         activeGeosets.RemoveAll(x => x > 1999 && x < 2100);
         if (worgen.Items[11] != null)
         {
             if (worgen.Items[11].LeftModel > 0)
             {
-                //collections[6].Path = "item/objectcomponents/collections/";
-                //string model = worgen.Items[11].LeftModel.Substring(0, worgen.Items[11].LeftModel.Length - 7) + Suffix2;
-                //collections[6].Texture = worgen.Items[11].LeftTexture;
-                //collections[6].LoadModel(model.Replace(collections[6].Path, ""));
-                //collections[6].ActiveGeosets.Clear();
-                //if (Race != 37)
-                //{
-                //    if (!activeGeosets.Contains(1302))
-                //        collections[6].ActiveGeosets.Add(501);
-                //    collections[6].ActiveGeosets.Add(2001);
-                //}
+                int model = worgen.Items[11].GetRaceSpecificModel(worgen.Items[11].LeftModel, 23, Gender, worgen.Class);
+                StartCoroutine(worgen.collections[6].LoadModel(model, worgen.Items[11].LeftTexture, casc));
+                worgen.collections[6].ActiveGeosets = new List<int>();
+                if (!activeGeosets.Contains(1302))
+                {
+                    worgen.collections[6].ActiveGeosets.Add(501);
+                }
+                worgen.collections[6].ActiveGeosets.Add(2001);
             }
             if (!activeGeosets.Contains(1302))
             {
@@ -524,7 +514,7 @@ public class Gilnean : ModelRenderer
             LoadColors();
             yield return null;
             textures = new Texture2D[Model.Textures.Length];
-            if (worgen.Gender)
+            if (Gender)
             {
                 helper = new GilneanMale(Model, worgen);
             }

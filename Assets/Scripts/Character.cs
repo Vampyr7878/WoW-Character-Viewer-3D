@@ -8,34 +8,55 @@ using UnityEngine.Rendering;
 using WoW;
 using WoW.Characters;
 
+//Main class to handle character rendering
 public class Character : ModelRenderer
 {
-    //public Collection[] collections;
+    //References to collection models
+    public Collection[] collections;
+    //Reference to Demon Hunter colleciton model
     public Collection demonHunter;
+    //Referene to race specific collection model
     public Collection racial;
+    //Reference to the main input class
     public ScreenInput input;
 
+    //Reference to the helper class that handles specific race
     private CharacterHelper helper;
+    //List of geosets that are enabled for loading
     private List<int> activeGeosets;
+    //Textures that shift for worgen form
+    private List<int> shiftTextures;
 
+    //Dropdowns containing customization options
     public List<CustomDropdown> CustomizationDropdowns { get; set; }
+    //Name of Demon Hunter collection file
     public string DemonHunterFile { get; set; }
+    //Name of race specific collection file
     public string RacialCollection { get; set; }
+    //Equipped items
     public ItemModel[] Items { get; set; }
-    public string Suffix1 { get; set; }
-    public string Suffix2 { get; set; }
+    //Path from where the model is loaded
     public string RacePath { get; set; }
+    //Character's race
     public int Race { get; set; }
+    //Character's class
     public int Class { get; set; }
+    //Character's gender
     public bool Gender { get; set; }
+    //Curent character form
     public int Form { get; set; }
+    //Customization options for current character
     public CustomizationOption[] Options { get; set; }
+    //Customization values for each option
     public int[] Customization { get; set; }
+    //Customization choices for each option
     public CustomizationChoice[][] Choices { get; set; }
 
     private void Start()
     {
+        //Initialize character
         Items = new ItemModel[13];
+        shiftTextures = new List<int> { 3045083, 3045085, 3045087, 3045089 };
         modelsPath = @"character\";
         converter = new System.Drawing.ImageConverter();
         CustomizationDropdowns = new List<CustomDropdown>();
@@ -50,6 +71,7 @@ public class Character : ModelRenderer
         {
             if (Change)
             {
+                //Render the model
                 try
                 {
                     Resources.UnloadUnusedAssets();
@@ -65,10 +87,10 @@ public class Character : ModelRenderer
                     animator.SetInteger("Face", Choices[index][Customization[index]].Bone);
                     demonHunter.Change = true;
                     racial.Change = true;
-                    //foreach (Collection collection in collections)
-                    //{
-                    //    collection.Change = true;
-                    //}
+                    foreach (Collection collection in collections)
+                    {
+                        collection.Change = true;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -76,6 +98,7 @@ public class Character : ModelRenderer
                 }
                 Change = false;
             }
+            //Animate textures
             for (int i = 0; i < Model.Skin.Textures.Length; i++)
             {
                 AnimateTextures(renderer, i);
@@ -87,6 +110,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Mark face options active/inactive depending on skin color
     public void ChangeFaceDropdown(int index, int index2)
     {
         for (int i = 0; i < CustomizationDropdowns[index2].options.Count; i++)
@@ -102,6 +126,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Mark tattoo color options active/inactive depending on chosen tattoo
     public void ChangeTattooDropdown(int index, int index2)
     {
         int bone = Choices[index][Customization[index]].Bone;
@@ -125,6 +150,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Mark customization options active/inactive depeing on other options chosen
     public void ChangeDropdown(int index, int index2)
     {
         int bone = Choices[index][Customization[index]].Bone;
@@ -141,6 +167,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Mark customization options active/inactive depending on binary array
     public void ChangeDropdown(int index, int[] array)
     {
         for (int i = 0; i < CustomizationDropdowns[index].options.Count; i++)
@@ -156,6 +183,8 @@ public class Character : ModelRenderer
         }
     }
 
+
+    //Set material with proper shader
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
         if (Race == 9 && Model.Skin.Textures[i].Id == 1)
@@ -184,6 +213,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Clear all the items
     public void ClearItems()
     {
         for (int i = 0; i < Items.Length; i++)
@@ -192,6 +222,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load all the equipped items
     private void EquipArmor()
     {
         EquipHead();
@@ -209,9 +240,10 @@ public class Character : ModelRenderer
         EquipLeftHand();
     }
 
+    //Load head slot item models and geosets
     private void EquipHead()
     {
-        //collections[0].UnloadModel();
+        collections[0].UnloadModel();
         ItemObject helm = GameObject.Find("helm").GetComponent<ItemObject>();
         helm.UnloadModel();
         if (Items[0] != null)
@@ -223,15 +255,13 @@ public class Character : ModelRenderer
                 helm.ParticleColors = Items[0].ParticleColors;
                 helm.Change = true;
             }
-            //if (Items[0].RightModel != "")
-            //{
-            //    collections[0].Path = "item/objectcomponents/collections/";
-            //    string model = Items[0].RightModel.Substring(0, Items[0].RightModel.Length - 7) + Suffix2;
-            //    collections[0].Texture = Items[0].RightTexture;
-            //    collections[0].LoadModel(model.Replace(collections[0].Path, ""));
-            //    collections[0].ActiveGeosets.Clear();
-            //    collections[0].ActiveGeosets.Add(2701);
-            //}
+            if (Items[0].RightModel > 0)
+            {
+                int model = Items[0].GetRaceSpecificModel(Items[0].RightModel, Race, Gender, Class);
+                StartCoroutine(collections[0].LoadModel(model, Items[0].RightTexture, casc));
+                collections[0].ActiveGeosets = new List<int>();
+                collections[0].ActiveGeosets.Add(2701);
+            }
             foreach (int helmet in Items[0].Helmet)
             {
                 if (helmet == 0)
@@ -275,6 +305,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load shoulder slot item model
     private void EquipShoulder()
     {
         ItemObject left = GameObject.Find("left shoulder").GetComponent<ItemObject>();
@@ -300,9 +331,10 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load back slot item models and geosets
     private void EquipBack()
     {
-        //collections[1].UnloadModel();
+        collections[1].UnloadModel();
         ItemObject backpack = GameObject.Find("backpack").GetComponent<ItemObject>();
         backpack.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1499 && x < 1600);
@@ -310,12 +342,10 @@ public class Character : ModelRenderer
         {
             if (Items[2].LeftModel > 0)
             {
-                //collections[1].Path = "item/objectcomponents/collections/";
-                //string model = Items[2].LeftModel.Substring(0, Items[2].LeftModel.Length - 7) + Suffix2;
-                //collections[1].Texture = Items[2].LeftTexture;
-                //collections[1].LoadModel(model.Replace(collections[1].Path, ""));
-                //collections[1].ActiveGeosets.Clear();
-                //collections[1].ActiveGeosets.Add(1501);
+                int model = Items[2].GetRaceSpecificModel(Items[2].LeftModel, Race, Gender, Class);
+                StartCoroutine(collections[1].LoadModel(model, Items[2].LeftTexture, casc));
+                collections[1].ActiveGeosets = new List<int>();
+                collections[1].ActiveGeosets.Add(1501);
             }
             if (Items[2].RightModel > 0)
             {
@@ -341,9 +371,10 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load chest slot item models and geosets
     private void EquipChest()
     {
-        //collections[2].UnloadModel();
+        collections[2].UnloadModel();
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
         activeGeosets.RemoveAll(x => x > 999 && x < 1100);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
@@ -352,16 +383,17 @@ public class Character : ModelRenderer
         {
             if (Items[3].LeftModel > 0)
             {
-                //collections[2].Path = "item/objectcomponents/collections/";
-                //string model = Items[3].LeftModel.Substring(0, Items[3].LeftModel.Length - 7) + Suffix2;
-                //collections[2].Texture = Items[3].LeftTexture;
-                //collections[2].LoadModel(model.Replace(collections[2].Path, ""));
-                //collections[2].ActiveGeosets.Clear();
-                //collections[2].ActiveGeosets.Add(801);
-                //collections[2].ActiveGeosets.Add(1001);
-                //collections[2].ActiveGeosets.Add(1301);
-                //collections[2].ActiveGeosets.Add(2201);
-                //collections[2].ActiveGeosets.Add(2801);
+                int model = Items[3].GetRaceSpecificModel(Items[3].LeftModel, Race, Gender, Class);
+                StartCoroutine(collections[2].LoadModel(model, Items[3].LeftTexture, casc));
+                collections[2].ActiveGeosets = new List<int>();
+                collections[2].ActiveGeosets.Add(801);
+                collections[2].ActiveGeosets.Add(1001);
+                if (Items[3].Slot == 20)
+                {
+                    collections[2].ActiveGeosets.Add(1301);
+                }
+                collections[2].ActiveGeosets.Add(2201);
+                collections[2].ActiveGeosets.Add(2801);
             }
             activeGeosets.Add(801 + Items[3].Geoset1);
             activeGeosets.Add(1001 + Items[3].Geoset2);
@@ -375,7 +407,7 @@ public class Character : ModelRenderer
                     racial.ActiveGeosets.RemoveAll(x => x > 2999 && x < 3100);
                 }
             }
-            activeGeosets.Add(2201 + Items[3].Geoset3);
+            activeGeosets.Add(2201 + Items[3].Geoset4);
             if (Items[3].UpperLeg > 0)
             {
                 activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
@@ -383,10 +415,10 @@ public class Character : ModelRenderer
                 {
                     demonHunter.ActiveGeosets.RemoveAll(x => x > 1399 && x < 1500);
                 }
-                //if (collections[5].Loaded)
-                //{
-                //    collections[5].ActiveGeosets.Clear();
-                //}
+                if (collections[5].Loaded)
+                {
+                    collections[5].ActiveGeosets.Clear();
+                }
             }
         }
         else
@@ -411,6 +443,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load shirt slot item geosets
     private void EquipShirt()
     {
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
@@ -424,6 +457,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load tabard slot item geosets
     private void EquipTabard()
     {
         activeGeosets.RemoveAll(x => x > 1199 && x < 1300);
@@ -444,6 +478,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load wrist slot item geosets
     private void EquipWrist()
     {
         if (Items[6] != null)
@@ -452,27 +487,26 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load hands slot item models and geosets
     private void EquipHands()
     {
-        //collections[3].UnloadModel();
+        collections[3].UnloadModel();
         activeGeosets.RemoveAll(x => x > 399 && x < 500);
         if (Items[8] != null)
         {
             if (Items[8].LeftModel > 0)
             {
-                //collections[3].Path = "item/objectcomponents/collections/";
-                //string model = Items[8].LeftModel.Substring(0, Items[8].LeftModel.Length - 7) + Suffix2;
-                //collections[3].Texture = Items[8].LeftTexture;
-                //collections[3].LoadModel(model.Replace(collections[3].Path, ""));
-                //collections[3].ActiveGeosets.Clear();
-                //if (Race != 37)
-                //{
-                //    if (activeGeosets.Contains(801))
-                //    {
-                //        collections[3].ActiveGeosets.Add(401);
-                //        collections[3].ActiveGeosets.Add(2301);
-                //    }
-                //}
+                int model = Items[8].GetRaceSpecificModel(Items[8].LeftModel, Race, Gender, Class);
+                StartCoroutine(collections[3].LoadModel(model, Items[8].LeftTexture, casc));
+                collections[3].ActiveGeosets = new List<int>();
+                if (Race != 37)
+                {
+                    if (activeGeosets.Contains(801))
+                    {
+                        collections[3].ActiveGeosets.Add(401);
+                    }
+                    collections[3].ActiveGeosets.Add(2301);
+                }
             }
             activeGeosets.Add(401 + Items[8].Geoset1);
             if (Items[8].Geoset1 != 0)
@@ -486,9 +520,10 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load waist slot item models and geosets
     private void EquipWaist()
     {
-        //collections[4].UnloadModel();
+        collections[4].UnloadModel();
         ItemObject buckle = GameObject.Find("buckle").GetComponent<ItemObject>();
         buckle.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1799 && x < 1900);
@@ -496,12 +531,10 @@ public class Character : ModelRenderer
         {
             if (Items[9].RightModel > 0)
             {
-                //collections[4].Path = "item/objectcomponents/collections/";
-                //string model = Items[9].RightModel.Substring(0, Items[9].RightModel.Length - 7) + Suffix2;
-                //collections[4].Texture = Items[9].RightTexture;
-                //collections[4].LoadModel(model.Replace(collections[4].Path, ""));
-                //collections[4].ActiveGeosets.Clear();
-                //collections[4].ActiveGeosets.Add(1801);
+                int model = Items[9].GetRaceSpecificModel(Items[9].RightModel, Race, Gender, Class);
+                StartCoroutine(collections[4].LoadModel(model, Items[9].RightTexture, casc));
+                collections[4].ActiveGeosets = new List<int>();
+                collections[4].ActiveGeosets.Add(1801);
             }
             if (Items[9].LeftModel > 0)
             {
@@ -522,9 +555,10 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load legs slot item models and geosets
     private void EquipLegs()
     {
-        //collections[5].UnloadModel();
+        collections[5].UnloadModel();
         activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
         activeGeosets.RemoveAll(x => x > 899 && x < 1000);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
@@ -532,16 +566,14 @@ public class Character : ModelRenderer
         {
             if (Items[10].LeftModel > 0)
             {
-                //collections[5].Path = "item/objectcomponents/collections/";
-                //string model = Items[10].LeftModel.Substring(0, Items[10].LeftModel.Length - 7) + Suffix2;
-                //collections[5].Texture = Items[10].LeftTexture;
-                //collections[5].LoadModel(model.Replace(collections[5].Path, ""));
-                //collections[5].ActiveGeosets.Clear();
-                //collections[5].ActiveGeosets.Add(901);
-                //if (Race != 37)
-                //{
-                //    collections[5].ActiveGeosets.Add(1101);
-                //}
+                int model = Items[10].GetRaceSpecificModel(Items[10].LeftModel, Race, Gender, Class);
+                StartCoroutine(collections[5].LoadModel(model, Items[10].LeftTexture, casc));
+                collections[5].ActiveGeosets = new List<int>();
+                collections[5].ActiveGeosets.Add(901);
+                if (Race != 37)
+                {
+                    collections[5].ActiveGeosets.Add(1101);
+                }
             }
             activeGeosets.Add(1101 + Items[10].Geoset1);
             activeGeosets.Add(901 + Items[10].Geoset2);
@@ -566,26 +598,27 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load feet slot item models and geosets
     private void EquipFeet()
     {
-        //collections[6].UnloadModel();
+        collections[6].UnloadModel();
         activeGeosets.RemoveAll(x => x > 499 && x < 600);
         activeGeosets.RemoveAll(x => x > 1999 && x < 2100);
         if (Items[11] != null)
         {
             if (Items[11].LeftModel > 0)
             {
-                //collections[6].Path = "item/objectcomponents/collections/";
-                //string model = Items[11].LeftModel.Substring(0, Items[11].LeftModel.Length - 7) + Suffix2;
-                //collections[6].Texture = Items[11].LeftTexture;
-                //collections[6].LoadModel(model.Replace(collections[6].Path, ""));
-                //collections[6].ActiveGeosets.Clear();
-                //if (Race != 37)
-                //{
-                //    if (!activeGeosets.Contains(1302))
-                //        collections[6].ActiveGeosets.Add(501);
-                //    collections[6].ActiveGeosets.Add(2001);
-                //}
+                int model = Items[11].GetRaceSpecificModel(Items[11].LeftModel, Race, Gender, Class);
+                StartCoroutine(collections[6].LoadModel(model, Items[11].LeftTexture, casc));
+                collections[6].ActiveGeosets = new List<int>();
+                if (Race != 37)
+                {
+                    if (!activeGeosets.Contains(1302))
+                    {
+                        collections[6].ActiveGeosets.Add(501);
+                    }
+                    collections[6].ActiveGeosets.Add(2001);
+                }
             }
             if (!activeGeosets.Contains(1302))
             {
@@ -607,6 +640,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load main hand slot item models and geosets
     private void EquipRightHand()
     {
         //ItemObject right = GameObject.Find("right hand").GetComponent<ItemObject>();
@@ -640,6 +674,7 @@ public class Character : ModelRenderer
         //}
     }
 
+    //Load offhand slot item models and geosets
     private void EquipLeftHand()
     {
         //ItemObject left = GameObject.Find("left hand").GetComponent<ItemObject>();
@@ -709,16 +744,22 @@ public class Character : ModelRenderer
         //}
     }
 
+    //Load item texture
     Texture2D LoadTexture(int file, int width, int height)
     {
         if (file == 0)
         {
             return null;
         }
+        if (Race == 22 && Form != 7 && shiftTextures.Contains(file))
+        {
+            file++;
+        }
         Texture2D texture = TextureFromBLP(file);
         return TextureScaler.scaled(texture, width, height);
     }
 
+    //Draw chest slot item textures
     public void TextureChest(Texture2D texture)
     {
         if (Items[3] != null)
@@ -774,6 +815,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw shirt slot item textures
     public void TextureShirt(Texture2D texture)
     {
         if (Items[4] != null)
@@ -813,6 +855,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw tabard slot item textures
     public void TextureTabard(Texture2D texture)
     {
         if (Items[5] != null)
@@ -844,6 +887,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw wrist slot item textures
     public void TextureWrist(Texture2D texture)
     {
         if (Items[6] != null)
@@ -859,6 +903,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw hands slot item textures
     public void TextureHands(Texture2D texture)
     {
         if (Items[8] != null)
@@ -882,6 +927,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw waist slot item textures
     public void TextureWaist(Texture2D texture)
     {
         if (Items[9] != null)
@@ -905,6 +951,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw legs slot item textures
     public void TextureLegs(Texture2D texture)
     {
         if (Items[10] != null)
@@ -928,6 +975,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw feet slot item textures
     public void TextureFeet(Texture2D texture, bool showFeet = false)
     {
         if (Items[11] != null)
@@ -951,6 +999,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on chest slot textures to obstruct tattoo emission
     public void BlackChest(Texture2D texture)
     {
         if (Items[3] != null)
@@ -1000,6 +1049,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on shirt slot textures to obstruct tattoo emission
     public void BlackShirt(Texture2D texture)
     {
         if (Items[4] != null)
@@ -1035,6 +1085,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on tabard slot textures to obstruct tattoo emission
     public void BlackTabard(Texture2D texture)
     {
         if (Items[5] != null)
@@ -1063,6 +1114,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on wrist slot textures to obstruct tattoo emission
     public void BlackWrist(Texture2D texture)
     {
         if (Items[6] != null)
@@ -1077,6 +1129,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on hands slot textures to obstruct tattoo emission
     public void BlackHands(Texture2D texture)
     {
         if (Items[8] != null)
@@ -1098,6 +1151,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on waist slot textures to obstruct tattoo emission
     public void BlackWaist(Texture2D texture)
     {
         if (Items[9] != null)
@@ -1119,6 +1173,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on legs slot textures to obstruct tattoo emission
     public void BlackLegs(Texture2D texture)
     {
         if (Items[10] != null)
@@ -1140,6 +1195,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Draw black texture based on feet slot textures to obstruct tattoo emission
     public void BlackFeet(Texture2D texture, bool showFeet = false)
     {
         if (Items[11] != null)
@@ -1161,6 +1217,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Setup all the material properties
     protected override void SetTexture(Material material, int i)
     {
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
@@ -1192,7 +1249,8 @@ public class Character : ModelRenderer
         material.SetFloat("_DepthTest", depth);
     }
 
-    public void InitializeHelper(CASCHandler casc)
+    //Initialize helper class for chosen race/gender
+    public void InitializeHelper()
     {
         if (Gender)
         {
@@ -1346,6 +1404,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load and setup model prefab
     private IEnumerator LoadPrefab(string modelfile)
     {
         bool done = false;
@@ -1400,7 +1459,7 @@ public class Character : ModelRenderer
             LoadColors();
             yield return null;
             textures = new Texture2D[Model.Textures.Length];
-            InitializeHelper(casc);
+            InitializeHelper();
             yield return null;
             time = new float[Model.TextureAnimations.Length];
             frame = new int[Model.TextureAnimations.Length];
@@ -1417,6 +1476,7 @@ public class Character : ModelRenderer
         }
     }
 
+    //Load the model
     public void LoadModel(string modelfile, CASCHandler casc)
     {
         Loaded = false;

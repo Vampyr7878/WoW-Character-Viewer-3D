@@ -322,7 +322,7 @@ public class ItemObject : ModelRenderer
             GameObject[] particles = new GameObject[Model.Particles.Length];
             for (int i = 0; i < particles.Length; i++)
             {
-                particles[i] = ParticleEffect(Model.Particles[i]);
+                particles[i] = WoWHelper.ParticleEffect(Model.Particles[i]);
                 particles[i].transform.parent = bones[Model.Particles[i].Bone];
                 particles[i].transform.localPosition = Vector3.zero;
                 particles[i].name = $"Particle{i}";
@@ -339,91 +339,5 @@ public class ItemObject : ModelRenderer
         }
         Loaded = true;
         Change = true;
-    }
-
-    //Particle shape
-    private ParticleSystemShapeType ParticleShape(byte value)
-    {
-        ParticleSystemShapeType shape = ParticleSystemShapeType.Cone;
-        switch (value)
-        {
-            case 1:
-                shape = ParticleSystemShapeType.Rectangle;
-                break;
-            case 2:
-                shape = ParticleSystemShapeType.Sphere;
-                break;
-            case 3:
-                shape = ParticleSystemShapeType.Circle;
-                break;
-        }
-        return shape;
-    }
-
-    //Generate particle effect system based on the data
-    private GameObject ParticleEffect(M2Particle particle)
-    {
-        //Create gameobject
-        GameObject element = new GameObject();
-        element.AddComponent<ParticleSystem>();
-        ParticleSystem system = element.GetComponent<ParticleSystem>();
-        //Setup lifetime and speed in main module
-        ParticleSystem.MainModule main = system.main;
-        float variation = particle.LifespanVariation * particle.Lifespan;
-        main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2, (particle.Lifespan + variation) / 2);
-        variation = particle.SpeedVariation * particle.Speed;
-        main.startSpeed = new ParticleSystem.MinMaxCurve((particle.Speed - variation) / 2f, (particle.Speed + variation) / 2f);
-        //Setup emission rate in emission module
-        ParticleSystem.EmissionModule emission = system.emission;
-        variation = particle.EmissionVariation * particle.EmissionRate;
-        emission.rateOverTime = new ParticleSystem.MinMaxCurve((particle.EmissionRate - variation) / 2, (particle.EmissionRate + variation) / 2);
-        emission.rateOverDistance = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
-        //Setup shape and scale in shape module
-        ParticleSystem.ShapeModule shape = system.shape;
-        shape.shapeType = ParticleShape(particle.Type);
-        shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionLength, particle.EmissionWidth);
-        //Setup color and alpha gradients in color over lifetime module
-        ParticleSystem.ColorOverLifetimeModule color = system.colorOverLifetime;
-        color.enabled = true;
-        Gradient gradient = new Gradient();
-        GradientColorKey[] colorKeys = new GradientColorKey[particle.Colors.Values.Length];
-        for (int i = 0; i < colorKeys.Length; i++)
-        {
-            colorKeys[i] = new GradientColorKey(new Color(particle.Colors.Values[i].X / 255f, particle.Colors.Values[i].Y / 255f, particle.Colors.Values[i].Z / 255f), particle.Colors.Timestamps[i]);
-        }
-        GradientAlphaKey[] alphaKeys;
-        if (particle.Alpha.Values.Length > 8)
-        {
-            alphaKeys = new GradientAlphaKey[particle.Alpha.Values.Length / 2];
-        }
-        else
-        {
-            alphaKeys = new GradientAlphaKey[particle.Alpha.Values.Length];
-        }
-        for (int i = 0, j = 0; i < alphaKeys.Length; i++, j++)
-        {
-            if (particle.Alpha.Values.Length > 8)
-            {
-                j++;
-            }
-            alphaKeys[i] = new GradientAlphaKey(particle.Alpha.Values[j], particle.Alpha.Timestamps[j]);
-        }
-        gradient.SetKeys(colorKeys, alphaKeys);
-        color.color = gradient;
-        //Setup size in size over lifetime module
-        ParticleSystem.SizeOverLifetimeModule size = system.sizeOverLifetime;
-        size.enabled = true;
-        AnimationCurve curve = new AnimationCurve();
-        for (int i = 0; i < particle.Scale.Values.Length; i++)
-        {
-            curve.AddKey(particle.Scale.Timestamps[i], particle.Scale.Values[i].X);
-        }
-        size.size = new ParticleSystem.MinMaxCurve(1f, curve);
-        //Setup texture sheet in texture sheet animation module
-        ParticleSystem.TextureSheetAnimationModule textureSheet = system.textureSheetAnimation;
-        textureSheet.enabled = true;
-        textureSheet.numTilesX = particle.TileColumns;
-        textureSheet.numTilesY = particle.TileRows;
-        return element;
     }
 }

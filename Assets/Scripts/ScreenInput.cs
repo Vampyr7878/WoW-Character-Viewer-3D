@@ -857,9 +857,7 @@ public class ScreenInput : MonoBehaviour
             SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
             model = reader.GetString(3);
-            gilnean.Suffix1 = reader.GetString(4);
-            gilnean.Suffix2 = reader.GetString(5);
-            gilnean.RacePath = reader.GetString(6);
+            gilnean.RacePath = reader.GetString(4);
         }
         connection.Close();
         ClearItems();
@@ -891,11 +889,9 @@ public class ScreenInput : MonoBehaviour
             SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
             model = reader.GetString(3);
-            character.Suffix1 = reader.GetString(4);
-            character.Suffix2 = reader.GetString(5);
-            character.RacePath = reader.GetString(6);
-            character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
-            character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
+            character.RacePath = reader.GetString(4);
+            character.DemonHunterFile = reader.IsDBNull(5) ? null : reader.GetString(5);
+            character.RacialCollection = reader.IsDBNull(6) ? null : reader.GetString(6);
         }
         connection.Close();
         ClearItems();
@@ -962,11 +958,9 @@ public class ScreenInput : MonoBehaviour
             SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
             model = reader.GetString(3);
-            character.Suffix1 = reader.GetString(4);
-            character.Suffix2 = reader.GetString(5);
-            character.RacePath = reader.GetString(6);
-            character.DemonHunterFile = reader.IsDBNull(7) ? null : reader.GetString(7);
-            character.RacialCollection = reader.IsDBNull(8) ? null : reader.GetString(8);
+            character.RacePath = reader.GetString(4);
+            character.DemonHunterFile = reader.IsDBNull(5) ? null : reader.GetString(5);
+            character.RacialCollection = reader.IsDBNull(6) ? null : reader.GetString(6);
         }
         connection.Close();
         ClearItems();
@@ -1051,7 +1045,7 @@ public class ScreenInput : MonoBehaviour
             customizationOptions[i].GetComponentInChildren<CustomDropdown>(true).SetValue(customization[i]);
         }
         ChangeButtonColors();
-        character.InitializeHelper(casc);
+        character.InitializeHelper();
         character.Change = true;
     }
 
