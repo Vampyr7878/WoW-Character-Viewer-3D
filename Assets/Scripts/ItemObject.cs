@@ -105,15 +105,7 @@ public class ItemObject : ModelRenderer
     //Set material with proper shader
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
-        Material material;
-        if (Model.Name.ToLower().Contains("offhand_1h_artifactskulloferedar") && i % 2 == 0)
-        {
-            renderer.materials[Model.Skin.Textures[i].Id] = new Material(hiddenMaterial.shader);
-            renderer.materials[Model.Skin.Textures[i].Id].shader = hiddenMaterial.shader;
-            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(hiddenMaterial);
-            return;
-        }
-        material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+        Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
         if (material == null)
         {
             Debug.LogError(Model.Skin.Textures[i].Shader);

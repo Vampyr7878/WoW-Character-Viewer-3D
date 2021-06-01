@@ -24,7 +24,7 @@ Shader "Custom/17"
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard alpha:blend fullforwardshadows
+			#pragma surface surfaceFunction Standard fullforwardshadows alpha:blend
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF

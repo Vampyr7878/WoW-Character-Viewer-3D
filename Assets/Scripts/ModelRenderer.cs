@@ -167,7 +167,7 @@ public abstract class ModelRenderer : MonoBehaviour
                 material = "particlemodulatematerial";
                 break;
             case 7:
-                material = "particlesubtractivematerial";
+                material = "particletransparentmaterial";
                 break;
         }
         if (material == "")

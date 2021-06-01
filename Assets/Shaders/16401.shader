@@ -47,8 +47,8 @@ Shader "Custom/16401"
 				color *= mask;
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
 				emission *= mask;
-				OUT.Albedo = color.rgb;
-				OUT.Alpha = emission.a;
+				OUT.Albedo = color.rgb * 2;
+				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
 				OUT.Emission = emission;

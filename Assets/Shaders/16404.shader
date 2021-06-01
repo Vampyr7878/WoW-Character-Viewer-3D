@@ -24,7 +24,7 @@ Shader "Custom/16404"
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard alpha:blend fullforwardshadows
+			#pragma surface surfaceFunction Standard fullforwardshadows alpha:blend
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF
@@ -38,17 +38,29 @@ Shader "Custom/16404"
 			sampler2D _Texture1;
 			sampler2D _Texture2;
 			fixed4 _Color;
+			int _SrcBlend;
+			int _DstBlend;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
-				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * tex2D(_Texture2, IN.uv2_Texture2) * _Color;
+				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
-				float alpha = color.r * 0.299f + color.g * 0.587f + color.b * 0.114f;
+				fixed4 alpha = tex2D(_Texture2, IN.uv2_Texture2);
+				if (_SrcBlend == 1 && _DstBlend == 10)
+				{
+					color.rgb *= alpha.rgb;
+					color.a *= alpha.a;
+				}
+				else
+				{
+					alpha.a = color.r * 0.299f + color.g * 0.587f + color.b * 0.114f;
+					color.a *= alpha;
+					OUT.Emission = emission;
+				}
 				OUT.Albedo = color.rgb * 2;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
-				OUT.Emission = emission;
 			}
 		ENDCG
 	}
