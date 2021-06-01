@@ -743,7 +743,7 @@ public class Character : ModelRenderer
             file++;
         }
         Texture2D texture = TextureFromBLP(file);
-        texture.wrapMode = TextureWrapMode.Repeat;
+        texture.wrapMode = TextureWrapMode.Clamp;
         return TextureScaler.scaled(texture, width, height);
     }
 
