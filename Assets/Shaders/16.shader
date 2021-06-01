@@ -24,7 +24,7 @@ Shader "Custom/16"
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard alphatest:_AlphaCut fullforwardshadows
+			#pragma surface surfaceFunction Standard fullforwardshadows alphatest:_AlphaCut
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF
@@ -36,10 +36,17 @@ Shader "Custom/16"
 
 			sampler2D _Texture1;
 			fixed4 _Color;
+			int _SrcBlend;
+			int _DstBlend;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
+				if (_SrcBlend == 5 && _DstBlend == 1)
+				{
+					float alpha = color.r * 0.299f + color.g * 0.587f + color.b * 0.114f;
+					color.a *= alpha;
+				}
 				OUT.Albedo = color.rgb;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;

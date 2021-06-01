@@ -643,105 +643,92 @@ public class Character : ModelRenderer
     //Load main hand slot item models and geosets
     private void EquipRightHand()
     {
-        //ItemObject right = GameObject.Find("right hand").GetComponent<ItemObject>();
-        //ItemObject book = GameObject.Find("book").GetComponent<ItemObject>();
-        //right.UnloadModel();
-        //book.UnloadModel();
-        //if (Items[7] != null)
-        //{
-        //    if (Items[7].Slot != 15)
-        //    {
-        //        if (Items[7].LeftModel != "")
-        //        {
-        //            right.LoadModel(Items[7].LeftModel);
-        //            right.Texture = Items[7].LeftTexture;
-        //            right.ParticleColors = Items[7].ParticleColors;
-        //            right.Path = @"item\objectcomponents\weapon\";
-        //            right.Change = true;
-        //        }
-        //    }
-        //    if (Items[7].Slot != 15 && Items[7].Slot != 26)
-        //    {
-        //        if (Items[7].RightModel != "")
-        //        {
-        //            book.LoadModel(Items[7].RightModel);
-        //            book.Texture = Items[7].RightTexture;
-        //            book.ParticleColors = Items[7].ParticleColors;
-        //            book.Path = @"item\objectcomponents\weapon\";
-        //            book.Change = true;
-        //        }
-        //    }
-        //}
+        ItemObject right = GameObject.Find("right hand").GetComponent<ItemObject>();
+        ItemObject book = GameObject.Find("book").GetComponent<ItemObject>();
+        right.UnloadModel();
+        book.UnloadModel();
+        if (Items[7] != null)
+        {
+            if (Items[7].Slot != 15)
+            {
+                if (Items[7].LeftModel > 0)
+                {
+                    int model = Items[7].GetModel(Items[7].LeftModel, Class);
+                    StartCoroutine(right.LoadModel(model, Items[7].LeftTexture, casc));
+                    right.ParticleColors = Items[7].ParticleColors;
+                    right.Change = true;
+                }
+            }
+            if (Items[7].Slot != 15 && Items[7].Slot != 26)
+            {
+                if (Items[7].RightModel > 0)
+                {
+                    int model = Items[7].GetModel(Items[7].RightModel, Class);
+                    StartCoroutine(book.LoadModel(model, Items[7].RightTexture, casc));
+                    book.ParticleColors = Items[7].ParticleColors;
+                    book.Change = true;
+                }
+            }
+        }
     }
 
     //Load offhand slot item models and geosets
     private void EquipLeftHand()
     {
-        //ItemObject left = GameObject.Find("left hand").GetComponent<ItemObject>();
-        //ItemObject shield = GameObject.Find("shield").GetComponent<ItemObject>();
-        //ItemObject quiver = GameObject.Find("quiver").GetComponent<ItemObject>();
-        //left.UnloadModel();
-        //shield.UnloadModel();
-        //quiver.UnloadModel();
-        //if (Items[7] != null)
-        //{
-        //    if (Items[7].Slot == 15)
-        //    {
-        //        left.transform.localScale = new Vector3(1f, 1f, 1f);
-        //        if (Items[7].LeftModel != "")
-        //        {
-        //            left.LoadModel(Items[7].LeftModel);
-        //            left.Texture = Items[7].LeftTexture;
-        //            left.ParticleColors = Items[7].ParticleColors;
-        //            left.Path = @"item\objectcomponents\weapon\";
-        //            left.Change = true;
-        //        }
-        //    }
-        //    if (Items[7].Slot == 15 || Items[7].Slot == 26)
-        //    {
-        //        if (Items[7].RightModel != "")
-        //        {
-        //            quiver.LoadModel(Items[7].RightModel);
-        //            quiver.Texture = Items[7].RightTexture;
-        //            quiver.ParticleColors = Items[7].ParticleColors;
-        //            quiver.Path = @"item\objectcomponents\quiver\";
-        //            quiver.Change = true;
-        //        }
-        //    }
-        //}
-        //if (Items[12] != null)
-        //{
-        //    if (Items[12].Slot == 14)
-        //    {
-        //        if (Items[12].LeftModel != "")
-        //        {
-        //            shield.LoadModel(Items[12].LeftModel);
-        //            shield.Texture = Items[12].LeftTexture;
-        //            shield.ParticleColors = Items[12].ParticleColors;
-        //            shield.Path = @"item\objectcomponents\shield\";
-        //            shield.Change = true;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (Items[12].LeftModel != "")
-        //        {
-        //            if (Items[12].LeftModel.Contains("left"))
-        //            {
-        //                left.transform.localScale = new Vector3(1f, 1f, 1f);
-        //            }
-        //            else
-        //            {
-        //                left.transform.localScale = new Vector3(1f, 1f, -1f);
-        //            }
-        //            left.LoadModel(Items[12].LeftModel);
-        //            left.Texture = Items[12].LeftTexture;
-        //            left.ParticleColors = Items[12].ParticleColors;
-        //            left.Path = @"item\objectcomponents\weapon\";
-        //            left.Change = true;
-        //        }
-        //    }
-        //}
+        ItemObject left = GameObject.Find("left hand").GetComponent<ItemObject>();
+        ItemObject shield = GameObject.Find("shield").GetComponent<ItemObject>();
+        ItemObject quiver = GameObject.Find("quiver").GetComponent<ItemObject>();
+        left.UnloadModel();
+        shield.UnloadModel();
+        quiver.UnloadModel();
+        if (Items[7] != null)
+        {
+            if (Items[7].Slot == 15)
+            {
+                left.transform.localScale = new Vector3(1f, 1f, 1f);
+                if (Items[7].LeftModel > 0)
+                {
+                    int model = Items[7].GetModel(Items[7].LeftModel, Class);
+                    StartCoroutine(left.LoadModel(model, Items[7].LeftTexture, casc));
+                    left.ParticleColors = Items[7].ParticleColors;
+                    left.Change = true;
+                }
+            }
+            if (Items[7].Slot == 15 || Items[7].Slot == 26)
+            {
+                if (Items[7].RightModel > 0)
+                {
+                    int model = Items[7].GetModel(Items[7].RightModel, Class);
+                    StartCoroutine(quiver.LoadModel(model, Items[7].RightTexture, casc));
+                    quiver.ParticleColors = Items[7].ParticleColors;
+                    quiver.Change = true;
+                }
+            }
+        }
+        if (Items[12] != null)
+        {
+            if (Items[12].Slot == 14)
+            {
+                if (Items[12].LeftModel > 0)
+                {
+                    int model = Items[12].GetModel(Items[12].LeftModel, Class);
+                    StartCoroutine(shield.LoadModel(model, Items[12].LeftTexture, casc));
+                    shield.ParticleColors = Items[12].ParticleColors;
+                    shield.Change = true;
+                }
+            }
+            else
+            {
+                if (Items[12].LeftModel > 0)
+                {
+                    left.transform.localScale = new Vector3(1f, 1f, -1f);
+                    int model = Items[12].GetModel(Items[12].LeftModel, Class);
+                    StartCoroutine(left.LoadModel(model, Items[12].LeftTexture, casc));
+                    left.ParticleColors = Items[12].ParticleColors;
+                    left.Change = true;
+                }
+            }
+        }
     }
 
     //Load item texture
@@ -1239,6 +1226,7 @@ public class Character : ModelRenderer
         }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.1f : 0f);
         if (Model.Skin.Textures[i].Color != -1)
         {
             material.SetColor("_Color", colors[Model.Skin.Textures[i].Color]);

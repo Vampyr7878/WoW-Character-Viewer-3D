@@ -17,7 +17,7 @@ Shader "Custom/17"
 
 	SubShader
 	{
-		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" }
+		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
 		ZWrite[_DepthTest]
 		Blend[_SrcBlend][_DstBlend]

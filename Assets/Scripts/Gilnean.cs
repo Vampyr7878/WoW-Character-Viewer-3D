@@ -102,6 +102,7 @@ public class Gilnean : ModelRenderer
         }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.1f : 0f);
         if (Model.Skin.Textures[i].Color != -1)
         {
             material.SetColor("_Color", colors[Model.Skin.Textures[i].Color]);
@@ -125,8 +126,8 @@ public class Gilnean : ModelRenderer
         EquipHands();
         EquipWaist();
         EquipFeet();
-        //EquipRightHand();
-        //EquipLeftHand();
+        EquipRightHand();
+        EquipLeftHand();
     }
 
     //Load head slot item models and geosets
@@ -475,6 +476,97 @@ public class Gilnean : ModelRenderer
                 activeGeosets.Add(501);
             }
             activeGeosets.Add(2001);
+        }
+    }
+
+    //Load main hand slot item models and geosets
+    private void EquipRightHand()
+    {
+        ItemObject right = GameObject.Find("right hand").GetComponent<ItemObject>();
+        ItemObject book = GameObject.Find("book").GetComponent<ItemObject>();
+        right.UnloadModel();
+        book.UnloadModel();
+        if (worgen.Items[7] != null)
+        {
+            if (worgen.Items[7].Slot != 15)
+            {
+                if (worgen.Items[7].LeftModel > 0)
+                {
+                    int model = worgen.Items[7].GetModel(worgen.Items[7].LeftModel, worgen.Class);
+                    StartCoroutine(right.LoadModel(model, worgen.Items[7].LeftTexture, casc));
+                    right.ParticleColors = worgen.Items[7].ParticleColors;
+                    right.Change = true;
+                }
+            }
+            if (worgen.Items[7].Slot != 15 && worgen.Items[7].Slot != 26)
+            {
+                if (worgen.Items[7].RightModel > 0)
+                {
+                    int model = worgen.Items[7].GetModel(worgen.Items[7].RightModel, worgen.Class);
+                    StartCoroutine(book.LoadModel(model, worgen.Items[7].RightTexture, casc));
+                    book.ParticleColors = worgen.Items[7].ParticleColors;
+                    book.Change = true;
+                }
+            }
+        }
+    }
+
+    //Load offhand slot item models and geosets
+    private void EquipLeftHand()
+    {
+        ItemObject left = GameObject.Find("left hand").GetComponent<ItemObject>();
+        ItemObject shield = GameObject.Find("shield").GetComponent<ItemObject>();
+        ItemObject quiver = GameObject.Find("quiver").GetComponent<ItemObject>();
+        left.UnloadModel();
+        shield.UnloadModel();
+        quiver.UnloadModel();
+        if (worgen.Items[7] != null)
+        {
+            if (worgen.Items[7].Slot == 15)
+            {
+                left.transform.localScale = new Vector3(1f, 1f, 1f);
+                if (worgen.Items[7].LeftModel > 0)
+                {
+                    int model = worgen.Items[7].GetModel(worgen.Items[7].LeftModel, worgen.Class);
+                    StartCoroutine(left.LoadModel(model, worgen.Items[7].LeftTexture, casc));
+                    left.ParticleColors = worgen.Items[7].ParticleColors;
+                    left.Change = true;
+                }
+            }
+            if (worgen.Items[7].Slot == 15 || worgen.Items[7].Slot == 26)
+            {
+                if (worgen.Items[7].RightModel > 0)
+                {
+                    int model = worgen.Items[7].GetModel(worgen.Items[7].RightModel, worgen.Class);
+                    StartCoroutine(quiver.LoadModel(model, worgen.Items[7].RightTexture, casc));
+                    quiver.ParticleColors = worgen.Items[7].ParticleColors;
+                    quiver.Change = true;
+                }
+            }
+        }
+        if (worgen.Items[12] != null)
+        {
+            if (worgen.Items[12].Slot == 14)
+            {
+                if (worgen.Items[12].LeftModel > 0)
+                {
+                    int model = worgen.Items[12].GetModel(worgen.Items[12].LeftModel, worgen.Class);
+                    StartCoroutine(shield.LoadModel(model, worgen.Items[12].LeftTexture, casc));
+                    shield.ParticleColors = worgen.Items[12].ParticleColors;
+                    shield.Change = true;
+                }
+            }
+            else
+            {
+                if (worgen.Items[12].LeftModel > 0)
+                {
+                    left.transform.localScale = new Vector3(1f, 1f, -1f);
+                    int model = worgen.Items[12].GetModel(worgen.Items[12].LeftModel, worgen.Class);
+                    StartCoroutine(left.LoadModel(model, worgen.Items[12].LeftTexture, casc));
+                    left.ParticleColors = worgen.Items[12].ParticleColors;
+                    left.Change = true;
+                }
+            }
         }
     }
 

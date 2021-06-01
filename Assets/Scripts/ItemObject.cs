@@ -40,9 +40,12 @@ public class ItemObject : ModelRenderer
                     GC.Collect();
                     LoadTextures();
                     ParticleEffects();
-                    for (int i = 0; i < Model.Skin.Submeshes.Length; i++)
+                    for (int i = 0; i < Model.Skin.Textures.Length; i++)
                     {
-                        SetMaterial(renderer, i);
+                        if (Model.Skin.Textures[i].Layer == 0)
+                        {
+                            SetMaterial(renderer, i);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -103,21 +106,14 @@ public class ItemObject : ModelRenderer
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
         Material material;
-        //if (Model.Name.ToLower().Contains("offhand_1h_artifactskulloferedar") && i % 2 == 0)
-        //{
-        //    renderer.materials[Model.Skin.Textures[i].Id] = new Material(hidden.shader);
-        //    renderer.materials[Model.Skin.Textures[i].Id].shader = hidden.shader;
-        //    renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(hidden);
-        //    return;
-        //}
-        //if (Model.Skin.Textures[i].Shader == 32783)
-        //{
-        //    material = Resources.Load<Material>(@"Materials\32783s");
-        //}
-        //else
-        //{
+        if (Model.Name.ToLower().Contains("offhand_1h_artifactskulloferedar") && i % 2 == 0)
+        {
+            renderer.materials[Model.Skin.Textures[i].Id] = new Material(hiddenMaterial.shader);
+            renderer.materials[Model.Skin.Textures[i].Id].shader = hiddenMaterial.shader;
+            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(hiddenMaterial);
+            return;
+        }
         material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
-        //}
         if (material == null)
         {
             Debug.LogError(Model.Skin.Textures[i].Shader);
@@ -204,6 +200,8 @@ public class ItemObject : ModelRenderer
         }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.1f : 0f);
+        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 7 ? 0.1f : 0f);
         if (Model.Skin.Textures[i].Color != -1)
         {
             material.SetColor("_Color", colors[Model.Skin.Textures[i].Color]);
@@ -215,6 +213,7 @@ public class ItemObject : ModelRenderer
         float alpha = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
         Color color = new Color(1, 1, 1, alpha);
         material.SetColor("_Color", color);
+        material.renderQueue += Model.Skin.Textures[i].Priority;
     }
 
     //Load specific texture
@@ -252,14 +251,8 @@ public class ItemObject : ModelRenderer
                 }
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
-                if (Model.Textures[i].Flags == 0)
-                {
-                    textures[i].wrapMode = TextureWrapMode.Clamp;
-                }
-                else
-                {
-                    textures[i].wrapMode = TextureWrapMode.Repeat;
-                }
+                textures[i].wrapModeU = (Model.Textures[i].Flags & 1) != 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
+                textures[i].wrapModeV = (Model.Textures[i].Flags & 2) != 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
                 textures[i].Apply();
             }
         }
@@ -305,7 +298,7 @@ public class ItemObject : ModelRenderer
         yield return null;
         Model.Skin.LoadFile(bytes);
         yield return null;
-        //Array.Sort(Model.Skin.Textures, (a, b) => Model.Materials[a.Material].Blend.CompareTo(Model.Materials[b.Material].Blend));
+        //Array.Sort(Model.Skin.Textures, (a, b) => a.Priority.CompareTo(b.Priority));
         LoadColors();
         yield return null;
         textures = new Texture2D[Model.Textures.Length];

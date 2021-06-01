@@ -17,7 +17,7 @@ Shader "Custom/16404"
 
 	SubShader
 	{
-		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" }
+		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
 		ZWrite[_DepthTest]
 		Blend[_SrcBlend][_DstBlend]
@@ -42,7 +42,8 @@ Shader "Custom/16404"
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * tex2D(_Texture2, IN.uv2_Texture2) * _Color;
-				fixed4 emission = tex2D(_Texture2, IN.uv2_Texture2);
+				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
+				float alpha = color.r * 0.299f + color.g * 0.587f + color.b * 0.114f;
 				OUT.Albedo = color.rgb * 2;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
