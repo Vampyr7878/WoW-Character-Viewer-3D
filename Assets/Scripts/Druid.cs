@@ -146,15 +146,7 @@ public class Druid : ModelRenderer
             limitVelocityOverLifetime.multiplyDragByParticleVelocity = true;
             particles[i].transform.localScale = transform.lossyScale;
             ParticleSystemRenderer renderer = particles[i].GetComponent<ParticleSystemRenderer>();
-            Material material;
-            if (Model.Particles[i].Blend == 2)
-            {
-                material = Resources.Load<Material>(@"Materials\particlefadematerial");
-            }
-            else
-            {
-                material = Resources.Load<Material>(@"Materials\particleadditivematerial");
-            }
+            Material material = ParticleMaterial(Model.Particles[i].Blend);
             renderer.material.shader = material.shader;
             renderer.material.CopyPropertiesFromMaterial(material);
             Texture2D temp = textures[Model.Particles[i].Textures[0]];

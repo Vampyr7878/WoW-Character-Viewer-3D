@@ -144,6 +144,39 @@ public abstract class ModelRenderer : MonoBehaviour
         return blend;
     }
 
+    public Material ParticleMaterial(int blend)
+    {
+        string material = "";
+        switch(blend)
+        {
+            case 0:
+                material = "particleopaquematerial";
+                break;
+            case 1:
+                material = "particlecutoutmaterial";
+                break;
+            case 2:
+                material = "particlefadematerial";
+                break;
+            case 3:
+            case 4:
+                material = "particleadditivematerial";
+                break;
+            case 5:
+            case 6:
+                material = "particlemodulatematerial";
+                break;
+            case 7:
+                material = "particlesubtractivematerial";
+                break;
+        }
+        if (material == "")
+        {
+            return null;
+        }
+        return Resources.Load<Material>(@$"Materials\{material}");
+    }
+
     //Load model colors
     protected void LoadColors()
     {

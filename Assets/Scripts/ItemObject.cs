@@ -160,17 +160,8 @@ public class ItemObject : ModelRenderer
             limitVelocityOverLifetime.multiplyDragByParticleSize = false;
             limitVelocityOverLifetime.multiplyDragByParticleVelocity = true;
             ParticleSystemRenderer renderer = particles[i].GetComponent<ParticleSystemRenderer>();
-            Material material;
+            Material material = ParticleMaterial(Model.Particles[i].Blend);
             particles[i].transform.localScale = transform.lossyScale;
-            if (Model.Particles[i].Blend == 2)
-            {
-                material = Resources.Load<Material>(@"Materials\particlefadematerial");
-            }
-            else
-            {
-                material = Resources.Load<Material>(@"Materials\particleadditivematerial");
-
-            }
             if (name.Contains("right") && Model.Particles[i].TileRotation != 0)
             {
                 renderer.flip = new Vector3(1f, 0f, 0f);
