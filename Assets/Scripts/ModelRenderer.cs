@@ -89,8 +89,8 @@ public abstract class ModelRenderer : MonoBehaviour
                 {
                     float timestamp = (animation.Translation.Timestamps[0][frame[index]] - animation.Translation.Timestamps[0][frame[index] - 1]) / 1000f;
                     timestamp = (time[index] - animation.Translation.Timestamps[0][frame[index] - 1] / 1000f) / timestamp;
-                    offset.x = Mathf.Lerp(animation.Translation.Values[0][frame[index] - 1].X, animation.Translation.Values[0][frame[index]].X, timestamp);// * Time.deltaTime);
-                    offset.y = Mathf.Lerp(animation.Translation.Values[0][frame[index] - 1].Y, animation.Translation.Values[0][frame[index]].Y, timestamp);// * Time.deltaTime);
+                    offset.x = Mathf.Lerp(animation.Translation.Values[0][frame[index] - 1].X, animation.Translation.Values[0][frame[index]].X, timestamp);
+                    offset.y = -Mathf.Lerp(animation.Translation.Values[0][frame[index] - 1].Y, animation.Translation.Values[0][frame[index]].Y, timestamp);
                 }
                 offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
                 offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
