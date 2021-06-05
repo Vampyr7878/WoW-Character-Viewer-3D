@@ -71,6 +71,8 @@ public class ScreenInput : MonoBehaviour
     public Druid druid;
     //Name of item set to equip in autoscreenshot mode
     public string itemSet;
+    //Character's gender for start
+    public bool gender;
     //Toggle on autoscreenshot mode
     public bool screenshot;
     //Autoscreenshot core races
@@ -187,6 +189,8 @@ public class ScreenInput : MonoBehaviour
         items = new List<Item>();
         scrollItems = new List<GameObject>();
         customize = false;
+        GenderButton(gender);
+        character.Class = 1;
     }
 
     private void Update()
@@ -239,11 +243,11 @@ public class ScreenInput : MonoBehaviour
             string g = character.Gender ? "Male" : "Female";
             if (r >= coreRaceNames.Count && allied && r < coreRaceNames.Count + alliedRaceNames.Count)
             {
-                StartCoroutine(TakeScreenshot(@"Screenshots\" + g + alliedRaceNames[r - coreRaceNames.Count] + classes[character.Class].Replace(" ", "") + ".png"));
+                StartCoroutine(TakeScreenshot(@$"Screenshots\{g}{alliedRaceNames[r - coreRaceNames.Count]}{classes[character.Class].Replace(" ", "")}.png"));
             }
             else if (r < coreRaceNames.Count)
             {
-                StartCoroutine(TakeScreenshot(@"Screenshots\" + g + coreRaceNames[r] + classes[character.Class].Replace(" ", "") + ".png"));
+                StartCoroutine(TakeScreenshot(@$"Screenshots\{g}{coreRaceNames[r]}{classes[character.Class].Replace(" ", "")}.png"));
             }
         }
     }
@@ -283,7 +287,7 @@ public class ScreenInput : MonoBehaviour
         }
         yield return new WaitForEndOfFrame();
         openButton.transform.parent.gameObject.SetActive(false);
-        zzTransparencyCapture.captureScreenshot(@"Screenshots\" + (character.Gender ? "Male" : "Female") + races[character.Race].Replace(" ", "").Replace("'", "") + classes[character.Class].Replace(" ", "") + ".png");
+        zzTransparencyCapture.captureScreenshot(@$"Screenshots\{(character.Gender ? "Male" : "Female")}{races[character.Race].Replace(" ", "").Replace("'", "")}{classes[character.Class].Replace(" ", "")}.png");
         openButton.transform.parent.gameObject.SetActive(true);
     }
 
@@ -308,21 +312,21 @@ public class ScreenInput : MonoBehaviour
         string folder = character.Gender ? "Male" : "Female";
         if (r < coreRaceNames.Count)
         {
-            if (c < classNames.Count && File.Exists(@"Save\" + folder + @"\" + itemSet + @"\" + coreRaceNames[r] + @"\" + coreRaceNames[r] + classNames[c] + ".chr"))
+            if (c < classNames.Count && File.Exists(@$"Save\{folder}\{itemSet}\{coreRaceNames[r]}\{coreRaceNames[r]}{classNames[c]}.chr"))
             {
-                Open(@"Save\" + folder + @"\" + itemSet + @"\" + coreRaceNames[r] + @"\" + coreRaceNames[r] + classNames[c] + ".chr");
+                Open(@$"Save\{folder}\{itemSet}\{coreRaceNames[r]}\{coreRaceNames[r]}{classNames[c]}.chr");
             }
         }
         else if (allied && r < coreRaceNames.Count + alliedRaceNames.Count)
         {
-            if (c < classNames.Count && File.Exists(@"Save\" + folder + @"\" + itemSet + @"\" + alliedRaceNames[r - coreRaceNames.Count] + @"\" + alliedRaceNames[r - coreRaceNames.Count] + classNames[c] + ".chr"))
+            if (c < classNames.Count && File.Exists(@$"Save\{folder}\{itemSet}\{alliedRaceNames[r - coreRaceNames.Count]}\{alliedRaceNames[r - coreRaceNames.Count]}{classNames[c]}.chr"))
             {
-                Open(@"Save\" + folder + @"\" + itemSet + @"\" + alliedRaceNames[r - coreRaceNames.Count] + @"\" + alliedRaceNames[r - coreRaceNames.Count] + classNames[c] + ".chr");
+                Open(@$"Save\{folder}\{itemSet}\{alliedRaceNames[r - coreRaceNames.Count]}\{alliedRaceNames[r - coreRaceNames.Count]}{classNames[c]}.chr");
             }
         }
         yield return new WaitForSeconds(1);
         character.Change = true;
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(2);
         screenshot = true;
     }
 
@@ -1468,7 +1472,7 @@ public class ScreenInput : MonoBehaviour
             for (int i = 0; i < sCharacter.customization.Length; i++)
             {
                 character.Customization[i] = sCharacter.customization[i];
-                customizationOptions[i].GetComponentInChildren<Dropdown>(true).value = character.Customization[i];
+                ((CustomDropdown)customizationOptions[i].GetComponentInChildren<Dropdown>(true)).SetValue(character.Customization[i]);
             }
             connection.Open();
             gearPanel.gameObject.SetActive(true);
