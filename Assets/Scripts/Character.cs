@@ -406,7 +406,10 @@ public class Character : ModelRenderer
                 {
                     racial.ActiveGeosets.RemoveAll(x => x > 2999 && x < 3100);
                 }
-                collections[5].ActiveGeosets.RemoveAll(x => x > 1099 && x < 1200);
+                if (collections[5].Loaded)
+                {
+                    collections[5].ActiveGeosets.RemoveAll(x => x > 1099 && x < 1200);
+                }
             }
             activeGeosets.Add(2201 + Items[3].Geoset4);
             if (Items[3].UpperLeg > 0)
