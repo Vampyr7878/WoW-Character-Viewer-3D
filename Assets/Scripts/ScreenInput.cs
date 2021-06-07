@@ -324,7 +324,7 @@ public class ScreenInput : MonoBehaviour
                 Open(@$"Save\{folder}\{itemSet}\{alliedRaceNames[r - coreRaceNames.Count]}\{alliedRaceNames[r - coreRaceNames.Count]}{classNames[c]}.chr");
             }
         }
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4);
         screenshot = true;
     }
 

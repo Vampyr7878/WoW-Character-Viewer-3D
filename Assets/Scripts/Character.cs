@@ -388,7 +388,7 @@ public class Character : ModelRenderer
                 collections[2].ActiveGeosets = new List<int>();
                 collections[2].ActiveGeosets.Add(801);
                 collections[2].ActiveGeosets.Add(1001);
-                if (Items[3].Slot == 20)
+                if (Items[3].Geoset3 == 1)
                 {
                     collections[2].ActiveGeosets.Add(1301);
                 }
@@ -406,6 +406,7 @@ public class Character : ModelRenderer
                 {
                     racial.ActiveGeosets.RemoveAll(x => x > 2999 && x < 3100);
                 }
+                collections[5].ActiveGeosets.RemoveAll(x => x > 1099 && x < 1200);
             }
             activeGeosets.Add(2201 + Items[3].Geoset4);
             if (Items[3].UpperLeg > 0)
