@@ -23,6 +23,8 @@ public class Collection : ModelRenderer
     public string Path { get; set; }
     //Changable texture from database
     public int Texture { get; set; }
+    //File id of the model
+    public int File { get; private set; }
 
     private void Start()
     {
@@ -237,6 +239,7 @@ public class Collection : ModelRenderer
     //Load the model from CASC
     public IEnumerator LoadModel(int file, int texture, CASCHandler casc)
     {
+        File = file;
         if (file != 0)
         {
             Texture = texture;

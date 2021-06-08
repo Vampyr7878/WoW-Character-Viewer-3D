@@ -13,9 +13,11 @@ public class ItemObject : ModelRenderer
 {
     //Reference to the main camera
     private new Transform camera;
-    //Swappable item texture
-    private int mainTexture;
 
+    //Swappable item texture
+    public int MainTexture { get; private set; }
+    //File id of the model
+    public int File { get; private set; }
     //Particle colors from database
     public ParticleColor[] ParticleColors { get; set; }
 
@@ -208,7 +210,7 @@ public class ItemObject : ModelRenderer
                 file = Model.TextureIDs[i];
                 break;
             case 2:
-                file = mainTexture;
+                file = MainTexture;
                 break;
         }
         return file;
@@ -250,7 +252,8 @@ public class ItemObject : ModelRenderer
     //Load the model
     public IEnumerator LoadModel(int file, int texture, CASCHandler casc)
     {
-        mainTexture = texture;
+        File = file;
+        MainTexture = texture;
         this.casc = casc;
         converter = new System.Drawing.ImageConverter();
         byte[] bytes;

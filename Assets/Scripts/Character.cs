@@ -243,63 +243,79 @@ public class Character : ModelRenderer
     //Load head slot item models and geosets
     private void EquipHead()
     {
-        collections[0].UnloadModel();
         ItemObject helm = GameObject.Find("helm").GetComponent<ItemObject>();
-        helm.UnloadModel();
-        if (Items[0] != null)
+        if (Items[0] == null)
         {
+            helm.UnloadModel();
+            collections[0].UnloadModel();
+            return;
+        }
+        int model = 0;
+        if (Items[0].LeftModel > 0)
+        {
+            model = Items[0].GetRaceSpecificModel(Items[0].LeftModel, Race, Gender, Class);
+        }
+        if (helm.File != model || helm.MainTexture != Items[0].LeftTexture)
+        {
+            helm.UnloadModel();
             if (Items[0].LeftModel > 0)
             {
-                int model = Items[0].GetRaceSpecificModel(Items[0].LeftModel, Race, Gender, Class);
                 StartCoroutine(helm.LoadModel(model, Items[0].LeftTexture, casc));
                 helm.ParticleColors = Items[0].ParticleColors;
                 helm.Change = true;
             }
+        }
+        if (Items[0].RightModel > 0)
+        {
+            model = Items[0].GetRaceSpecificModel(Items[0].RightModel, Race, Gender, Class);
+        }
+        if (collections[0].File != model || collections[0].Texture != Items[0].RightTexture)
+        {
+            collections[0].UnloadModel();
             if (Items[0].RightModel > 0)
             {
-                int model = Items[0].GetRaceSpecificModel(Items[0].RightModel, Race, Gender, Class);
                 StartCoroutine(collections[0].LoadModel(model, Items[0].RightTexture, casc));
                 collections[0].ActiveGeosets = new List<int>();
                 collections[0].ActiveGeosets.Add(2701);
             }
-            foreach (int helmet in Items[0].Helmet)
+        }
+        foreach (int helmet in Items[0].Helmet)
+        {
+            if (helmet == 0)
             {
-                if (helmet == 0)
+                activeGeosets.RemoveAll(x => x > 0 && x < 100);
+                activeGeosets.Add(1);
+            }
+            else if (helmet == 7)
+            {
+                activeGeosets.RemoveAll(x => x > 699 && x < 800);
+                activeGeosets.Add(701);
+                if (racial.Loaded)
                 {
-                    activeGeosets.RemoveAll(x => x > 0 && x < 100);
-                    activeGeosets.Add(1);
+                    racial.ActiveGeosets.RemoveAll(x => x > 699 && x < 800);
+                    racial.ActiveGeosets.Add(701);
                 }
-                else if (helmet == 7)
+            }
+            else if (helmet == 24)
+            {
+                if (racial.Loaded && !racial.ActiveGeosets.Contains(2400))
                 {
-                    activeGeosets.RemoveAll(x => x > 699 && x < 800);
-                    activeGeosets.Add(701);
-                    if (racial.Loaded)
-                    {
-                        racial.ActiveGeosets.RemoveAll(x => x > 699 && x < 800);
-                        racial.ActiveGeosets.Add(701);
-                    }
+                    racial.ActiveGeosets.RemoveAll(x => x > 2399 && x < 2500);
+                    racial.ActiveGeosets.Add(2401);
                 }
-                else if (helmet == 24)
+            }
+            else if (helmet == 31)
+            {
+                continue;
+            }
+            else
+            {
+                activeGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
+                activeGeosets.Add(helmet * 100);
+                if (racial.Loaded)
                 {
-                    if (racial.Loaded && !racial.ActiveGeosets.Contains(2400))
-                    {
-                        racial.ActiveGeosets.RemoveAll(x => x > 2399 && x < 2500);
-                        racial.ActiveGeosets.Add(2401);
-                    }
-                }
-                else if (helmet == 31)
-                {
-                    continue;
-                }
-                else
-                {
-                    activeGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
-                    activeGeosets.Add(helmet * 100);
-                    if (racial.Loaded)
-                    {
-                        racial.ActiveGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
-                        racial.ActiveGeosets.Add(helmet * 100);
-                    }
+                    racial.ActiveGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
+                    racial.ActiveGeosets.Add(helmet * 100);
                 }
             }
         }
@@ -310,20 +326,36 @@ public class Character : ModelRenderer
     {
         ItemObject left = GameObject.Find("left shoulder").GetComponent<ItemObject>();
         ItemObject right = GameObject.Find("right shoulder").GetComponent<ItemObject>();
-        left.UnloadModel();
-        right.UnloadModel();
-        if (Items[1] != null)
+        if (Items[1] == null)
         {
+            left.UnloadModel();
+            right.UnloadModel();
+            return;
+        }
+        int model = 0;
+        if (Items[1].LeftModel > 0)
+        {
+            model = Items[1].GetSideSpecificModel(Items[1].LeftModel, false, Class);
+        }
+        if (left.File != model || left.MainTexture != Items[1].LeftTexture)
+        {
+            left.UnloadModel();
             if (Items[1].LeftModel > 0)
             {
-                int model = Items[1].GetSideSpecificModel(Items[1].LeftModel, false, Class);
                 StartCoroutine(left.LoadModel(model, Items[1].LeftTexture, casc));
                 left.ParticleColors = Items[1].ParticleColors;
                 left.Change = true;
             }
+        }
+        if (Items[1].RightModel > 0)
+        {
+            model = Items[1].GetSideSpecificModel(Items[1].RightModel, true, Class);
+        }
+        if (right.File != model || right.MainTexture != Items[1].RightTexture)
+        {
+            right.UnloadModel();
             if (Items[1].RightModel > 0)
             {
-                int model = Items[1].GetSideSpecificModel(Items[1].RightModel, true, Class);
                 StartCoroutine(right.LoadModel(model, Items[1].RightTexture, casc));
                 right.ParticleColors = Items[1].ParticleColors;
                 right.Change = true;
@@ -334,66 +366,94 @@ public class Character : ModelRenderer
     //Load back slot item models and geosets
     private void EquipBack()
     {
-        collections[1].UnloadModel();
         ItemObject backpack = GameObject.Find("backpack").GetComponent<ItemObject>();
-        backpack.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1499 && x < 1600);
-        if (Items[2] != null)
+        if (Items[2] == null)
         {
+            collections[1].UnloadModel();
+            backpack.UnloadModel();
+            activeGeosets.Add(1501);
+            return;
+        }
+        int model = 0;
+        if (Items[2].LeftModel > 0)
+        {
+            model = Items[2].GetRaceSpecificModel(Items[2].LeftModel, Race, Gender, Class);
+        }
+        if (collections[1].File != model || collections[1].Texture != Items[2].LeftTexture)
+        {
+            collections[1].UnloadModel();
             if (Items[2].LeftModel > 0)
             {
-                int model = Items[2].GetRaceSpecificModel(Items[2].LeftModel, Race, Gender, Class);
                 StartCoroutine(collections[1].LoadModel(model, Items[2].LeftTexture, casc));
                 collections[1].ActiveGeosets = new List<int>();
                 collections[1].ActiveGeosets.Add(1501);
             }
+        }
+        if (Items[2].RightModel > 0)
+        {
+            model = Items[2].GetModel(Items[2].RightModel, Class);
+        }
+        if (backpack.File != model || backpack.MainTexture != Items[2].RightTexture)
+        {
+            backpack.UnloadModel();
             if (Items[2].RightModel > 0)
             {
-                int model = Items[2].GetModel(Items[2].RightModel, Class);
                 StartCoroutine(backpack.LoadModel(model, Items[2].RightTexture, casc));
                 backpack.ParticleColors = Items[2].ParticleColors;
                 backpack.Change = true;
             }
-            int geoset = Items[2].Geoset1;
-            if (Race == 5)
-            {
-                int index = Array.FindIndex(Options, o => o.Name == "Skin Type");
-                if (Customization[index] > 0)
-                {
-                    geoset += 9;
-                }
-            }
-            activeGeosets.Add(1501 + geoset);
         }
-        else
+        int geoset = Items[2].Geoset1;
+        if (Race == 5)
         {
-            activeGeosets.Add(1501);
+            int index = Array.FindIndex(Options, o => o.Name == "Skin Type");
+            if (Customization[index] > 0)
+            {
+                geoset += 9;
+            }
         }
+        activeGeosets.Add(1501 + geoset);
     }
 
     //Load chest slot item models and geosets
     private void EquipChest()
     {
-        collections[2].UnloadModel();
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
         activeGeosets.RemoveAll(x => x > 999 && x < 1100);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
         activeGeosets.RemoveAll(x => x > 2199 && x < 2300);
-        if (Items[3] != null)
+        if (Items[3] == null)
         {
+            collections[2].UnloadModel();
+            activeGeosets.Add(801);
+            activeGeosets.Add(1001);
+            activeGeosets.Add(1301);
+            activeGeosets.Add(2201);
+        }
+        else
+        {
+            int model = 0;
             if (Items[3].LeftModel > 0)
             {
-                int model = Items[3].GetRaceSpecificModel(Items[3].LeftModel, Race, Gender, Class);
-                StartCoroutine(collections[2].LoadModel(model, Items[3].LeftTexture, casc));
-                collections[2].ActiveGeosets = new List<int>();
-                collections[2].ActiveGeosets.Add(801);
-                collections[2].ActiveGeosets.Add(1001);
-                if (Items[3].Geoset3 == 1)
+                model = Items[3].GetRaceSpecificModel(Items[3].LeftModel, Race, Gender, Class);
+            }
+            if (collections[2].File != model || collections[2].Texture != Items[3].LeftTexture)
+            {
+                collections[2].UnloadModel();
+                if (Items[3].LeftModel > 0)
                 {
-                    collections[2].ActiveGeosets.Add(1301);
+                    StartCoroutine(collections[2].LoadModel(model, Items[3].LeftTexture, casc));
+                    collections[2].ActiveGeosets = new List<int>();
+                    collections[2].ActiveGeosets.Add(801);
+                    collections[2].ActiveGeosets.Add(1001);
+                    if (Items[3].Geoset3 == 1)
+                    {
+                        collections[2].ActiveGeosets.Add(1301);
+                    }
+                    collections[2].ActiveGeosets.Add(2201);
+                    collections[2].ActiveGeosets.Add(2801);
                 }
-                collections[2].ActiveGeosets.Add(2201);
-                collections[2].ActiveGeosets.Add(2801);
             }
             activeGeosets.Add(801 + Items[3].Geoset1);
             activeGeosets.Add(1001 + Items[3].Geoset2);
@@ -425,13 +485,6 @@ public class Character : ModelRenderer
                 }
             }
         }
-        else
-        {
-            activeGeosets.Add(801);
-            activeGeosets.Add(1001);
-            activeGeosets.Add(1301);
-            activeGeosets.Add(2201);
-        }
         if (Items[10] != null && Items[10].Geoset3 == 1)
         {
             activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
@@ -451,56 +504,63 @@ public class Character : ModelRenderer
     private void EquipShirt()
     {
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
-        if (Items[4] != null)
-        {
-            activeGeosets.Add(801 + Items[4].Geoset1);
-        }
-        else
+        if (Items[4] == null)
         {
             activeGeosets.Add(801);
+            return;
         }
+        activeGeosets.Add(801 + Items[4].Geoset1);
     }
 
     //Load tabard slot item geosets
     private void EquipTabard()
     {
         activeGeosets.RemoveAll(x => x > 1199 && x < 1300);
-        if (Items[5] != null)
+        if (Items[5] == null)
         {
-            if ((Items[3] != null && Items[3].Geoset3 == 1) || (Items[10] != null && Items[10].Geoset3 == 1))
-            {
-                activeGeosets.Add(1201);
-            }
-            else
-            {
-                activeGeosets.Add(1201 + Items[5].Geoset1);
-            }
+            activeGeosets.Add(1201);
+            return;
+        }
+        if ((Items[3] != null && Items[3].Geoset3 == 1) || (Items[10] != null && Items[10].Geoset3 == 1))
+        {
+            activeGeosets.Add(1201);
         }
         else
         {
-            activeGeosets.Add(1201);
+            activeGeosets.Add(1201 + Items[5].Geoset1);
         }
     }
 
     //Load wrist slot item geosets
     private void EquipWrist()
     {
-        if (Items[6] != null)
+        if (Items[6] == null)
         {
-            activeGeosets.RemoveAll(x => x > 799 && x < 900);
+            return;
         }
+        activeGeosets.RemoveAll(x => x > 799 && x < 900);
     }
 
     //Load hands slot item models and geosets
     private void EquipHands()
     {
-        collections[3].UnloadModel();
         activeGeosets.RemoveAll(x => x > 399 && x < 500);
-        if (Items[8] != null)
+        if (Items[8] == null)
         {
+            collections[3].UnloadModel();
+            activeGeosets.Add(401);
+            return;
+        }
+        int model = 0;
+        if (Items[8].LeftModel > 0)
+        {
+            model = Items[8].GetRaceSpecificModel(Items[8].LeftModel, Race, Gender, Class);
+        }
+        if (collections[3].File != model || collections[3].Texture != Items[8].LeftTexture)
+        {
+            collections[3].UnloadModel();
             if (Items[8].LeftModel > 0)
             {
-                int model = Items[8].GetRaceSpecificModel(Items[8].LeftModel, Race, Gender, Class);
                 StartCoroutine(collections[3].LoadModel(model, Items[8].LeftTexture, casc));
                 collections[3].ActiveGeosets = new List<int>();
                 if (Race != 37)
@@ -512,65 +572,86 @@ public class Character : ModelRenderer
                     collections[3].ActiveGeosets.Add(2301);
                 }
             }
-            activeGeosets.Add(401 + Items[8].Geoset1);
-            if (Items[8].Geoset1 != 0)
-            {
-                activeGeosets.RemoveAll(x => x > 799 && x < 900);
-            }
         }
-        else
+        activeGeosets.Add(401 + Items[8].Geoset1);
+        if (Items[8].Geoset1 != 0)
         {
-            activeGeosets.Add(401);
+            activeGeosets.RemoveAll(x => x > 799 && x < 900);
         }
     }
 
     //Load waist slot item models and geosets
     private void EquipWaist()
     {
-        collections[4].UnloadModel();
         ItemObject buckle = GameObject.Find("buckle").GetComponent<ItemObject>();
-        buckle.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1799 && x < 1900);
-        if (Items[9] != null)
+        if (Items[9] == null)
         {
-            if (Items[9].RightModel > 0)
-            {
-                int model = Items[9].GetRaceSpecificModel(Items[9].RightModel, Race, Gender, Class);
-                StartCoroutine(collections[4].LoadModel(model, Items[9].RightTexture, casc));
-                collections[4].ActiveGeosets = new List<int>();
-                collections[4].ActiveGeosets.Add(1801);
-            }
+            collections[4].UnloadModel();
+            buckle.UnloadModel();
+            activeGeosets.Add(1801);
+            return;
+        }
+        int model = 0;
+        if (Items[9].LeftModel > 0)
+        {
+            model = Items[9].GetModel(Items[9].LeftModel, Class);
+        }
+        if (buckle.File != model || buckle.MainTexture != Items[9].LeftTexture)
+        {
+            buckle.UnloadModel();
             if (Items[9].LeftModel > 0)
             {
-                int model = Items[9].GetModel(Items[9].LeftModel, Class);
                 StartCoroutine(buckle.LoadModel(model, Items[9].LeftTexture, casc));
                 buckle.ParticleColors = Items[9].ParticleColors;
                 buckle.Change = true;
             }
-            activeGeosets.Add(1801 + Items[9].Geoset1);
-            if (Items[9].Geoset1 == 1)
+        }
+        if (Items[9].RightModel > 0)
+        {
+            model = Items[9].GetRaceSpecificModel(Items[9].RightModel, Race, Gender, Class);
+        }
+        if (collections[4].File != model || collections[4].Texture != Items[9].RightTexture)
+        {
+            collections[4].UnloadModel();
+            if (Items[9].RightModel > 0)
             {
-                activeGeosets.RemoveAll(x => x > 999 && x < 1100);
+                StartCoroutine(collections[4].LoadModel(model, Items[9].RightTexture, casc));
+                collections[4].ActiveGeosets = new List<int>();
+                collections[4].ActiveGeosets.Add(1801);
             }
         }
-        else
+        activeGeosets.Add(1801 + Items[9].Geoset1);
+        if (Items[9].Geoset1 == 1)
         {
-            activeGeosets.Add(1801);
+            activeGeosets.RemoveAll(x => x > 999 && x < 1100);
         }
     }
 
     //Load legs slot item models and geosets
     private void EquipLegs()
     {
-        collections[5].UnloadModel();
         activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
         activeGeosets.RemoveAll(x => x > 899 && x < 1000);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
-        if (Items[10] != null)
+        if (Items[10] == null)
         {
+            collections[5].UnloadModel();
+            activeGeosets.Add(1101);
+            activeGeosets.Add(901);
+            activeGeosets.Add(1301);
+            return;
+        }
+        int model = 0;
+        if (Items[10].LeftModel > 0)
+        {
+            model = Items[10].GetRaceSpecificModel(Items[10].LeftModel, Race, Gender, Class);
+        }
+        if (collections[5].File != model || collections[5].Texture != Items[10].LeftTexture)
+        {
+            collections[5].UnloadModel();
             if (Items[10].LeftModel > 0)
             {
-                int model = Items[10].GetRaceSpecificModel(Items[10].LeftModel, Race, Gender, Class);
                 StartCoroutine(collections[5].LoadModel(model, Items[10].LeftTexture, casc));
                 collections[5].ActiveGeosets = new List<int>();
                 collections[5].ActiveGeosets.Add(901);
@@ -579,40 +660,48 @@ public class Character : ModelRenderer
                     collections[5].ActiveGeosets.Add(1101);
                 }
             }
-            activeGeosets.Add(1101 + Items[10].Geoset1);
-            activeGeosets.Add(901 + Items[10].Geoset2);
-            if (Items[10].Geoset1 != 3)
-            {
-                activeGeosets.Add(1301 + Items[10].Geoset3);
-            }
-            if (Items[10].UpperLeg > 0)
-            {
-                activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
-                if (demonHunter.Loaded)
-                {
-                    demonHunter.ActiveGeosets.RemoveAll(x => x > 1399 && x < 1500);
-                }
-            }
         }
-        else
+        activeGeosets.Add(1101 + Items[10].Geoset1);
+        activeGeosets.Add(901 + Items[10].Geoset2);
+        if (Items[10].Geoset1 != 3)
         {
-            activeGeosets.Add(1101);
-            activeGeosets.Add(901);
-            activeGeosets.Add(1301);
+            activeGeosets.Add(1301 + Items[10].Geoset3);
+        }
+        if (Items[10].UpperLeg > 0)
+        {
+            activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
+            if (demonHunter.Loaded)
+            {
+                demonHunter.ActiveGeosets.RemoveAll(x => x > 1399 && x < 1500);
+            }
         }
     }
 
     //Load feet slot item models and geosets
     private void EquipFeet()
     {
-        collections[6].UnloadModel();
         activeGeosets.RemoveAll(x => x > 499 && x < 600);
         activeGeosets.RemoveAll(x => x > 1999 && x < 2100);
-        if (Items[11] != null)
+        if (Items[11] == null)
         {
+            collections[6].UnloadModel();
+            if (!activeGeosets.Contains(1302))
+            {
+                activeGeosets.Add(501);
+            }
+            activeGeosets.Add(2001);
+            return;
+        }
+        int model = 0;
+        if (Items[11].LeftModel > 0)
+        {
+            model = Items[11].GetRaceSpecificModel(Items[11].LeftModel, Race, Gender, Class);
+        }
+        if (collections[6].File != model || collections[6].Texture != Items[11].LeftTexture)
+        {
+            collections[6].UnloadModel();
             if (Items[11].LeftModel > 0)
             {
-                int model = Items[11].GetRaceSpecificModel(Items[11].LeftModel, Race, Gender, Class);
                 StartCoroutine(collections[6].LoadModel(model, Items[11].LeftTexture, casc));
                 collections[6].ActiveGeosets = new List<int>();
                 if (Race != 37)
@@ -624,24 +713,16 @@ public class Character : ModelRenderer
                     collections[6].ActiveGeosets.Add(2001);
                 }
             }
-            if (!activeGeosets.Contains(1302))
-            {
-                activeGeosets.Add(501 + Items[11].Geoset1);
-            }
-            if (Items[11].Geoset1 != 0)
-            {
-                activeGeosets.RemoveAll(x => x > 899 && x < 1000);
-            }
-            activeGeosets.Add(2002 - Items[11].Geoset2);
         }
-        else
+        if (!activeGeosets.Contains(1302))
         {
-            if (!activeGeosets.Contains(1302))
-            {
-                activeGeosets.Add(501);
-            }
-            activeGeosets.Add(2001);
+            activeGeosets.Add(501 + Items[11].Geoset1);
         }
+        if (Items[11].Geoset1 != 0)
+        {
+            activeGeosets.RemoveAll(x => x > 899 && x < 1000);
+        }
+        activeGeosets.Add(2002 - Items[11].Geoset2);
     }
 
     //Load main hand slot item models and geosets
