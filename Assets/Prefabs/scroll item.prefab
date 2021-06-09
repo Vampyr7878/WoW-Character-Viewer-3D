@@ -255,6 +255,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4109476329765422789}
   - component: {fileID: 4109476329765422794}
+  - component: {fileID: 7536173889816719649}
   m_Layer: 5
   m_Name: scroll item
   m_TagString: Untagged
@@ -333,6 +334,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!114 &7536173889816719649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4109476329765422788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d801a14a1a798954a8289b624a8b5e17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tooltip: {fileID: 2481646021427042833}
 --- !u!1 &4986720586299644881
 GameObject:
   m_ObjectHideFlags: 0

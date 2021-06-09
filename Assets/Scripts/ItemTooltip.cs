@@ -6,12 +6,11 @@ using UnityEngine.UI;
 //Custom tooltip
 public class ItemTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public GameObject item;
+    public Image tooltip;
 
     //Show tooltip
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Image tooltip = Array.Find(item.GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
         tooltip.gameObject.SetActive(true);
         tooltip.GetComponent<ContentSizeFitter>().SetLayoutHorizontal();
         Vector3 pos = tooltip.rectTransform.position;
@@ -26,7 +25,6 @@ public class ItemTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     //Hide tooltip
     public void OnPointerExit(PointerEventData eventData)
     {
-        Image tooltip = Array.Find(item.GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
         tooltip.gameObject.SetActive(false);
     }
 }

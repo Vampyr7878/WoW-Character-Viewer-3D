@@ -102,14 +102,18 @@ public class Collection : ModelRenderer
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.1f : 0f);
+        Color color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
-            material.SetColor("_Color", colors[Model.Skin.Textures[i].Color]);
+            color = colors[Model.Skin.Textures[i].Color];
         }
         CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Front;
         material.SetInt("_Cull", (int)cull);
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
+        color.a = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
+        material.SetColor("_Color", color);
+        material.renderQueue += Model.Skin.Textures[i].Priority;
     }
 
     //Load specific texture
