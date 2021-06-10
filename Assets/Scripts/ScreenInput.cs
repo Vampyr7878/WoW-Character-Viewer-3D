@@ -1366,6 +1366,7 @@ public class ScreenInput : MonoBehaviour
     {
         if (!customize)
         {
+            casc.Clear();
             #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
             #else

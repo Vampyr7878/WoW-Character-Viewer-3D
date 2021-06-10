@@ -352,7 +352,7 @@ namespace WoW
                     shape = ParticleSystemShapeType.Rectangle;
                     break;
                 case 2:
-                    shape = ParticleSystemShapeType.Sphere;
+                    shape = ParticleSystemShapeType.Circle;
                     break;
                 case 3:
                     shape = ParticleSystemShapeType.Circle;

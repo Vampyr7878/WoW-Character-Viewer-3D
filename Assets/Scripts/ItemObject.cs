@@ -156,7 +156,7 @@ public class ItemObject : ModelRenderer
             ParticleSystemRenderer renderer = particles[i].GetComponent<ParticleSystemRenderer>();
             Material material = ParticleMaterial(Model.Particles[i].Blend);
             particles[i].transform.localScale = transform.lossyScale;
-            if (name.Contains("right") && Model.Particles[i].TileRotation != 0)
+            if (name.Contains("right") && (Model.Particles[i].Flags & 512) == 0)
             {
                 renderer.flip = new Vector3(1f, 0f, 0f);
             }
