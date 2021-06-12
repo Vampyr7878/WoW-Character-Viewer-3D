@@ -90,16 +90,6 @@ namespace WoW
             }
             else
             {
-                int leftModel;
-                int rightModel;
-                int upperArm;
-                int lowerArm;
-                int hand;
-                int upperTorso;
-                int lowerTorso;
-                int upperLeg;
-                int lowerLeg;
-                int foot;
                 int maleHelmet;
                 int femaleHelmet;
                 int particleColor;
@@ -109,8 +99,8 @@ namespace WoW
                     command.CommandText = $"SELECT * FROM DisplayInfo WHERE ID = {display};";
                     SqliteDataReader reader = command.ExecuteReader();
                     reader.Read();
-                    leftModel = reader.GetInt32(1);
-                    rightModel = reader.GetInt32(2);
+                    LeftModel = reader.GetInt32(1);
+                    RightModel = reader.GetInt32(2);
                     LeftTexture = reader.GetInt32(3);
                     RightTexture = reader.GetInt32(4);
                     Geoset1 = reader.GetInt32(5);
@@ -125,28 +115,18 @@ namespace WoW
                     Collection4 = reader.GetInt32(14);
                     Collection5 = reader.GetInt32(15);
                     Collection6 = reader.GetInt32(16);
-                    upperArm = reader.GetInt32(17);
-                    lowerArm = reader.GetInt32(18);
-                    hand = reader.GetInt32(19);
-                    upperTorso = reader.GetInt32(20);
-                    lowerTorso = reader.GetInt32(21);
-                    upperLeg = reader.GetInt32(22);
-                    lowerLeg = reader.GetInt32(23);
-                    foot = reader.GetInt32(24);
+                    UpperArm = reader.GetInt32(17);
+                    LowerArm = reader.GetInt32(18);
+                    Hand = reader.GetInt32(19);
+                    UpperTorso = reader.GetInt32(20);
+                    LowerTorso = reader.GetInt32(21);
+                    UpperLeg = reader.GetInt32(22);
+                    LowerLeg = reader.GetInt32(23);
+                    Foot = reader.GetInt32(24);
                     maleHelmet = reader.GetInt32(25);
                     femaleHelmet = reader.GetInt32(26);
                     particleColor = reader.GetInt32(27);
                 }
-                LeftModel = leftModel;
-                RightModel = rightModel;
-                UpperArm = GetMaterial(upperArm, gender);
-                LowerArm = GetMaterial(lowerArm, gender);
-                Hand = GetMaterial(hand, gender);
-                UpperTorso = GetMaterial(upperTorso, gender);
-                LowerTorso = GetMaterial(lowerTorso, gender);
-                UpperLeg = GetMaterial(upperLeg, gender);
-                LowerLeg = GetMaterial(lowerLeg, gender);
-                Foot = GetMaterial(foot, gender);
                 Helmet = gender ? HelmetGeosets(maleHelmet, race) : HelmetGeosets(femaleHelmet, race);
                 ParticleColors = GetParticleColors(particleColor);
             }
@@ -154,21 +134,87 @@ namespace WoW
         }
 
         //Get proper texture ID based on gender
-        private int GetMaterial(int index, bool gender)
+        public int GetMaterial(int resource, int race, bool gender, int c)
         {
-            if (index == 0)
-            {
-                return 0;
-            }
-            int result;
+            int result = 0;
+            int g = gender ? 0 : 1;
+            connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
-                command.CommandText = $"SELECT Female, Male FROM ItemMaterials WHERE ID = {index};";
+                command.CommandText = $"SELECT ID FROM ItemMaterials WHERE Material = {resource} AND Race = {race} AND Gender = 3;";
                 SqliteDataReader reader = command.ExecuteReader();
-                reader.Read();
-                result = gender ? reader.GetInt32(1) : reader.GetInt32(0);
+                if (reader.Read())
+                {
+                    result = reader.GetInt32(0);
+                }
             }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT ID FROM ItemMaterials WHERE Material = {resource} AND Race = {race} AND Gender = {g};";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT ID FROM ItemMaterials WHERE Material = {resource} AND Class = {c} AND Gender = 3;";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT ID FROM ItemMaterials WHERE Material = {resource} AND Class = {c} AND Gender = {g};";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT ID FROM ItemMaterials WHERE Material = {resource} AND Gender = 3;";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
+                }
+            }
+            if (result == 0)
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT ID FROM ItemMaterials WHERE Material = {resource} AND Gender = {g};";
+                    SqliteDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        result = reader.GetInt32(0);
+                    }
+                }
+            }
+            connection.Close();
             return result;
         }
 

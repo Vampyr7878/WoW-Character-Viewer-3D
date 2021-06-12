@@ -817,16 +817,10 @@ public class Character : ModelRenderer
     }
 
     //Load item texture
-    Texture2D LoadTexture(int file, int width, int height)
+    Texture2D LoadTexture(ItemModel model, int material, int width, int height)
     {
-        if (file == 0)
-        {
-            return null;
-        }
-        if (Race == 22 && Form != 7 && shiftTextures.Contains(file))
-        {
-            file++;
-        }
+        int race = Form == 7 ? 23 : Race;
+        int file = model.GetMaterial(material, race, Gender, Class);
         Texture2D texture = TextureFromBLP(file);
         texture.wrapMode = TextureWrapMode.Clamp;
         return TextureScaler.scaled(texture, width, height);
@@ -839,7 +833,7 @@ public class Character : ModelRenderer
         {
             if (Items[3].UpperArm > 0)
             {
-                Texture2D armUpper = LoadTexture(Items[3].UpperArm, 256, 128);
+                Texture2D armUpper = LoadTexture(Items[3], Items[3].UpperArm, 256, 128);
                 if (armUpper != null)
                 {
                     helper.DrawTexture(texture, armUpper, 0, 384);
@@ -847,7 +841,7 @@ public class Character : ModelRenderer
             }
             if (Items[3].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[3].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[3], Items[3].LowerArm, 256, 128);
                 if (armLower != null)
                 {
                     helper.DrawTexture(texture, armLower, 0, 256);
@@ -855,7 +849,7 @@ public class Character : ModelRenderer
             }
             if (Items[3].UpperTorso > 0)
             {
-                Texture2D torsoUpper = LoadTexture(Items[3].UpperTorso, 256, 128);
+                Texture2D torsoUpper = LoadTexture(Items[3], Items[3].UpperTorso, 256, 128);
                 if (torsoUpper != null)
                 {
                     helper.DrawTexture(texture, torsoUpper, 256, 384);
@@ -863,7 +857,7 @@ public class Character : ModelRenderer
             }
             if (Items[3].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[3].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[3], Items[3].LowerTorso, 256, 64);
                 if (torsoLower != null)
                 {
                     helper.DrawTexture(texture, torsoLower, 256, 320);
@@ -871,7 +865,7 @@ public class Character : ModelRenderer
             }
             if (Items[3].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[3].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[3], Items[3].UpperLeg, 256, 128);
                 if (legUpper != null)
                 {
                     helper.DrawTexture(texture, legUpper, 256, 192);
@@ -879,7 +873,7 @@ public class Character : ModelRenderer
             }
             if (Items[3].LowerLeg > 0)
             {
-                Texture2D legLower = LoadTexture(Items[3].LowerLeg, 256, 128);
+                Texture2D legLower = LoadTexture(Items[3], Items[3].LowerLeg, 256, 128);
                 if (legLower != null)
                 {
                     helper.DrawTexture(texture, legLower, 256, 64);
@@ -895,7 +889,7 @@ public class Character : ModelRenderer
         {
             if (Items[4].UpperArm > 0)
             {
-                Texture2D armUpper = LoadTexture(Items[4].UpperArm, 256, 128);
+                Texture2D armUpper = LoadTexture(Items[4], Items[4].UpperArm, 256, 128);
                 if (armUpper != null)
                 {
                     helper.DrawTexture(texture, armUpper, 0, 384);
@@ -903,7 +897,7 @@ public class Character : ModelRenderer
             }
             if (Items[4].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[4].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[4], Items[4].LowerArm, 256, 128);
                 if (armLower != null)
                 {
                     helper.DrawTexture(texture, armLower, 0, 256);
@@ -911,7 +905,7 @@ public class Character : ModelRenderer
             }
             if (Items[4].UpperTorso > 0)
             {
-                Texture2D torsoUpper = LoadTexture(Items[4].UpperTorso, 256, 128);
+                Texture2D torsoUpper = LoadTexture(Items[4], Items[4].UpperTorso, 256, 128);
                 if (torsoUpper != null)
                 {
                     helper.DrawTexture(texture, torsoUpper, 256, 384);
@@ -919,7 +913,7 @@ public class Character : ModelRenderer
             }
             if (Items[4].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[4].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[4], Items[4].LowerTorso, 256, 64);
                 if (torsoLower != null)
                 {
                     helper.DrawTexture(texture, torsoLower, 256, 320);
@@ -935,7 +929,7 @@ public class Character : ModelRenderer
         {
             if (Items[5].UpperTorso > 0)
             {
-                Texture2D torsoUpper = LoadTexture(Items[5].UpperTorso, 256, 128);
+                Texture2D torsoUpper = LoadTexture(Items[5], Items[5].UpperTorso, 256, 128);
                 if (torsoUpper != null)
                 {
                     helper.DrawTexture(texture, torsoUpper, 256, 384);
@@ -943,7 +937,7 @@ public class Character : ModelRenderer
             }
             if (Items[5].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[5].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[5], Items[5].LowerTorso, 256, 64);
                 if (torsoLower != null)
                 {
                     helper.DrawTexture(texture, torsoLower, 256, 320);
@@ -951,7 +945,7 @@ public class Character : ModelRenderer
             }
             if (Items[5].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[5].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[5], Items[5].UpperLeg, 256, 128);
                 if (legUpper != null)
                 {
                     helper.DrawTexture(texture, legUpper, 256, 192);
@@ -967,7 +961,7 @@ public class Character : ModelRenderer
         {
             if (Items[6].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[6].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[6], Items[6].LowerArm, 256, 128);
                 if (armLower != null)
                 {
                     helper.DrawTexture(texture, armLower, 0, 256);
@@ -983,7 +977,7 @@ public class Character : ModelRenderer
         {
             if (Items[8].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[8].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[8], Items[8].LowerArm, 256, 128);
                 if (armLower != null)
                 {
                     helper.DrawTexture(texture, armLower, 0, 256);
@@ -991,7 +985,7 @@ public class Character : ModelRenderer
             }
             if (Items[8].Hand > 0)
             {
-                Texture2D hand = LoadTexture(Items[8].Hand, 256, 64);
+                Texture2D hand = LoadTexture(Items[8], Items[8].Hand, 256, 64);
                 if (hand != null)
                 {
                     helper.DrawTexture(texture, hand, 0, 192);
@@ -1007,7 +1001,7 @@ public class Character : ModelRenderer
         {
             if (Items[9].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[9].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[9], Items[9].LowerTorso, 256, 64);
                 if (torsoLower != null)
                 {
                     helper.DrawTexture(texture, torsoLower, 256, 320);
@@ -1015,7 +1009,7 @@ public class Character : ModelRenderer
             }
             if (Items[9].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[9].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[9], Items[9].UpperLeg, 256, 128);
                 if (legUpper != null)
                 {
                     helper.DrawTexture(texture, legUpper, 256, 192);
@@ -1031,7 +1025,7 @@ public class Character : ModelRenderer
         {
             if (Items[10].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[10].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[10], Items[10].UpperLeg, 256, 128);
                 if (legUpper != null)
                 {
                     helper.DrawTexture(texture, legUpper, 256, 192);
@@ -1039,7 +1033,7 @@ public class Character : ModelRenderer
             }
             if (Items[10].LowerLeg > 0)
             {
-                Texture2D legLower = LoadTexture(Items[10].LowerLeg, 256, 128);
+                Texture2D legLower = LoadTexture(Items[10], Items[10].LowerLeg, 256, 128);
                 if (legLower != null)
                 {
                     helper.DrawTexture(texture, legLower, 256, 64);
@@ -1055,7 +1049,7 @@ public class Character : ModelRenderer
         {
             if (Items[11].LowerLeg > 0 && !activeGeosets.Contains(1302))
             {
-                Texture2D legLower = LoadTexture(Items[11].LowerLeg, 256, 128);
+                Texture2D legLower = LoadTexture(Items[11], Items[11].LowerLeg, 256, 128);
                 if (legLower != null)
                 {
                     helper.DrawTexture(texture, legLower, 256, 64);
@@ -1063,7 +1057,7 @@ public class Character : ModelRenderer
             }
             if (Items[11].Foot > 0 && !showFeet)
             {
-                Texture2D foot = LoadTexture(Items[11].Foot, 256, 64);
+                Texture2D foot = LoadTexture(Items[11], Items[11].Foot, 256, 64);
                 if (foot != null)
                 {
                     helper.DrawTexture(texture, foot, 256, 0);
@@ -1079,42 +1073,42 @@ public class Character : ModelRenderer
         {
             if (Items[3].UpperArm > 0)
             {
-                Texture2D armUpper = LoadTexture(Items[3].UpperArm, 256, 128);
+                Texture2D armUpper = LoadTexture(Items[3], Items[3].UpperArm, 256, 128);
                 helper.BlackTexture(armUpper, armUpper);
                 armUpper.Apply();
                 helper.DrawTexture(texture, armUpper, 0, 384);
             }
             if (Items[3].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[3].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[3], Items[3].LowerArm, 256, 128);
                 helper.BlackTexture(armLower, armLower);
                 armLower.Apply();
                 helper.DrawTexture(texture, armLower, 0, 256);
             }
             if (Items[3].UpperTorso > 0)
             {
-                Texture2D torsoUpper = LoadTexture(Items[3].UpperTorso, 256, 128);
+                Texture2D torsoUpper = LoadTexture(Items[3], Items[3].UpperTorso, 256, 128);
                 helper.BlackTexture(torsoUpper, torsoUpper);
                 torsoUpper.Apply();
                 helper.DrawTexture(texture, torsoUpper, 256, 384);
             }
             if (Items[3].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[3].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[3], Items[3].LowerTorso, 256, 64);
                 helper.BlackTexture(torsoLower, torsoLower);
                 torsoLower.Apply();
                 helper.DrawTexture(texture, torsoLower, 256, 320);
             }
             if (Items[3].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[3].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[3], Items[3].UpperLeg, 256, 128);
                 helper.BlackTexture(legUpper, legUpper);
                 legUpper.Apply();
                 helper.DrawTexture(texture, legUpper, 256, 192);
             }
             if (Items[3].LowerLeg > 0)
             {
-                Texture2D legLower = LoadTexture(Items[3].LowerLeg, 256, 128);
+                Texture2D legLower = LoadTexture(Items[3], Items[3].LowerLeg, 256, 128);
                 helper.BlackTexture(legLower, legLower);
                 legLower.Apply();
                 helper.DrawTexture(texture, legLower, 256, 64);
@@ -1129,28 +1123,28 @@ public class Character : ModelRenderer
         {
             if (Items[4].UpperArm > 0)
             {
-                Texture2D armUpper = LoadTexture(Items[4].UpperArm, 256, 128);
+                Texture2D armUpper = LoadTexture(Items[4], Items[4].UpperArm, 256, 128);
                 helper.BlackTexture(armUpper, armUpper);
                 armUpper.Apply();
                 helper.DrawTexture(texture, armUpper, 0, 384);
             }
             if (Items[4].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[4].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[4], Items[4].LowerArm, 256, 128);
                 helper.BlackTexture(armLower, armLower);
                 armLower.Apply();
                 helper.DrawTexture(texture, armLower, 0, 256);
             }
             if (Items[4].UpperTorso > 0)
             {
-                Texture2D torsoUpper = LoadTexture(Items[4].UpperTorso, 256, 128);
+                Texture2D torsoUpper = LoadTexture(Items[4], Items[4].UpperTorso, 256, 128);
                 helper.BlackTexture(torsoUpper, torsoUpper);
                 torsoUpper.Apply();
                 helper.DrawTexture(texture, torsoUpper, 256, 384);
             }
             if (Items[4].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[4].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[4], Items[4].LowerTorso, 256, 64);
                 helper.BlackTexture(torsoLower, torsoLower);
                 torsoLower.Apply();
                 helper.DrawTexture(texture, torsoLower, 256, 320);
@@ -1165,21 +1159,21 @@ public class Character : ModelRenderer
         {
             if (Items[5].UpperTorso > 0)
             {
-                Texture2D torsoUpper = LoadTexture(Items[5].UpperTorso, 256, 128);
+                Texture2D torsoUpper = LoadTexture(Items[5], Items[5].UpperTorso, 256, 128);
                 helper.BlackTexture(torsoUpper, torsoUpper);
                 torsoUpper.Apply();
                 helper.DrawTexture(texture, torsoUpper, 256, 384);
             }
             if (Items[5].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[5].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[5], Items[5].LowerTorso, 256, 64);
                 helper.BlackTexture(torsoLower, torsoLower);
                 torsoLower.Apply();
                 helper.DrawTexture(texture, torsoLower, 256, 320);
             }
             if (Items[5].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[5].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[5], Items[5].UpperLeg, 256, 128);
                 helper.BlackTexture(legUpper, legUpper);
                 legUpper.Apply();
                 helper.DrawTexture(texture, legUpper, 256, 192);
@@ -1194,7 +1188,7 @@ public class Character : ModelRenderer
         {
             if (Items[6].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[6].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[6], Items[6].LowerArm, 256, 128);
                 helper.BlackTexture(armLower, armLower);
                 armLower.Apply();
                 helper.DrawTexture(texture, armLower, 0, 256);
@@ -1209,14 +1203,14 @@ public class Character : ModelRenderer
         {
             if (Items[8].LowerArm > 0)
             {
-                Texture2D armLower = LoadTexture(Items[8].LowerArm, 256, 128);
+                Texture2D armLower = LoadTexture(Items[8], Items[8].LowerArm, 256, 128);
                 helper.BlackTexture(armLower, armLower);
                 armLower.Apply();
                 helper.DrawTexture(texture, armLower, 0, 256);
             }
             if (Items[8].Hand > 0)
             {
-                Texture2D hand = LoadTexture(Items[8].Hand, 256, 64);
+                Texture2D hand = LoadTexture(Items[8], Items[8].Hand, 256, 64);
                 helper.BlackTexture(hand, hand);
                 hand.Apply();
                 helper.DrawTexture(texture, hand, 0, 192);
@@ -1231,14 +1225,14 @@ public class Character : ModelRenderer
         {
             if (Items[9].LowerTorso > 0)
             {
-                Texture2D torsoLower = LoadTexture(Items[9].LowerTorso, 256, 64);
+                Texture2D torsoLower = LoadTexture(Items[9], Items[9].LowerTorso, 256, 64);
                 helper.BlackTexture(torsoLower, torsoLower);
                 torsoLower.Apply();
                 helper.DrawTexture(texture, torsoLower, 256, 320);
             }
             if (Items[9].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[9].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[9], Items[9].UpperLeg, 256, 128);
                 helper.BlackTexture(legUpper, legUpper);
                 legUpper.Apply();
                 helper.DrawTexture(texture, legUpper, 256, 192);
@@ -1253,14 +1247,14 @@ public class Character : ModelRenderer
         {
             if (Items[10].UpperLeg > 0)
             {
-                Texture2D legUpper = LoadTexture(Items[10].UpperLeg, 256, 128);
+                Texture2D legUpper = LoadTexture(Items[10], Items[10].UpperLeg, 256, 128);
                 helper.BlackTexture(legUpper, legUpper);
                 legUpper.Apply();
                 helper.DrawTexture(texture, legUpper, 256, 192);
             }
             if (Items[10].LowerLeg > 0)
             {
-                Texture2D legLower = LoadTexture(Items[10].LowerLeg, 256, 128);
+                Texture2D legLower = LoadTexture(Items[10], Items[10].LowerLeg, 256, 128);
                 helper.BlackTexture(legLower, legLower);
                 legLower.Apply();
                 helper.DrawTexture(texture, legLower, 256, 64);
@@ -1275,14 +1269,14 @@ public class Character : ModelRenderer
         {
             if (Items[11].LowerLeg > 0)
             {
-                Texture2D legLower = LoadTexture(Items[11].LowerLeg, 256, 128);
+                Texture2D legLower = LoadTexture(Items[11], Items[11].LowerLeg, 256, 128);
                 helper.BlackTexture(legLower, legLower);
                 legLower.Apply();
                 helper.DrawTexture(texture, legLower, 256, 64);
             }
             if (Items[11].Foot > 0 && !showFeet)
             {
-                Texture2D foot = LoadTexture(Items[11].Foot, 256, 64);
+                Texture2D foot = LoadTexture(Items[11], Items[11].Foot, 256, 64);
                 helper.BlackTexture(foot, foot);
                 foot.Apply();
                 helper.DrawTexture(texture, foot, 256, 0);
