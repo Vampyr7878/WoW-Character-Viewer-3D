@@ -17,6 +17,10 @@ namespace WoW
         //Draw Texture on top of another
         public void DrawTexture(Texture2D texture, Texture2D layer, int i, int j, float cover = 1f)
         {
+            if (layer == null)
+            {
+                return;
+            }
             for (int x = 0; x < layer.width; x++)
             {
                 for (int y = 0; y < layer.height; y++)

@@ -821,6 +821,10 @@ public class Character : ModelRenderer
     {
         int race = Form == 7 ? 23 : Race;
         int file = model.GetMaterial(material, race, Gender, Class);
+        if (file == 0)
+        {
+            return null;
+        }
         Texture2D texture = TextureFromBLP(file);
         texture.wrapMode = TextureWrapMode.Clamp;
         return TextureScaler.scaled(texture, width, height);
