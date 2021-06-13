@@ -34,6 +34,10 @@ namespace WoW
         //Overlay textures together
         protected void OverlayTexture(Texture2D texture, Texture2D layer, int i, int j)
         {
+            if (layer == null)
+            {
+                return;
+            }
             for (int x = 0; x < layer.width; x++)
             {
                 for (int y = 0; y < layer.height; y++)
@@ -58,6 +62,10 @@ namespace WoW
         //Multiply textures
         protected void MultiplyTexture(Texture2D texture, Texture2D layer, int i, int j)
         {
+            if (layer == null)
+            {
+                return;
+            }
             for (int x = 0; x < layer.width; x++)
             {
                 for (int y = 0; y < layer.height; y++)
@@ -71,6 +79,10 @@ namespace WoW
         //Generate black texture
         public void BlackTexture(Texture2D src, Texture2D dst)
         {
+            if (src == null)
+            {
+                return;
+            }
             for (int x = 0; x < src.width; x++)
             {
                 for (int y = 0; y < src.height; y++)

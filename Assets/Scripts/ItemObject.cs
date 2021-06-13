@@ -246,6 +246,7 @@ public class ItemObject : ModelRenderer
     public void UnloadModel()
     {
         DestroyImmediate(mesh);
+        File = 0;
         Loaded = false;
     }
 

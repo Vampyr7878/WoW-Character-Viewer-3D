@@ -24,8 +24,6 @@ public class Character : ModelRenderer
     private CharacterHelper helper;
     //List of geosets that are enabled for loading
     private List<int> activeGeosets;
-    //Textures that shift for worgen form
-    private List<int> shiftTextures;
 
     //Dropdowns containing customization options
     public List<CustomDropdown> CustomizationDropdowns { get; set; }
@@ -56,7 +54,6 @@ public class Character : ModelRenderer
     {
         //Initialize character
         Items = new ItemModel[13];
-        shiftTextures = new List<int> { 3045083, 3045085, 3045087, 3045089 };
         modelsPath = @"character\";
         converter = new System.Drawing.ImageConverter();
         CustomizationDropdowns = new List<CustomDropdown>();
