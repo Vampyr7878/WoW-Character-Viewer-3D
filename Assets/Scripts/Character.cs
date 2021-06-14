@@ -265,6 +265,8 @@ public class Character : ModelRenderer
         if (Items[0].RightModel > 0)
         {
             model = Items[0].GetRaceSpecificModel(Items[0].RightModel, Race, Gender, Class);
+            collections[0].ActiveGeosets = new List<int>();
+            collections[0].ActiveGeosets.Add(2701);
         }
         if (collections[0].File != model || collections[0].Texture != Items[0].RightTexture)
         {
@@ -272,8 +274,6 @@ public class Character : ModelRenderer
             if (Items[0].RightModel > 0)
             {
                 StartCoroutine(collections[0].LoadModel(model, Items[0].RightTexture, casc));
-                collections[0].ActiveGeosets = new List<int>();
-                collections[0].ActiveGeosets.Add(2701);
             }
         }
         foreach (int helmet in Items[0].Helmet)
@@ -376,6 +376,8 @@ public class Character : ModelRenderer
         if (Items[2].LeftModel > 0)
         {
             model = Items[2].GetRaceSpecificModel(Items[2].LeftModel, Race, Gender, Class);
+            collections[1].ActiveGeosets = new List<int>();
+            collections[1].ActiveGeosets.Add(1501);
         }
         if (collections[1].File != model || collections[1].Texture != Items[2].LeftTexture)
         {
@@ -383,8 +385,6 @@ public class Character : ModelRenderer
             if (Items[2].LeftModel > 0)
             {
                 StartCoroutine(collections[1].LoadModel(model, Items[2].LeftTexture, casc));
-                collections[1].ActiveGeosets = new List<int>();
-                collections[1].ActiveGeosets.Add(1501);
             }
         }
         if (Items[2].RightModel > 0)
@@ -434,6 +434,15 @@ public class Character : ModelRenderer
             if (Items[3].LeftModel > 0)
             {
                 model = Items[3].GetRaceSpecificModel(Items[3].LeftModel, Race, Gender, Class);
+                collections[2].ActiveGeosets = new List<int>();
+                collections[2].ActiveGeosets.Add(801);
+                collections[2].ActiveGeosets.Add(1001);
+                if (Items[3].Geoset3 == 1)
+                {
+                    collections[2].ActiveGeosets.Add(1301);
+                }
+                collections[2].ActiveGeosets.Add(2201);
+                collections[2].ActiveGeosets.Add(2801);
             }
             if (collections[2].File != model || collections[2].Texture != Items[3].LeftTexture)
             {
@@ -441,15 +450,6 @@ public class Character : ModelRenderer
                 if (Items[3].LeftModel > 0)
                 {
                     StartCoroutine(collections[2].LoadModel(model, Items[3].LeftTexture, casc));
-                    collections[2].ActiveGeosets = new List<int>();
-                    collections[2].ActiveGeosets.Add(801);
-                    collections[2].ActiveGeosets.Add(1001);
-                    if (Items[3].Geoset3 == 1)
-                    {
-                        collections[2].ActiveGeosets.Add(1301);
-                    }
-                    collections[2].ActiveGeosets.Add(2201);
-                    collections[2].ActiveGeosets.Add(2801);
                 }
             }
             activeGeosets.Add(801 + Items[3].Geoset1);
@@ -552,6 +552,15 @@ public class Character : ModelRenderer
         if (Items[8].LeftModel > 0)
         {
             model = Items[8].GetRaceSpecificModel(Items[8].LeftModel, Race, Gender, Class);
+            collections[3].ActiveGeosets = new List<int>();
+            if (Race != 37)
+            {
+                if (activeGeosets.Contains(801))
+                {
+                    collections[3].ActiveGeosets.Add(401);
+                }
+                collections[3].ActiveGeosets.Add(2301);
+            }
         }
         if (collections[3].File != model || collections[3].Texture != Items[8].LeftTexture)
         {
@@ -559,15 +568,6 @@ public class Character : ModelRenderer
             if (Items[8].LeftModel > 0)
             {
                 StartCoroutine(collections[3].LoadModel(model, Items[8].LeftTexture, casc));
-                collections[3].ActiveGeosets = new List<int>();
-                if (Race != 37)
-                {
-                    if (activeGeosets.Contains(801))
-                    {
-                        collections[3].ActiveGeosets.Add(401);
-                    }
-                    collections[3].ActiveGeosets.Add(2301);
-                }
             }
         }
         activeGeosets.Add(401 + Items[8].Geoset1);
@@ -607,6 +607,8 @@ public class Character : ModelRenderer
         if (Items[9].RightModel > 0)
         {
             model = Items[9].GetRaceSpecificModel(Items[9].RightModel, Race, Gender, Class);
+            collections[4].ActiveGeosets = new List<int>();
+            collections[4].ActiveGeosets.Add(1801);
         }
         if (collections[4].File != model || collections[4].Texture != Items[9].RightTexture)
         {
@@ -614,8 +616,6 @@ public class Character : ModelRenderer
             if (Items[9].RightModel > 0)
             {
                 StartCoroutine(collections[4].LoadModel(model, Items[9].RightTexture, casc));
-                collections[4].ActiveGeosets = new List<int>();
-                collections[4].ActiveGeosets.Add(1801);
             }
         }
         activeGeosets.Add(1801 + Items[9].Geoset1);
@@ -643,6 +643,12 @@ public class Character : ModelRenderer
         if (Items[10].LeftModel > 0)
         {
             model = Items[10].GetRaceSpecificModel(Items[10].LeftModel, Race, Gender, Class);
+            collections[5].ActiveGeosets = new List<int>();
+            collections[5].ActiveGeosets.Add(901);
+            if (Race != 37)
+            {
+                collections[5].ActiveGeosets.Add(1101);
+            }
         }
         if (collections[5].File != model || collections[5].Texture != Items[10].LeftTexture)
         {
@@ -650,12 +656,6 @@ public class Character : ModelRenderer
             if (Items[10].LeftModel > 0)
             {
                 StartCoroutine(collections[5].LoadModel(model, Items[10].LeftTexture, casc));
-                collections[5].ActiveGeosets = new List<int>();
-                collections[5].ActiveGeosets.Add(901);
-                if (Race != 37)
-                {
-                    collections[5].ActiveGeosets.Add(1101);
-                }
             }
         }
         activeGeosets.Add(1101 + Items[10].Geoset1);
@@ -693,6 +693,15 @@ public class Character : ModelRenderer
         if (Items[11].LeftModel > 0)
         {
             model = Items[11].GetRaceSpecificModel(Items[11].LeftModel, Race, Gender, Class);
+            collections[6].ActiveGeosets = new List<int>();
+            if (Race != 37)
+            {
+                if (!activeGeosets.Contains(1302))
+                {
+                    collections[6].ActiveGeosets.Add(501);
+                }
+                collections[6].ActiveGeosets.Add(2001);
+            }
         }
         if (collections[6].File != model || collections[6].Texture != Items[11].LeftTexture)
         {
@@ -700,15 +709,6 @@ public class Character : ModelRenderer
             if (Items[11].LeftModel > 0)
             {
                 StartCoroutine(collections[6].LoadModel(model, Items[11].LeftTexture, casc));
-                collections[6].ActiveGeosets = new List<int>();
-                if (Race != 37)
-                {
-                    if (!activeGeosets.Contains(1302))
-                    {
-                        collections[6].ActiveGeosets.Add(501);
-                    }
-                    collections[6].ActiveGeosets.Add(2001);
-                }
             }
         }
         if (!activeGeosets.Contains(1302))
