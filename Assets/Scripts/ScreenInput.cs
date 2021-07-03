@@ -255,26 +255,34 @@ public class ScreenInput : MonoBehaviour
     //Get API access token
     string GetToken()
     {
-        using (HttpClient client = new HttpClient())
+        try
         {
-            using (HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("POST"), "https://us.battle.net/oauth/token"))
+            using (HttpClient client = new HttpClient())
             {
-                TextAsset api = Resources.Load<TextAsset>("API");
-                string auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(api.text));
-                request.Headers.TryAddWithoutValidation("Authorization", $"Basic {auth}");
-                request.Content = new StringContent("grant_type=client_credentials", Encoding.UTF8, "application/x-www-form-urlencoded");
-                HttpResponseMessage response = client.SendAsync(request).Result;
-                string resp = response.Content.ReadAsStringAsync().Result;
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                using (HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("POST"), "https://us.battle.net/oauth/token"))
                 {
-                    JObject access = JObject.Parse(resp);
-                    return access.Value<string>("access_token");
-                }
-                else
-                {
-                    return null;
+                    TextAsset api = Resources.Load<TextAsset>("API");
+                    string auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(api.text));
+                    request.Headers.TryAddWithoutValidation("Authorization", $"Basic {auth}");
+                    request.Content = new StringContent("grant_type=client_credentials", Encoding.UTF8, "application/x-www-form-urlencoded");
+                    HttpResponseMessage response = client.SendAsync(request).Result;
+                    string resp = response.Content.ReadAsStringAsync().Result;
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        JObject access = JObject.Parse(resp);
+                        return access.Value<string>("access_token");
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"{e.Message}\n{e.StackTrace}");
+            return null;
         }
     }
 

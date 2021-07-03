@@ -17,14 +17,14 @@ Shader "Custom/32772"
 
 	SubShader
 	{
-		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" }
+		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
 		ZWrite On
 		Blend[_SrcBlend][_DstBlend]
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard fullforwardshadows
+			#pragma surface surfaceFunction Standard fullforwardshadows keepalpha
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF
@@ -32,17 +32,21 @@ Shader "Custom/32772"
 			struct Input
 			{
 				float2 uv_Texture1;
+				float2 uv2_Texture2;
 			};
 
 			sampler2D _Texture1;
+			sampler2D _Texture2;
 			fixed4 _Color;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
+				fixed4 emission = tex2D(_Texture2, IN.uv2_Texture2);
 				OUT.Albedo = color.rgb;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
+				OUT.Emission = emission;
 				OUT.Smoothness = 0;
 			}
 		ENDCG

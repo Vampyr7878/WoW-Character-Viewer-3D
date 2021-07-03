@@ -32,22 +32,18 @@ Shader "Custom/32771"
 			struct Input
 			{
 				float2 uv_Texture1;
-				float2 uv_Emission;
 			};
 
 			sampler2D _Texture1;
-			sampler2D _Emission;
 			fixed4 _Color;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
-				fixed4 emission = tex2D(_Emission, IN.uv_Emission);
 				OUT.Albedo = color.rgb;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
-				OUT.Emission = emission;
 			}
 		ENDCG
 	}

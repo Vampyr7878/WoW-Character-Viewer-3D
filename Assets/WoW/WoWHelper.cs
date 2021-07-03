@@ -1,6 +1,4 @@
-﻿using BLPLib;
-using CASCLib;
-using M2Lib;
+﻿using M2Lib;
 using UnityEngine;
 
 namespace WoW
@@ -9,42 +7,42 @@ namespace WoW
     public class WoWHelper
     {
         //Color for each item quality
-        public static UnityEngine.Color QualityColor(int quality)
+        public static Color QualityColor(int quality)
         {
-            UnityEngine.Color color;
+            Color color;
             switch (quality)
             {
                 //Poor
                 case 0:
-                    color = new UnityEngine.Color(0.62f, 0.62f, 0.62f);
+                    color = new Color(0.62f, 0.62f, 0.62f);
                     break;
                 //Uncommon
                 case 2:
-                    color = new UnityEngine.Color(0.12f, 1f, 0f);
+                    color = new Color(0.12f, 1f, 0f);
                     break;
                 //Rare
                 case 3:
-                    color = new UnityEngine.Color(0f, 0.44f, 0.87f);
+                    color = new Color(0f, 0.44f, 0.87f);
                     break;
                 //Epic
                 case 4:
-                    color = new UnityEngine.Color(0.64f, 0.21f, 0.93f);
+                    color = new Color(0.64f, 0.21f, 0.93f);
                     break;
                 //Legendary
                 case 5:
-                    color = new UnityEngine.Color(1f, 0.5f, 0f);
+                    color = new Color(1f, 0.5f, 0f);
                     break;
                 //Artifact
                 case 6:
-                    color = new UnityEngine.Color(0.9f, 0.8f, 0.5f);
+                    color = new Color(0.9f, 0.8f, 0.5f);
                     break;
                 //Heirloom
                 case 7:
-                    color = new UnityEngine.Color(0f, 0.8f, 1f);
+                    color = new Color(0f, 0.8f, 1f);
                     break;
                 //Common
                 default:
-                    color = new UnityEngine.Color(1f, 1f, 1f);
+                    color = new Color(1f, 1f, 1f);
                     break;
             }
             return color;

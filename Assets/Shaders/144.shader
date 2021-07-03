@@ -20,11 +20,11 @@ Shader "Custom/144"
 		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" }
 		LOD 200
 		ZWrite[_DepthTest]
-		Blend[_SrcBlend][_DstBlend]
+		Blend Zero One
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard fullforwardshadows
+			#pragma surface surfaceFunction Standard fullforwardshadows keepalpha
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF

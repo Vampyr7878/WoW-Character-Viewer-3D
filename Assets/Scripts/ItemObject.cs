@@ -2,6 +2,7 @@
 using M2Lib;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -47,6 +48,13 @@ public class ItemObject : ModelRenderer
                         if (Model.Skin.Textures[i].Layer == 0)
                         {
                             SetMaterial(renderer, i);
+                        }
+                        else if (Model.Skin.Textures[i].Layer == 1)
+                        {
+                            List<Material> materials = renderer.materials.ToList();
+                            materials.Add(new Material(materials[0]));
+                            renderer.materials = materials.ToArray();
+                            SetLayeredMaterial(renderer, i);
                         }
                     }
                 }
@@ -102,6 +110,22 @@ public class ItemObject : ModelRenderer
                 renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
             }
         }
+    }
+
+    //Set material with proper shader
+    private void SetLayeredMaterial(SkinnedMeshRenderer renderer, int i)
+    {
+        Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+        if (material == null)
+        {
+            Debug.LogError(Model.Skin.Textures[i].Shader);
+        }
+        int index = renderer.materials.Length - 1;
+        renderer.materials[index] = new Material(material.shader);
+        renderer.materials[index].shader = material.shader;
+        renderer.materials[index].CopyPropertiesFromMaterial(material);
+        renderer.sharedMesh.OptimizeReorderVertexBuffer();
+        SetTexture(renderer.materials[index], i);
     }
 
     //Set material with proper shader
@@ -196,6 +220,10 @@ public class ItemObject : ModelRenderer
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
         color.a = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
+        if(Model.Skin.Textures[i].Layer > 0)
+        {
+            color.a *= 0.25f;
+        }
         material.SetColor("_Color", color);
         material.renderQueue += Model.Skin.Textures[i].Priority;
     }

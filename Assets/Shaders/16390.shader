@@ -41,10 +41,10 @@ Shader "Custom/16390"
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
-				fixed4 color = tex2D(_Texture2, IN.uv2_Texture2) * _Color;
-				fixed4 layer = tex2D(_Texture1, IN.uv_Texture1);
+				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
+				fixed4 layer = tex2D(_Texture2, IN.uv2_Texture2);
 				layer.a = layer.r * 0.299f + layer.g * 0.587f + layer.b * 0.114f;
-				color = lerp(color, layer, layer.a);
+				color *= layer;
 				OUT.Albedo = color.rgb;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;

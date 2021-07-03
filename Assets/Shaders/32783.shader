@@ -48,7 +48,6 @@ Shader "Custom/32783"
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
-				OUT.Emission = emission;
 			}
 		ENDCG
 	}
