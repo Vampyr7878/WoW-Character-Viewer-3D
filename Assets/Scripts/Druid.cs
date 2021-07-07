@@ -56,7 +56,7 @@ public class Druid : ModelRenderer
             {
                 if ((Model.Skeleton.Bones[i].Flags & 0x8) != 0)
                 {
-                    renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x, camera.eulerAngles.y - 90, camera.eulerAngles.z);
+                    renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x - 90, camera.eulerAngles.y - 90, camera.eulerAngles.z);
                 }
             }
             //Animate textures
@@ -119,7 +119,7 @@ public class Druid : ModelRenderer
         particles = particles.OrderBy(x => x.name).ToArray();
         for (int i = 0; i < particles.Length; i++)
         {
-            particles[i].transform.localEulerAngles = new Vector3(-90f, 0f, 0f);
+            particles[i].transform.localEulerAngles = new Vector3(0f, 0f, 0f);
             if (Model.Particles[i].ColorIndex != 0)
             {
                 ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particles[i].colorOverLifetime;

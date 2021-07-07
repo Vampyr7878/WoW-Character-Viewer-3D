@@ -47,6 +47,8 @@ namespace WoW
         public int Foot { get; private set; }
         //Geosets that are hidden by the helmet
         public List<int> Helmet { get; private set; }
+        //Geosets that are hidden by the helmet in Gilnean form
+        public List<int> GilneanHelmet { get; private set; }
         //Particle colors for the item
         public ParticleColor[] ParticleColors { get; private set; }
 
@@ -87,6 +89,7 @@ namespace WoW
                 LowerLeg = 0;
                 Foot = 0;
                 Helmet = HelmetGeosets(0, race);
+                GilneanHelmet = HelmetGeosets(0, 1);
             }
             else
             {
@@ -128,6 +131,7 @@ namespace WoW
                     particleColor = reader.GetInt32(27);
                 }
                 Helmet = gender ? HelmetGeosets(maleHelmet, race) : HelmetGeosets(femaleHelmet, race);
+                GilneanHelmet = gender ? HelmetGeosets(maleHelmet, 1) : HelmetGeosets(femaleHelmet, 1);
                 ParticleColors = GetParticleColors(particleColor);
             }
             connection.Close();

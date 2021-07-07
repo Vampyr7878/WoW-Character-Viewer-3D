@@ -13,6 +13,8 @@ namespace WoW
         public Texture2D Emission { get; protected set; }
         //Reference to a main class that handles character models
         public Character Character { get; protected set; }
+        //Hide hair when wearing helmet
+        public bool HideHair { get; set; }
 
         //Draw Texture on top of another
         public void DrawTexture(Texture2D texture, Texture2D layer, int i, int j, float cover = 1f)

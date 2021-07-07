@@ -42,6 +42,7 @@ public class Gilnean : ModelRenderer
             {
                 Resources.UnloadUnusedAssets();
                 GC.Collect();
+                CheckHair();
                 helper.ChangeGeosets(activeGeosets);
                 EquipArmor();
                 helper.LoadTextures(textures);
@@ -113,6 +114,24 @@ public class Gilnean : ModelRenderer
         material.SetFloat("_DepthTest", depth);
     }
 
+    //Check if hair needs to be hidden
+    private void CheckHair()
+    {
+        helper.HideHair = false;
+        if (worgen.Items[0] == null)
+        {
+            return;
+        }
+        foreach (int helmet in worgen.Items[0].GilneanHelmet)
+        {
+            helper.HideHair = helmet == 0;
+            if (helper.HideHair)
+            {
+                break;
+            }
+        }
+    }
+
     private void EquipArmor()
     {
         EquipHead();
@@ -133,69 +152,100 @@ public class Gilnean : ModelRenderer
     //Load head slot item models and geosets
     private void EquipHead()
     {
-        worgen.collections[0].UnloadModel();
         ItemObject helm = GameObject.Find("helm").GetComponent<ItemObject>();
-        helm.UnloadModel();
-        if (worgen.Items[0] != null)
+        if (worgen.Items[0] == null)
         {
+            helm.UnloadModel();
+            worgen.collections[0].UnloadModel();
+            return;
+        }
+        int model = 0;
+        if (worgen.Items[0].LeftModel > 0)
+        {
+            model = worgen.Items[0].GetRaceSpecificModel(worgen.Items[0].LeftModel, 23, Gender, worgen.Class);
+        }
+        if (helm.File != model || helm.MainTexture != worgen.Items[0].LeftTexture)
+        {
+            helm.UnloadModel();
             if (worgen.Items[0].LeftModel > 0)
             {
-                int model = worgen.Items[0].GetRaceSpecificModel(worgen.Items[0].LeftModel, 23, Gender, worgen.Class);
                 StartCoroutine(helm.LoadModel(model, worgen.Items[0].LeftTexture, casc));
                 helm.ParticleColors = worgen.Items[0].ParticleColors;
                 helm.Change = true;
             }
+        }
+        if (worgen.Items[0].RightModel > 0)
+        {
+            model = worgen.Items[0].GetRaceSpecificModel(worgen.Items[0].RightModel, 23, Gender, worgen.Class);
+            worgen.collections[0].ActiveGeosets = new List<int>();
+            worgen.collections[0].ActiveGeosets.Add(2701);
+        }
+        if (worgen.collections[0].File != model || worgen.collections[0].Texture != worgen.Items[0].RightTexture)
+        {
+            worgen.collections[0].UnloadModel();
             if (worgen.Items[0].RightModel > 0)
             {
-                int model = worgen.Items[0].GetRaceSpecificModel(worgen.Items[0].RightModel, 23, Gender, worgen.Class);
                 StartCoroutine(worgen.collections[0].LoadModel(model, worgen.Items[0].RightTexture, casc));
-                worgen.collections[0].ActiveGeosets = new List<int>();
-                worgen.collections[0].ActiveGeosets.Add(2701);
             }
-            foreach (int helmet in worgen.Items[0].Helmet)
+        }
+        foreach (int helmet in worgen.Items[0].GilneanHelmet)
+        {
+            if (helmet == 0)
             {
-                if (helmet == 0)
-                {
-                    activeGeosets.RemoveAll(x => x > 0 && x < 100);
-                    activeGeosets.Add(1);
-                }
-                else if (helmet == 7)
-                {
-                    activeGeosets.RemoveAll(x => x > 699 && x < 800);
-                    activeGeosets.Add(701);
-                }
-                else if (helmet == 31)
-                {
-                    continue;
-                }
-                else
-                {
-                    activeGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
-                    activeGeosets.Add(helmet * 100);
-                }
+                continue;
+            }
+            else if (helmet == 7)
+            {
+                activeGeosets.RemoveAll(x => x > 699 && x < 800);
+                activeGeosets.Add(701);
+            }
+            else if (helmet == 31)
+            {
+                continue;
+            }
+            else
+            {
+                activeGeosets.RemoveAll(x => x > helmet * 100 - 1 && x < (1 + helmet) * 100);
+                activeGeosets.Add(helmet * 100);
             }
         }
     }
-
-    //Load shoulder slot item models
+    
+    //Load shoulder slot item model
     private void EquipShoulder()
     {
         ItemObject left = GameObject.Find("left shoulder").GetComponent<ItemObject>();
         ItemObject right = GameObject.Find("right shoulder").GetComponent<ItemObject>();
-        left.UnloadModel();
-        right.UnloadModel();
-        if (worgen.Items[1] != null)
+        if (worgen.Items[1] == null)
         {
+            left.UnloadModel();
+            right.UnloadModel();
+            return;
+        }
+        int model = 0;
+        if (worgen.Items[1].LeftModel > 0)
+        {
+            model = worgen.Items[1].GetSideSpecificModel(worgen.Items[1].LeftModel, false, worgen.Class);
+        }
+        if (left.File != model || left.MainTexture != worgen.Items[1].LeftTexture)
+        {
+            left.UnloadModel();
             if (worgen.Items[1].LeftModel > 0)
             {
-                int model = worgen.Items[1].GetSideSpecificModel(worgen.Items[1].LeftModel, false, worgen.Class);
                 StartCoroutine(left.LoadModel(model, worgen.Items[1].LeftTexture, casc));
                 left.ParticleColors = worgen.Items[1].ParticleColors;
                 left.Change = true;
             }
+        }
+        if (worgen.Items[1].RightModel > 0)
+        {
+            model = worgen.Items[1].GetSideSpecificModel(worgen.Items[1].RightModel, true, worgen.Class);
+        }
+        if (right.File != model || right.MainTexture != worgen.Items[1].RightTexture)
+        {
+            right.UnloadModel();
             if (worgen.Items[1].RightModel > 0)
             {
-                int model = worgen.Items[1].GetSideSpecificModel(worgen.Items[1].RightModel, true, worgen.Class);
                 StartCoroutine(right.LoadModel(model, worgen.Items[1].RightTexture, casc));
                 right.ParticleColors = worgen.Items[1].ParticleColors;
                 right.Change = true;
@@ -206,57 +256,85 @@ public class Gilnean : ModelRenderer
     //Load back slot item models and geosets
     private void EquipBack()
     {
-        worgen.collections[1].UnloadModel();
         ItemObject backpack = GameObject.Find("backpack").GetComponent<ItemObject>();
-        backpack.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1499 && x < 1600);
-        if (worgen.Items[2] != null)
+        if (worgen.Items[2] == null)
         {
+            worgen.collections[1].UnloadModel();
+            backpack.UnloadModel();
+            activeGeosets.Add(1501);
+            return;
+        }
+        int model = 0;
+        if (worgen.Items[2].LeftModel > 0)
+        {
+            model = worgen.Items[2].GetRaceSpecificModel(worgen.Items[2].LeftModel, 23, Gender, worgen.Class);
+            worgen.collections[1].ActiveGeosets = new List<int>();
+            worgen.collections[1].ActiveGeosets.Add(1501);
+        }
+        if (worgen.collections[1].File != model || worgen.collections[1].Texture != worgen.Items[2].LeftTexture)
+        {
+            worgen.collections[1].UnloadModel();
             if (worgen.Items[2].LeftModel > 0)
             {
-                int model = worgen.Items[2].GetRaceSpecificModel(worgen.Items[2].LeftModel, 23, Gender, worgen.Class);
                 StartCoroutine(worgen.collections[1].LoadModel(model, worgen.Items[2].LeftTexture, casc));
-                worgen.collections[1].ActiveGeosets = new List<int>();
-                worgen.collections[1].ActiveGeosets.Add(1501);
             }
+        }
+        if (worgen.Items[2].RightModel > 0)
+        {
+            model = worgen.Items[2].GetModel(worgen.Items[2].RightModel, worgen.Class);
+        }
+        if (backpack.File != model || backpack.MainTexture != worgen.Items[2].RightTexture)
+        {
+            backpack.UnloadModel();
             if (worgen.Items[2].RightModel > 0)
             {
-                int model = worgen.Items[2].GetModel(worgen.Items[2].RightModel, worgen.Class);
                 StartCoroutine(backpack.LoadModel(model, worgen.Items[2].RightTexture, casc));
                 backpack.ParticleColors = worgen.Items[2].ParticleColors;
                 backpack.Change = true;
             }
-            activeGeosets.Add(1501 + worgen.Items[2].Geoset1);
         }
-        else
-        {
-            activeGeosets.Add(1501);
-        }
+        activeGeosets.Add(1501 + worgen.Items[2].Geoset1);
     }
 
     //Load chest slot item models and geosets
     private void EquipChest()
     {
-        worgen.collections[2].UnloadModel();
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
         activeGeosets.RemoveAll(x => x > 999 && x < 1100);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
         activeGeosets.RemoveAll(x => x > 2199 && x < 2300);
-        if (worgen.Items[3] != null)
+        if (worgen.Items[3] == null)
         {
+            worgen.collections[2].UnloadModel();
+            activeGeosets.Add(801);
+            activeGeosets.Add(1001);
+            activeGeosets.Add(1301);
+            activeGeosets.Add(2201);
+        }
+        else
+        {
+            int model = 0;
             if (worgen.Items[3].LeftModel > 0)
             {
-                int model = worgen.Items[3].GetRaceSpecificModel(worgen.Items[3].LeftModel, 23, Gender, worgen.Class);
-                StartCoroutine(worgen.collections[2].LoadModel(model, worgen.Items[3].LeftTexture, casc));
+                model = worgen.Items[3].GetRaceSpecificModel(worgen.Items[3].LeftModel, 23, Gender, worgen.Class);
                 worgen.collections[2].ActiveGeosets = new List<int>();
                 worgen.collections[2].ActiveGeosets.Add(801);
                 worgen.collections[2].ActiveGeosets.Add(1001);
-                if (worgen.Items[3].Slot == 20)
+                if (worgen.Items[3].Geoset3 == 1)
                 {
                     worgen.collections[2].ActiveGeosets.Add(1301);
                 }
                 worgen.collections[2].ActiveGeosets.Add(2201);
                 worgen.collections[2].ActiveGeosets.Add(2801);
+            }
+            if (worgen.collections[2].File != model || worgen.collections[2].Texture != worgen.Items[3].LeftTexture)
+            {
+                worgen.collections[2].UnloadModel();
+                if (worgen.Items[3].LeftModel > 0)
+                {
+                    StartCoroutine(worgen.collections[2].LoadModel(model, worgen.Items[3].LeftTexture, casc));
+                }
             }
             activeGeosets.Add(801 + worgen.Items[3].Geoset1);
             activeGeosets.Add(1001 + worgen.Items[3].Geoset2);
@@ -265,8 +343,12 @@ public class Gilnean : ModelRenderer
             {
                 activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
                 activeGeosets.RemoveAll(x => x > 899 && x < 1000);
+                if (worgen.collections[5].Loaded)
+                {
+                    worgen.collections[5].ActiveGeosets.RemoveAll(x => x > 1099 && x < 1200);
+                }
             }
-            activeGeosets.Add(2201 + worgen.Items[3].Geoset3);
+            activeGeosets.Add(2201 + worgen.Items[3].Geoset4);
             if (worgen.Items[3].UpperLeg > 0)
             {
                 activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
@@ -275,13 +357,6 @@ public class Gilnean : ModelRenderer
                     worgen.collections[5].ActiveGeosets.Clear();
                 }
             }
-        }
-        else
-        {
-            activeGeosets.Add(801);
-            activeGeosets.Add(1001);
-            activeGeosets.Add(1301);
-            activeGeosets.Add(2201);
         }
         if (worgen.Items[10] != null && worgen.Items[10].Geoset3 == 1)
         {
@@ -298,185 +373,212 @@ public class Gilnean : ModelRenderer
     private void EquipShirt()
     {
         activeGeosets.RemoveAll(x => x > 799 && x < 900);
-        if (worgen.Items[4] != null)
-        {
-            activeGeosets.Add(801 + worgen.Items[4].Geoset1);
-        }
-        else
+        if (worgen.Items[4] == null)
         {
             activeGeosets.Add(801);
+            return;
         }
+        activeGeosets.Add(801 + worgen.Items[4].Geoset1);
     }
 
     //Load tabard slot item geosets
     private void EquipTabard()
     {
         activeGeosets.RemoveAll(x => x > 1199 && x < 1300);
-        if (worgen.Items[5] != null)
+        if (worgen.Items[5] == null)
         {
-            if ((worgen.Items[3] != null && worgen.Items[3].Geoset3 == 1) || (worgen.Items[10] != null && worgen.Items[10].Geoset3 == 1))
-            {
-                activeGeosets.Add(1201);
-            }
-            else
-            {
-                activeGeosets.Add(1201 + worgen.Items[5].Geoset1);
-            }
+            activeGeosets.Add(1201);
+            return;
+        }
+        if ((worgen.Items[3] != null && worgen.Items[3].Geoset3 == 1) || (worgen.Items[10] != null && worgen.Items[10].Geoset3 == 1))
+        {
+            activeGeosets.Add(1201);
         }
         else
         {
-            activeGeosets.Add(1201);
+            activeGeosets.Add(1201 + worgen.Items[5].Geoset1);
         }
     }
 
     //Load wrist slot item geosets
     private void EquipWrist()
     {
-        if (worgen.Items[6] != null)
+        if (worgen.Items[6] == null)
         {
-            activeGeosets.RemoveAll(x => x > 799 && x < 900);
+            return;
         }
+        activeGeosets.RemoveAll(x => x > 799 && x < 900);
     }
-
 
     //Load hands slot item models and geosets
     private void EquipHands()
     {
-        worgen.collections[3].UnloadModel();
         activeGeosets.RemoveAll(x => x > 399 && x < 500);
-        if (worgen.Items[8] != null)
+        if (worgen.Items[8] == null)
         {
+            worgen.collections[3].UnloadModel();
+            activeGeosets.Add(401);
+            return;
+        }
+        int model = 0;
+        if (worgen.Items[8].LeftModel > 0)
+        {
+            model = worgen.Items[8].GetRaceSpecificModel(worgen.Items[8].LeftModel, 23, Gender, worgen.Class);
+            worgen.collections[3].ActiveGeosets = new List<int>();
+            if (activeGeosets.Contains(801))
+            {
+                worgen.collections[3].ActiveGeosets.Add(401);
+            }
+            worgen.collections[3].ActiveGeosets.Add(2301);
+        }
+        if (worgen.collections[3].File != model || worgen.collections[3].Texture != worgen.Items[8].LeftTexture)
+        {
+            worgen.collections[3].UnloadModel();
             if (worgen.Items[8].LeftModel > 0)
             {
-                int model = worgen.Items[8].GetRaceSpecificModel(worgen.Items[8].LeftModel, 23, Gender, worgen.Class);
                 StartCoroutine(worgen.collections[3].LoadModel(model, worgen.Items[8].LeftTexture, casc));
-                worgen.collections[3].ActiveGeosets = new List<int>();
-                if (activeGeosets.Contains(801))
-                {
-                    worgen.collections[3].ActiveGeosets.Add(401);
-                }
-                worgen.collections[3].ActiveGeosets.Add(2301);
-            }
-            activeGeosets.Add(401 + worgen.Items[8].Geoset1);
-            if (worgen.Items[8].Geoset1 != 0)
-            {
-                activeGeosets.RemoveAll(x => x > 799 && x < 900);
             }
         }
-        else
+        activeGeosets.Add(401 + worgen.Items[8].Geoset1);
+        if (worgen.Items[8].Geoset1 != 0)
         {
-            activeGeosets.Add(401);
+            activeGeosets.RemoveAll(x => x > 799 && x < 900);
         }
     }
 
     //Load waist slot item models and geosets
     private void EquipWaist()
     {
-        worgen.collections[4].UnloadModel();
         ItemObject buckle = GameObject.Find("buckle").GetComponent<ItemObject>();
-        buckle.UnloadModel();
         activeGeosets.RemoveAll(x => x > 1799 && x < 1900);
-        if (worgen.Items[9] != null)
+        if (worgen.Items[9] == null)
         {
-            if (worgen.Items[9].RightModel > 0)
-            {
-                int model = worgen.Items[9].GetRaceSpecificModel(worgen.Items[9].RightModel, 23, Gender, worgen.Class);
-                StartCoroutine(worgen.collections[4].LoadModel(model, worgen.Items[9].RightTexture, casc));
-                worgen.collections[4].ActiveGeosets = new List<int>();
-                worgen.collections[4].ActiveGeosets.Add(1801);
-            }
+            worgen.collections[4].UnloadModel();
+            buckle.UnloadModel();
+            activeGeosets.Add(1801);
+            return;
+        }
+        int model = 0;
+        if (worgen.Items[9].LeftModel > 0)
+        {
+            model = worgen.Items[9].GetModel(worgen.Items[9].LeftModel, worgen.Class);
+        }
+        if (buckle.File != model || buckle.MainTexture != worgen.Items[9].LeftTexture)
+        {
+            buckle.UnloadModel();
             if (worgen.Items[9].LeftModel > 0)
             {
-                int model = worgen.Items[9].GetModel(worgen.Items[9].LeftModel, worgen.Class);
                 StartCoroutine(buckle.LoadModel(model, worgen.Items[9].LeftTexture, casc));
                 buckle.ParticleColors = worgen.Items[9].ParticleColors;
                 buckle.Change = true;
             }
-            activeGeosets.Add(1801 + worgen.Items[9].Geoset1);
-            if (worgen.Items[9].Geoset1 == 1)
+        }
+        if (worgen.Items[9].RightModel > 0)
+        {
+            model = worgen.Items[9].GetRaceSpecificModel(worgen.Items[9].RightModel, 23, Gender, worgen.Class);
+            worgen.collections[4].ActiveGeosets = new List<int>();
+            worgen.collections[4].ActiveGeosets.Add(1801);
+        }
+        if (worgen.collections[4].File != model || worgen.collections[4].Texture != worgen.Items[9].RightTexture)
+        {
+            worgen.collections[4].UnloadModel();
+            if (worgen.Items[9].RightModel > 0)
             {
-                activeGeosets.RemoveAll(x => x > 999 && x < 1100);
+                StartCoroutine(worgen.collections[4].LoadModel(model, worgen.Items[9].RightTexture, casc));
             }
         }
-        else
+        activeGeosets.Add(1801 + worgen.Items[9].Geoset1);
+        if (worgen.Items[9].Geoset1 == 1)
         {
-            activeGeosets.Add(1801);
+            activeGeosets.RemoveAll(x => x > 999 && x < 1100);
         }
     }
 
     //Load legs slot item models and geosets
     private void EquipLegs()
     {
-        worgen.collections[5].UnloadModel();
         activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
         activeGeosets.RemoveAll(x => x > 899 && x < 1000);
         activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
-        if (worgen.Items[10] != null)
+        if (worgen.Items[10] == null)
         {
-            if (worgen.Items[10].LeftModel > 0)
-            {
-                int model = worgen.Items[10].GetRaceSpecificModel(worgen.Items[10].LeftModel, 23, Gender, worgen.Class);
-                StartCoroutine(worgen.collections[5].LoadModel(model, worgen.Items[10].LeftTexture, casc));
-                worgen.collections[5].ActiveGeosets = new List<int>();
-                worgen.collections[5].ActiveGeosets.Add(901);
-                worgen.collections[5].ActiveGeosets.Add(1101);
-            }
-            activeGeosets.Add(1101 + worgen.Items[10].Geoset1);
-            activeGeosets.Add(901 + worgen.Items[10].Geoset2);
-            if (worgen.Items[10].Geoset1 != 3)
-            {
-                activeGeosets.Add(1301 + worgen.Items[10].Geoset3);
-            }
-            if (worgen.Items[10].UpperLeg > 0)
-            {
-                activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
-            }
-        }
-        else
-        {
+            worgen.collections[5].UnloadModel();
             activeGeosets.Add(1101);
             activeGeosets.Add(901);
             activeGeosets.Add(1301);
+            return;
+        }
+        int model = 0;
+        if (worgen.Items[10].LeftModel > 0)
+        {
+            model = worgen.Items[10].GetRaceSpecificModel(worgen.Items[10].LeftModel, 23, Gender, worgen.Class);
+            worgen.collections[5].ActiveGeosets = new List<int>();
+            worgen.collections[5].ActiveGeosets.Add(901);
+            worgen.collections[5].ActiveGeosets.Add(1101);
+        }
+        if (worgen.collections[5].File != model || worgen.collections[5].Texture != worgen.Items[10].LeftTexture)
+        {
+            worgen.collections[5].UnloadModel();
+            if (worgen.Items[10].LeftModel > 0)
+            {
+                StartCoroutine(worgen.collections[5].LoadModel(model, worgen.Items[10].LeftTexture, casc));
+            }
+        }
+        activeGeosets.Add(1101 + worgen.Items[10].Geoset1);
+        activeGeosets.Add(901 + worgen.Items[10].Geoset2);
+        if (worgen.Items[10].Geoset1 != 3)
+        {
+            activeGeosets.Add(1301 + worgen.Items[10].Geoset3);
+        }
+        if (worgen.Items[10].UpperLeg > 0)
+        {
+            activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
         }
     }
 
     //Load feet slot item models and geosets
     private void EquipFeet()
     {
-        worgen.collections[6].UnloadModel();
         activeGeosets.RemoveAll(x => x > 499 && x < 600);
         activeGeosets.RemoveAll(x => x > 1999 && x < 2100);
-        if (worgen.Items[11] != null)
+        if (worgen.Items[11] == null)
         {
-            if (worgen.Items[11].LeftModel > 0)
-            {
-                int model = worgen.Items[11].GetRaceSpecificModel(worgen.Items[11].LeftModel, 23, Gender, worgen.Class);
-                StartCoroutine(worgen.collections[6].LoadModel(model, worgen.Items[11].LeftTexture, casc));
-                worgen.collections[6].ActiveGeosets = new List<int>();
-                if (!activeGeosets.Contains(1302))
-                {
-                    worgen.collections[6].ActiveGeosets.Add(501);
-                }
-                worgen.collections[6].ActiveGeosets.Add(2001);
-            }
-            if (!activeGeosets.Contains(1302))
-            {
-                activeGeosets.Add(501 + worgen.Items[11].Geoset1);
-            }
-            if (worgen.Items[11].Geoset1 != 0)
-            {
-                activeGeosets.RemoveAll(x => x > 899 && x < 1000);
-            }
-            activeGeosets.Add(2002 - worgen.Items[11].Geoset2);
-        }
-        else
-        {
+            worgen.collections[6].UnloadModel();
             if (!activeGeosets.Contains(1302))
             {
                 activeGeosets.Add(501);
             }
             activeGeosets.Add(2001);
+            return;
         }
+        int model = 0;
+        if (worgen.Items[11].LeftModel > 0)
+        {
+            model = worgen.Items[11].GetRaceSpecificModel(worgen.Items[11].LeftModel, 23, Gender, worgen.Class);
+            worgen.collections[6].ActiveGeosets = new List<int>();
+            if (!activeGeosets.Contains(1302))
+            {
+                worgen.collections[6].ActiveGeosets.Add(501);
+            }
+            worgen.collections[6].ActiveGeosets.Add(2001);
+        }
+        if (worgen.collections[6].File != model || worgen.collections[6].Texture != worgen.Items[11].LeftTexture)
+        {
+            worgen.collections[6].UnloadModel();
+            if (worgen.Items[11].LeftModel > 0)
+            {
+                StartCoroutine(worgen.collections[6].LoadModel(model, worgen.Items[11].LeftTexture, casc));
+            }
+        }
+        if (!activeGeosets.Contains(1302))
+        {
+            activeGeosets.Add(501 + worgen.Items[11].Geoset1);
+        }
+        if (worgen.Items[11].Geoset1 != 0)
+        {
+            activeGeosets.RemoveAll(x => x > 899 && x < 1000);
+        }
+        activeGeosets.Add(2002 - worgen.Items[11].Geoset2);
     }
 
     //Load main hand slot item models and geosets

@@ -73,6 +73,7 @@ public class Character : ModelRenderer
                 {
                     Resources.UnloadUnusedAssets();
                     GC.Collect();
+                    CheckHair();
                     helper.ChangeGeosets(activeGeosets);
                     EquipArmor();
                     helper.LoadTextures(textures);
@@ -219,6 +220,24 @@ public class Character : ModelRenderer
         }
     }
 
+    //Check if hair needs to be hidden
+    private void CheckHair()
+    {
+        helper.HideHair = false;
+        if (Items[0] == null)
+        {
+            return;
+        }
+        foreach (int helmet in Items[0].Helmet)
+        {
+            helper.HideHair = helmet == 0;
+            if (helper.HideHair)
+            {
+                break;
+            }
+        }
+    }
+
     //Load all the equipped items
     private void EquipArmor()
     {
@@ -280,8 +299,7 @@ public class Character : ModelRenderer
         {
             if (helmet == 0)
             {
-                activeGeosets.RemoveAll(x => x > 0 && x < 100);
-                activeGeosets.Add(1);
+                continue;
             }
             else if (helmet == 7)
             {
@@ -1496,7 +1514,7 @@ public class Character : ModelRenderer
         if (Race == 4 || Race == 10)
         {
             demonHunter.Path = modelsPath + RacePath;
-            StartCoroutine(demonHunter.LoadModel(DemonHunterFile, casc));
+            StartCoroutine(demonHunter.LoadModel($"demonhunter\\{DemonHunterFile}", casc));
             yield return null;
             while (!demonHunter.Loaded)
             {
@@ -1511,7 +1529,7 @@ public class Character : ModelRenderer
         if (Race == 37)
         {
             racial.Path = modelsPath + RacePath;
-            StartCoroutine(racial.LoadModel(RacialCollection, casc));
+            StartCoroutine(racial.LoadModel($"collection\\{RacialCollection}", casc));
             yield return null;
             while (!racial.Loaded)
             {

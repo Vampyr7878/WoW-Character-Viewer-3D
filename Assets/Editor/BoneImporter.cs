@@ -28,7 +28,7 @@ public class BoneImporter : ScriptedImporter
         for (int i = 0; i < bones.Length; i++)
         {
             bones[i] = new GameObject("Bone" + i).transform;
-            bones[i].position = new Vector3(-skeleton.Bones[i].Pivot.X / 2, skeleton.Bones[i].Pivot.Z / 2, -skeleton.Bones[i].Pivot.Y / 2);
+            bones[i].position = new Vector3(-skeleton.Bones[i].Pivot.X / 2, skeleton.Bones[i].Pivot.Y / 2, skeleton.Bones[i].Pivot.Z / 2);
         }
         GameObject rig = new GameObject("Skeleton");
         for (int i = 0; i < bones.Length; i++)
@@ -54,27 +54,27 @@ public class BoneImporter : ScriptedImporter
             value = -matrix.m03 / 2 + bones[file.Bones[i]].localPosition.x;
             curve = AnimationCurve.Linear(0f, value, 0.1f, value);
             clip.SetCurve(path, typeof(Transform), "localPosition.x", curve);
-            value = matrix.m23 / 2 + bones[file.Bones[i]].localPosition.y;
+            value = matrix.m13 / 2 + bones[file.Bones[i]].localPosition.y;
             curve = AnimationCurve.Linear(0f, value, 0.1f, value);
             clip.SetCurve(path, typeof(Transform), "localPosition.y", curve);
-            value = -matrix.m13 / 2 + bones[file.Bones[i]].localPosition.z;
+            value = matrix.m23 / 2 + bones[file.Bones[i]].localPosition.z;
             curve = AnimationCurve.Linear(0f, value, 0.1f, value);
             clip.SetCurve(path, typeof(Transform), "localPosition.z", curve);
             UnityEngine.Quaternion rotation = matrix.rotation;
             curve = AnimationCurve.Linear(0f, -rotation.x, 1f, rotation.x);
             clip.SetCurve(path, typeof(Transform), "localRotation.x", curve);
-            curve = AnimationCurve.Linear(0f, -rotation.z, 0.1f, rotation.z);
+            curve = AnimationCurve.Linear(0f, -rotation.y, 0.1f, rotation.y);
             clip.SetCurve(path, typeof(Transform), "localRotation.y", curve);
-            curve = AnimationCurve.Linear(0f, rotation.y, 0.1f, rotation.y);
+            curve = AnimationCurve.Linear(0f, rotation.z, 0.1f, rotation.z);
             clip.SetCurve(path, typeof(Transform), "localRotation.z", curve);
             curve = AnimationCurve.Linear(0f, rotation.w, 0.1f, rotation.w);
             clip.SetCurve(path, typeof(Transform), "localRotation.w", curve);
             Vector3 scale = matrix.lossyScale;
             curve = AnimationCurve.Linear(0f, scale.x, 0.1f, scale.x);
             clip.SetCurve(path, typeof(Transform), "localScale.x", curve);
-            curve = AnimationCurve.Linear(0f, scale.z, 0.1f, scale.z);
-            clip.SetCurve(path, typeof(Transform), "localScale.y", curve);
             curve = AnimationCurve.Linear(0f, scale.y, 0.1f, scale.y);
+            clip.SetCurve(path, typeof(Transform), "localScale.y", curve);
+            curve = AnimationCurve.Linear(0f, scale.z, 0.1f, scale.z);
             clip.SetCurve(path, typeof(Transform), "localScale.z", curve);
         }
         //Clear temporary bones and add animation clip to the asset

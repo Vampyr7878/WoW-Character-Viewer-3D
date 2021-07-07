@@ -51,8 +51,8 @@ public class M2Importer : ScriptedImporter
         Vector2[] uv2 = new Vector2[file.Vertices.Length];
         for (int i = 0; i < file.Vertices.Length; i++)
         {
-            vertices[i] = new Vector3(-file.Vertices[i].Position.X / 2, file.Vertices[i].Position.Z / 2, -file.Vertices[i].Position.Y / 2);
-            normals[i] = new Vector3(-file.Vertices[i].Normal.X, file.Vertices[i].Normal.Z, -file.Vertices[i].Normal.Y);
+            vertices[i] = new Vector3(-file.Vertices[i].Position.X / 2, file.Vertices[i].Position.Y / 2, file.Vertices[i].Position.Z / 2);
+            normals[i] = new Vector3(-file.Vertices[i].Normal.X, file.Vertices[i].Normal.Y, file.Vertices[i].Normal.Z);
             BoneWeight weight = new BoneWeight
             {
                 boneIndex0 = file.Vertices[i].Bones[0],
@@ -89,7 +89,7 @@ public class M2Importer : ScriptedImporter
         for (int i = 0; i < bones.Length; i++)
         {
             bones[i] = new GameObject("Bone" + i).transform;
-            bones[i].position = new Vector3(-file.Skeleton.Bones[i].Pivot.X / 2, file.Skeleton.Bones[i].Pivot.Z / 2, -file.Skeleton.Bones[i].Pivot.Y / 2);
+            bones[i].position = new Vector3(-file.Skeleton.Bones[i].Pivot.X / 2, file.Skeleton.Bones[i].Pivot.Y / 2, file.Skeleton.Bones[i].Pivot.Z / 2);
         }
         GameObject skeleton = new GameObject("Skeleton");
         for (int i = 0; i < bones.Length; i++)
@@ -143,6 +143,7 @@ public class M2Importer : ScriptedImporter
         m2.skin = skin;
         m2.skel = skel;
         //Populate the asset
+        skeleton.transform.localEulerAngles = new Vector3(-90, 0, 0);
         ctx.AddObjectToAsset(file.Name, model);
         ctx.AddObjectToAsset(mesh.name, mesh);
         ctx.AddObjectToAsset(skeleton.name, skeleton);

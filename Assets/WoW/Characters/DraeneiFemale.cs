@@ -60,7 +60,7 @@ namespace WoW.Characters
             int index = Array.FindIndex(Character.Options, o => o.Name == "Hair Style");
             int index2 = Array.FindIndex(Character.Options, o => o.Name == "Circlet");
             activeGeosets.RemoveAll(x => x > 0 && x < 100);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
+            activeGeosets.Add(HideHair ? Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset2 : Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
             if (Character.Customization[index2] > Character.Choices[index][Character.Customization[index]].Bone)
             {
                 Character.CustomizationDropdowns[index2].value = Character.Choices[index][Character.Customization[index]].Bone;

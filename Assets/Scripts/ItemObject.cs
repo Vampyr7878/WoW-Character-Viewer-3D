@@ -69,7 +69,7 @@ public class ItemObject : ModelRenderer
             {
                 if ((Model.Skeleton.Bones[i].Flags & 0x8) != 0)
                 {
-                    renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x, camera.eulerAngles.y - 90, camera.eulerAngles.z);
+                    renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x - 90, camera.eulerAngles.y - 90, camera.eulerAngles.z);
                 }
             }
             //Animate textures
@@ -150,7 +150,7 @@ public class ItemObject : ModelRenderer
         particles = particles.OrderBy(x => x.name).ToArray();
         for (int i = 0; i < particles.Length; i++)
         {
-            particles[i].transform.localEulerAngles = new Vector3(-90f, 0f, 0f);
+            particles[i].transform.localEulerAngles = new Vector3(0f, 0f, 0f);
             ParticleSystem.EmissionModule emission = particles[i].emission;
             emission.rateOverTimeMultiplier = 4f;
             if (Model.Particles[i].ColorIndex != 0)
@@ -312,7 +312,6 @@ public class ItemObject : ModelRenderer
         yield return null;
         Model.Skin.LoadFile(bytes);
         yield return null;
-        //Array.Sort(Model.Skin.Textures, (a, b) => a.Priority.CompareTo(b.Priority));
         LoadColors();
         yield return null;
         textures = new Texture2D[Model.Textures.Length];

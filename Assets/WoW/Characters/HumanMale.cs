@@ -63,7 +63,7 @@ namespace WoW.Characters
             int index = Array.FindIndex(Character.Options, o => o.Name == "Hair Style");
             int index2 = Array.FindIndex(Character.Options, o => o.Name == "Hair Color");
             activeGeosets.RemoveAll(x => x > 0 && x < 100);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
+            activeGeosets.Add(HideHair ? Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset2 : Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
             int[] colors = new int[Character.Choices[index2].Length];
             switch (Character.Choices[index][Character.Customization[index]].Bone)
             {

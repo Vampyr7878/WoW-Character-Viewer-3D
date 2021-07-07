@@ -64,7 +64,7 @@ namespace WoW.Characters
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Foremane");
             activeGeosets.RemoveAll(x => x > 0 && x < 100);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
+            activeGeosets.Add(HideHair ? Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset2 : Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 
         private void ChangeHair(List<int> activeGeosets)

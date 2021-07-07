@@ -276,7 +276,6 @@ public class Collection : ModelRenderer
             yield return null;
             Model.Skin.LoadFile(bytes);
             yield return null;
-            //Array.Sort(Model.Skin.Textures, (a, b) => Model.Materials[a.Material].Blend.CompareTo(Model.Materials[b.Material].Blend));
             LoadColors();
             yield return null;
             textures = new Texture2D[Model.Textures.Length];
