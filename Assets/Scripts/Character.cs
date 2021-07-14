@@ -301,6 +301,14 @@ public class Character : ModelRenderer
             {
                 continue;
             }
+            else if (helmet == 1 && Race == 5)
+            {
+                continue;
+            }
+            else if (helmet == 2 && Race == 5)
+            {
+                continue;
+            }
             else if (helmet == 7)
             {
                 activeGeosets.RemoveAll(x => x > 699 && x < 800);

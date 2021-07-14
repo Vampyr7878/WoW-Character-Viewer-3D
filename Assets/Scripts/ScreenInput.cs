@@ -79,6 +79,8 @@ public class ScreenInput : MonoBehaviour
     public bool core;
     //Autoscreenshot allied races
     public bool allied;
+    //Autoscreenshot race
+    public string race;
 
     //List of all customization option dropdowns
     private List<GameObject> customizationOptions;
@@ -134,7 +136,7 @@ public class ScreenInput : MonoBehaviour
             path = reader.ReadLine();
         }
         casc = CASCHandler.OpenLocalStorage(path, "wow");
-        casc.Root.SetFlags(LocaleFlags.enGB, true, false);
+        casc.Root.SetFlags(LocaleFlags.enUS, false, false);
         converter = new System.Drawing.ImageConverter();
         //Allow for translation, rotation and zoom
         translate = true;
@@ -202,7 +204,7 @@ public class ScreenInput : MonoBehaviour
         }
         customizeButton.gameObject.SetActive(!gear);
         //Exit when autoscreenshotting is done
-        if (screenshot && ((!allied && r >= coreRaceNames.Count) || r >= coreRaceNames.Count + alliedRaceNames.Count))
+        if (screenshot && ((!allied && r >= coreRaceNames.Count) || r >= coreRaceNames.Count + alliedRaceNames.Count) && race == "")
         {
             #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
@@ -238,8 +240,21 @@ public class ScreenInput : MonoBehaviour
             StartCoroutine(TakeScreenshot());
         }
         //Autoscreenshot if enabled
-        if (c < coreRaceNames.Count && screenshot)
+        if (c < classNames.Count && screenshot)
         {
+            if (!core && !allied)
+            {
+                r = coreRaceNames.IndexOf(race);
+                if (r == -1)
+                {
+                    r = alliedRaceNames.IndexOf(race) + coreRaceNames.Count;
+                    allied = true;
+                }
+                else
+                {
+                    core = true;
+                }
+            }
             string g = character.Gender ? "Male" : "Female";
             if (r >= coreRaceNames.Count && allied && r < coreRaceNames.Count + alliedRaceNames.Count)
             {

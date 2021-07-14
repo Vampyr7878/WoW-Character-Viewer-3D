@@ -38,12 +38,17 @@ Shader "Custom/32783"
 			sampler2D _Texture1;
 			sampler2D _Texture2;
 			fixed4 _Color;
+			int _Cull;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				fixed4 emission = tex2D(_Texture2, IN.uv2_Texture2);
-				color = lerp(color, emission, emission.a / 2);
+				if (_Cull == 0)
+				{
+					color = lerp(color, emission, emission.a / 2);
+					OUT.Emission = emission;
+				}
 				OUT.Albedo = color.rgb;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
