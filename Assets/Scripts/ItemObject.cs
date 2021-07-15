@@ -209,7 +209,7 @@ public class ItemObject : ModelRenderer
         }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 || Model.Materials[Model.Skin.Textures[i].Material].Blend == 7 ? 0.1f : 0f);
+        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 || Model.Materials[Model.Skin.Textures[i].Material].Blend == 7 ? 0.5f : 0f);
         Color color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
