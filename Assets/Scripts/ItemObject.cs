@@ -151,6 +151,9 @@ public class ItemObject : ModelRenderer
         for (int i = 0; i < particles.Length; i++)
         {
             particles[i].transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+            ParticleSystem.MainModule main = particles[i].main;
+            main.startRotation3D = true;
+            main.startRotationZ = -Mathf.PI / 2 * Model.Particles[i].TileRotation;
             ParticleSystem.EmissionModule emission = particles[i].emission;
             emission.rateOverTimeMultiplier = 4f;
             if (Model.Particles[i].ColorIndex != 0)
@@ -177,12 +180,18 @@ public class ItemObject : ModelRenderer
             limitVelocityOverLifetime.drag = Model.Particles[i].Drag;
             limitVelocityOverLifetime.multiplyDragByParticleSize = false;
             limitVelocityOverLifetime.multiplyDragByParticleVelocity = true;
+            if (Model.Name.Contains("Shoulder_Leather_RaidDruid_I_01") && i > 0)
+            {
+                ParticleSystem.TextureSheetAnimationModule textureSheet = particles[i].textureSheetAnimation;
+                textureSheet.frameOverTime = 0.109375f;
+            }
             ParticleSystemRenderer renderer = particles[i].GetComponent<ParticleSystemRenderer>();
             Material material = ParticleMaterial(Model.Particles[i].Blend);
             particles[i].transform.localScale = transform.lossyScale;
             if (name.Contains("right") && (Model.Particles[i].Flags & 512) == 0)
             {
                 renderer.flip = new Vector3(1f, 0f, 0f);
+                main.startRotationZ = Mathf.PI / 2 * Model.Particles[i].TileRotation;
             }
             renderer.material.shader = material.shader;
             renderer.material.CopyPropertiesFromMaterial(material);

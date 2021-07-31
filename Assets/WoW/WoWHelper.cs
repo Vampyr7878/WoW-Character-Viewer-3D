@@ -369,13 +369,13 @@ namespace WoW
             //Setup lifetime and speed in main module
             ParticleSystem.MainModule main = system.main;
             float variation = particle.LifespanVariation * particle.Lifespan;
-            main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2, (particle.Lifespan + variation) / 2);
+            main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2f, (particle.Lifespan + variation) / 2f);
             variation = particle.SpeedVariation * particle.Speed;
             main.startSpeed = new ParticleSystem.MinMaxCurve((particle.Speed - variation) / 2f, (particle.Speed + variation) / 2f);
             //Setup emission rate in emission module
             ParticleSystem.EmissionModule emission = system.emission;
             variation = particle.EmissionVariation * particle.EmissionRate;
-            emission.rateOverTime = new ParticleSystem.MinMaxCurve((particle.EmissionRate - variation) / 2, (particle.EmissionRate + variation) / 2);
+            emission.rateOverTime = new ParticleSystem.MinMaxCurve((particle.EmissionRate - variation) / 2f, (particle.EmissionRate + variation) / 2f);
             emission.rateOverDistance = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
             //Setup shape and scale in shape module
             ParticleSystem.ShapeModule shape = system.shape;

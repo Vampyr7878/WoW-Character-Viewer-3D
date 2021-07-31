@@ -46,10 +46,16 @@ Shader "Custom/16404"
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
 				fixed4 alpha = tex2D(_Texture2, IN.uv2_Texture2);
-				if ((_SrcBlend == 1 || _SrcBlend == 5 ) && (_DstBlend == 1 || _DstBlend == 10))
+				if (_SrcBlend == 1 && _DstBlend == 10)
 				{
 					color.rgb *= alpha.rgb;
 					color.a *= alpha.a;
+				}
+				else if ((_SrcBlend == 1 || _SrcBlend == 5 ) && (_DstBlend == 1 || _DstBlend == 10))
+				{
+					color.rgb *= alpha.rgb;
+					color.a *= alpha.a;
+					OUT.Emission = emission;
 				}
 				else
 				{
