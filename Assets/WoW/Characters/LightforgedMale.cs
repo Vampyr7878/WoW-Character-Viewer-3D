@@ -19,10 +19,12 @@ namespace WoW.Characters
             ChangeEars(activeGeosets);
             ChangeHairStyle(activeGeosets);
             ChangeFacialHair(activeGeosets);
-            ChangeTendrils(activeGeosets);
             ChangeRune(activeGeosets);
+            ChangeTendrils(activeGeosets);
             ChangeEyebrows(activeGeosets);
             ChangeEyeColor(activeGeosets);
+            ChangeHornDecoration(activeGeosets);
+            ChangeTail(activeGeosets);
         }
 
         private void ChangeEars(List<int> activeGeosets)
@@ -45,17 +47,17 @@ namespace WoW.Characters
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 
-        private void ChangeTendrils(List<int> activeGeosets)
-        {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Tendrils");
-            activeGeosets.RemoveAll(x => x > 199 && x < 300);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
-        }
-
         private void ChangeRune(List<int> activeGeosets)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Rune");
             activeGeosets.RemoveAll(x => x > 2499 && x < 2600);
+            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
+        }
+
+        private void ChangeTendrils(List<int> activeGeosets)
+        {
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Tendrils");
+            activeGeosets.RemoveAll(x => x > 199 && x < 300);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 
@@ -73,6 +75,21 @@ namespace WoW.Characters
             activeGeosets.RemoveAll(x => x > 3299 && x < 3400);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset2);
+        }
+
+        private void ChangeHornDecoration(List<int> activeGeosets)
+        {
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Horn Decoration");
+            int index2 = Array.FindIndex(Character.Options, o => o.Name == "Hair Style");
+            activeGeosets.RemoveAll(x => x > 3899 && x < 4000);
+            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[Character.Customization[index2]].Geoset1);
+        }
+
+        private void ChangeTail(List<int> activeGeosets)
+        {
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Tail");
+            activeGeosets.RemoveAll(x => x > 3799 && x < 3900);
+            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 
         protected override void LayeredTexture(Texture2D texture)
@@ -97,13 +114,15 @@ namespace WoW.Characters
             {
                 Emission = null;
             }
-            index = Array.FindIndex(Character.Options, o => o.Name == "Skin Color");
+            index = Array.FindIndex(Character.Options, o => o.Name == "Jewelry Color");
             Texture2D underwear = null;
             if (!(Character.Items[3] != null && Character.Items[3].UpperLeg !> 0) && Character.Items[10] == null)
             {
                 underwear = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture3);
                 DrawTexture(texture, underwear, 256, 192);
             }
+            Texture2D jewelry = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
+            DrawTexture(texture, jewelry, 0, 0);
             if (Emission != null)
             {
                 if (underwear != null)
@@ -178,6 +197,10 @@ namespace WoW.Characters
                     break;
                 case 19:
                     index = Array.FindIndex(Character.Options, o => o.Name == "Eye Color");
+                    file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
+                    break;
+                case 20:
+                    index = Array.FindIndex(Character.Options, o => o.Name == "Jewelry Color");
                     file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
                     break;
             }

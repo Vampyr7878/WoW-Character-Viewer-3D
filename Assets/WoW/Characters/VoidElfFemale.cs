@@ -17,10 +17,11 @@ namespace WoW.Characters
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeSkinColor();
-            ChangeEars(activeGeosets);
             ChangeHairStyle(activeGeosets);
             ChangeEyeColor(activeGeosets);
             ChangeEarrings(activeGeosets);
+            ChangeEars(activeGeosets);
+            ChangeTentacles(activeGeosets);
         }
 
         private void ChangeSkinColor()
@@ -39,12 +40,6 @@ namespace WoW.Characters
                 }
             }
             Character.ChangeFaceDropdown(index, index2);
-        }
-
-        private void ChangeEars(List<int> activeGeosets)
-        {
-            activeGeosets.RemoveAll(x => x > 699 && x < 800);
-            activeGeosets.Add(702);
         }
 
         private void ChangeHairStyle(List<int> activeGeosets)
@@ -69,6 +64,21 @@ namespace WoW.Characters
             int index = Array.FindIndex(Character.Options, o => o.Name == "Earrings");
             activeGeosets.RemoveAll(x => x > 3499 && x < 3600);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
+        }
+
+        private void ChangeEars(List<int> activeGeosets)
+        {
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Ears");
+            activeGeosets.RemoveAll(x => x > 699 && x < 800);
+            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
+        }
+
+        private void ChangeTentacles(List<int> activeGeosets)
+        {
+            int index = Array.FindIndex(Character.Options, o => o.Name == "Tentacles");
+            int index2 = Array.FindIndex(Character.Options, o => o.Name == "Hair Style");
+            activeGeosets.RemoveAll(x => x > 2399 && x < 2500);
+            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[Character.Customization[index2]].Geoset1);
         }
 
         protected override void LayeredTexture(Texture2D texture)
@@ -131,6 +141,9 @@ namespace WoW.Characters
                 case 6:
                     index = Array.FindIndex(Character.Options, o => o.Name == "Hair Color");
                     file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
+                    break;
+                case 7:
+                    file = 1799939;
                     break;
                 case 19:
                     index = Array.FindIndex(Character.Options, o => o.Name == "Eye Color");

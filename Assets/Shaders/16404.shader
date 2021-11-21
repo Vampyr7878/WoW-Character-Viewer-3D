@@ -21,7 +21,7 @@ Shader "Custom/16404"
 		LOD 200
 		ZWrite[_DepthTest]
 		Blend[_SrcBlend][_DstBlend]
-		Cull[_Cull]
+		Cull Off
 
 		CGPROGRAM
 			#pragma surface surfaceFunction Standard fullforwardshadows alpha:blend
@@ -46,20 +46,15 @@ Shader "Custom/16404"
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
 				fixed4 alpha = tex2D(_Texture2, IN.uv2_Texture2);
+				alpha.a = color.r * 0.299f + color.g * 0.587f + color.b * 0.114f;
 				if (_SrcBlend == 1 && _DstBlend == 10)
 				{
 					color.rgb *= alpha.rgb;
 					color.a *= alpha.a;
 				}
-				else if ((_SrcBlend == 1 || _SrcBlend == 5 ) && (_DstBlend == 1 || _DstBlend == 10))
-				{
-					color.rgb *= alpha.rgb;
-					color.a *= alpha.a;
-					OUT.Emission = emission;
-				}
 				else
 				{
-					alpha.a = color.r * 0.299f + color.g * 0.587f + color.b * 0.114f;
+					color.rgb *= alpha.rgb;
 					color.a *= alpha;
 					OUT.Emission = emission;
 				}

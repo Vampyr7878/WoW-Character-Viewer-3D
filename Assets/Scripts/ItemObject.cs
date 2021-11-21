@@ -147,7 +147,7 @@ public class ItemObject : ModelRenderer
     private void ParticleEffects()
     {
         ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
-        particles = particles.OrderBy(x => x.name).ToArray();
+        particles = particles.OrderBy(x => int.Parse(x.name.Replace("Particle", ""))).ToArray();
         for (int i = 0; i < particles.Length; i++)
         {
             particles[i].transform.localEulerAngles = new Vector3(0f, 0f, 0f);
@@ -155,6 +155,10 @@ public class ItemObject : ModelRenderer
             main.startRotation3D = true;
             main.startRotationZ = -Mathf.PI / 2 * Model.Particles[i].TileRotation;
             ParticleSystem.EmissionModule emission = particles[i].emission;
+            if (Model.Name.Contains("RaidWarrior_N"))
+            {
+                main.startSize = main.startSize.constant / 2f;
+            }
             emission.rateOverTimeMultiplier = 4f;
             if (Model.Particles[i].ColorIndex != 0)
             {
@@ -214,7 +218,19 @@ public class ItemObject : ModelRenderer
         }
         if (Model.Skin.Textures[i].TextureCount > 2)
         {
-            material.SetTexture("_Emission", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 2]]);
+            int index = Model.TextureLookup[Model.Skin.Textures[i].Texture + 2];
+            Texture2D emission = new Texture2D(textures[index].width, textures[index].height);
+            for (int x = 0; x < emission.width; x++)
+            {
+                for (int y = 0; y < emission.height; y++)
+                {
+                    Color pixel = textures[index].GetPixel(x, y);
+                    pixel = new Color(pixel.a, pixel.a, pixel.a);
+                    emission.SetPixel(x, y, pixel);
+                }
+            }
+            emission.Apply();
+            material.SetTexture("_Emission", emission);
         }
         material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));

@@ -21,7 +21,7 @@ Shader "Custom/32768"
 		LOD 200
 		ZWrite[_DepthTest]
 		Blend[_SrcBlend][_DstBlend]
-		Cull[_Cull]
+		Cull Off
 
 		CGPROGRAM
 			#pragma surface surfaceFunction Standard fullforwardshadows

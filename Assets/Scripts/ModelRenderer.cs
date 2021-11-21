@@ -52,13 +52,16 @@ public abstract class ModelRenderer : MonoBehaviour
                 offset = AnimateTexture(index, offset);
                 renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
             }
-            index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
-            texture = "_Texture2";
-            if (index >= 0)
+            if (Model.Skin.Textures[i].TextureCount > 1)
             {
-                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, offset);
-                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+                index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
+                texture = "_Texture2";
+                if (index >= 0)
+                {
+                    Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
+                    offset = AnimateTexture(index, offset);
+                    renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+                }
             }
         }
     }

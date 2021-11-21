@@ -1,6 +1,6 @@
 ﻿using BLPLib;
 using CASCLib;
-using Crosstales.FB;
+using SimpleFileBrowser;
 using Mono.Data.Sqlite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -135,6 +135,8 @@ public class ScreenInput : MonoBehaviour
         {
             path = reader.ReadLine();
         }
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("character(.chr)", ".chr"));
+        FileBrowser.SetDefaultFilter(".chr");
         casc = CASCHandler.OpenLocalStorage(path, "wow");
         casc.Root.SetFlags(LocaleFlags.enUS, false, false);
         converter = new System.Drawing.ImageConverter();
@@ -354,7 +356,7 @@ public class ScreenInput : MonoBehaviour
     //Translate camera
     private void TranslateCamera()
     {
-        if (translate && Input.GetMouseButton(1))
+        if (translate && Input.GetMouseButton(1) && !FileBrowser.IsOpen)
         {
             mainCamera.transform.Translate(-Input.GetAxis("Mouse X") / 4f, -Input.GetAxis("Mouse Y") / 4, 0f);
             Vector3 value = mainCamera.transform.position;
@@ -367,7 +369,7 @@ public class ScreenInput : MonoBehaviour
     //Rotate model
     private void RotateCamera()
     {
-        if (rotate && Input.GetMouseButton(0))
+        if (rotate && Input.GetMouseButton(0) && !FileBrowser.IsOpen)
         {
             character.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
             gilnean.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
@@ -378,7 +380,7 @@ public class ScreenInput : MonoBehaviour
     //Zoom camare
     private void ZoomCamera()
     {
-        if (zoom)
+        if (zoom && !FileBrowser.IsOpen)
         {
             mainCamera.transform.Translate(0f, 0f, Input.GetAxis("Mouse ScrollWheel"));
             Vector3 value = mainCamera.transform.position;
@@ -1130,6 +1132,7 @@ public class ScreenInput : MonoBehaviour
         if (druid.gameObject.activeSelf)
         {
             druid.LoadModel(druidModels[character.Choices[index][character.Customization[index]].Model], casc);
+            druid.ActiveGeosets.Add(character.Choices[index][character.Customization[index]].Bone);
             ParticleColor[] particleColors = new ParticleColor[3];
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
@@ -1469,7 +1472,14 @@ public class ScreenInput : MonoBehaviour
         {
             Directory.CreateDirectory("Save");
         }
-        string path = file == "" ? FileBrowser.OpenSingleFile("Open character", "Save", "chr") : file;
+        StartCoroutine(OpenCharacter(file));
+    }
+
+    //Open character file
+    public IEnumerator OpenCharacter(string file)
+    {
+        yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, "Save", "", "Open character", "Open");
+        string path = FileBrowser.Success ? FileBrowser.Result[0] : file;
         if (path != "")
         {
             SerializableCharacter sCharacter;
@@ -1661,7 +1671,14 @@ public class ScreenInput : MonoBehaviour
         {
             Directory.CreateDirectory("Save");
         }
-        string path = FileBrowser.SaveFile("Save character", "Save", races[character.Race] + " " + classes[character.Class], "chr");
+        StartCoroutine(SaveCharacter());
+    }
+
+    //Save Character
+    public IEnumerator SaveCharacter()
+    {
+        yield return FileBrowser.WaitForSaveDialog(FileBrowser.PickMode.Files, false, "Save", races[character.Race] + " " + classes[character.Class], "Save character", "Save");
+        string path = FileBrowser.Success ? FileBrowser.Result[0] : "";
         if (path != "")
         {
             SerializableCharacter sCharacter = new SerializableCharacter();

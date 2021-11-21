@@ -1,4 +1,5 @@
-using Crosstales.FB;
+using SimpleFileBrowser;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,8 +44,14 @@ public class FolderSetup : MonoBehaviour
     //Open folder browser so you can select your World of Warcraft folder
     public void Browse()
     {
-        string file = FileBrowser.OpenSingleFolder("Find your main World of Warcraft folder");
-        path.text = file;
+        StartCoroutine(BrowseFolder());
+    }
+
+    //Browse for a folder
+    private IEnumerator BrowseFolder()
+    {
+        yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Folders, false, null, null, "Find your main World of Warcraft folder", "Select");
+        path.text = FileBrowser.Success ? FileBrowser.Result[0] : "";
     }
 
     //If selected path is valid store it in config.ini file and show main UI after pressing OK button

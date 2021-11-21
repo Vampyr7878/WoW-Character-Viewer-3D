@@ -2,6 +2,7 @@
 using M2Lib;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
@@ -17,6 +18,8 @@ public class Druid : ModelRenderer
     //Reference to the main camera
     private new Transform camera;
 
+    //List of geosets that are enabled for loading
+    public List<int> ActiveGeosets { get; set; }
     //Particle colors from database
     public ParticleColor[] ParticleColors { get; set; }
 
@@ -25,6 +28,7 @@ public class Druid : ModelRenderer
         //Initiazlie
         modelsPath = @"creature\";
         camera = Camera.main.transform;
+        ActiveGeosets = new List<int>() { 0 };
     }
 
     private void FixedUpdate()
@@ -74,42 +78,27 @@ public class Druid : ModelRenderer
         }
     }
 
-    //Animate current texture unit if it has any animations
-    private new void AnimateTextures(SkinnedMeshRenderer renderer, int i)
-    {
-        int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
-        string texture = "_Texture1";
-        if (index >= 0)
-        {
-            Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-            offset = AnimateTexture(index, offset);
-            renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
-        }
-        if (Model.Skin.Textures[i].TextureCount > 1)
-        {
-            index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
-            texture = "_Texture2";
-            if (index >= 0)
-            {
-                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
-                offset = AnimateTexture(index, offset);
-                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
-            }
-        }
-    }
-
     //Set material with proper shader
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
-        Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
-        if (material == null)
+        if (ActiveGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            Debug.LogError(Model.Skin.Textures[i].Shader);
+            Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            if (material == null)
+            {
+                Debug.LogError(Model.Skin.Textures[i].Shader);
+            }
+            renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
+            renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
+            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
+            SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
         }
-        renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
-        renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
-        renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
-        SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
+        else
+        {
+            renderer.materials[Model.Skin.Textures[i].Id] = new Material(hiddenMaterial.shader);
+            renderer.materials[Model.Skin.Textures[i].Id].shader = hiddenMaterial.shader;
+            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(hiddenMaterial);
+        }
     }
 
     //Setup particle effects for rendering

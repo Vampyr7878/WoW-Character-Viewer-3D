@@ -380,7 +380,7 @@ namespace WoW
             //Setup shape and scale in shape module
             ParticleSystem.ShapeModule shape = system.shape;
             shape.shapeType = ParticleShape(particle.Type);
-            shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionLength, particle.EmissionWidth);
+            shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionWidth, particle.EmissionLength);
             //Setup color and alpha gradients in color over lifetime module
             ParticleSystem.ColorOverLifetimeModule color = system.colorOverLifetime;
             color.enabled = true;

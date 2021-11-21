@@ -20,7 +20,7 @@ Shader "Custom/16401"
 		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
 		ZWrite Off
-		Blend SrcAlpha One
+		Blend[_SrcBlend][_DstBlend]
 		Cull[_Cull]
 
 		CGPROGRAM
@@ -41,17 +41,17 @@ Shader "Custom/16401"
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
-				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * tex2D(_Texture2, IN.uv2_Texture2) * _Color;
+				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				fixed4 mask = tex2D(_Texture2, IN.uv2_Texture2);
 				mask.a  = mask.r * 0.299f + mask.g * 0.587f + mask.b * 0.114f;
-				color *= mask;
+				color.a *= mask.a;
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
 				emission *= mask;
-				OUT.Albedo = color.rgb * 2;
+				OUT.Albedo = color.rgb;
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
-				OUT.Emission = emission;
+				//OUT.Emission = emission;
 			}
 		ENDCG
 	}
