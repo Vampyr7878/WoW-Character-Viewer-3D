@@ -652,6 +652,7 @@ public class ScreenInput : MonoBehaviour
             scrollItems[i].GetComponentInChildren<Text>().color = WoWHelper.QualityColor(items[i].Quality);
             scrollItems[i].GetComponentInChildren<Image>().sprite = IconFromBLP(items[i].Icon);
             scrollItems[i].GetComponentsInChildren<Image>()[1].color = WoWHelper.QualityColor(items[i].Quality);
+            scrollItems[i].GetComponentInChildren<UnityEngine.UI.Outline>().effectColor = WoWHelper.QualityColor(items[i].Quality);
             Image tooltip = Array.Find(scrollItems[i].GetComponentsInChildren<Image>(true), x => x.CompareTag("tooltip"));
             tooltip.gameObject.SetActive(true);
             tooltip.GetComponentInChildren<Text>().text = items[i].Name;
@@ -1466,20 +1467,38 @@ public class ScreenInput : MonoBehaviour
     }
 
     //Open saved character json file
+    public void Open()
+    {
+        if (!Directory.Exists("Save"))
+        {
+            Directory.CreateDirectory("Save");
+        }
+        StartCoroutine(OpenCharacter("", true));
+    }
+
+    //Open saved character json file
     public void Open(string file)
     {
         if (!Directory.Exists("Save"))
         {
             Directory.CreateDirectory("Save");
         }
-        StartCoroutine(OpenCharacter(file));
+        StartCoroutine(OpenCharacter(file, false));
     }
 
     //Open character file
-    public IEnumerator OpenCharacter(string file)
+    public IEnumerator OpenCharacter(string file, bool showDialog)
     {
-        yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, "Save", "", "Open character", "Open");
-        string path = FileBrowser.Success ? FileBrowser.Result[0] : file;
+        string path;
+        if (showDialog)
+        {
+            yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, "Save", "", "Open character", "Open");
+            path = FileBrowser.Success ? FileBrowser.Result[0] : file;
+        }
+        else
+        {
+            path = file;
+        }
         if (path != "")
         {
             SerializableCharacter sCharacter;

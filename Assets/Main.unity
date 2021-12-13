@@ -583,9 +583,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1809676660}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: ScreenInput, Assembly-CSharp
         m_MethodName: Open
-        m_Mode: 5
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -13011,26 +13011,6 @@ MonoBehaviour:
   hiddenMaterial: {fileID: 2100000, guid: a21f596c570fe984a98420611af50e78, type: 2}
   character: {fileID: 575538030}
   gilnean: {fileID: 838828348}
---- !u!1 &655039180 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4109476328235377808, guid: 5d771551bad2035438f80dd35547ba9c, type: 3}
-  m_PrefabInstance: {fileID: 4109476329797527922}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &655039184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 655039180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
-  m_EffectDistance: {x: 1, y: -1}
-  m_UseGraphicAlpha: 1
 --- !u!1 &659380302
 GameObject:
   m_ObjectHideFlags: 0
@@ -33471,10 +33451,10 @@ MonoBehaviour:
   character: {fileID: 575538030}
   gilnean: {fileID: 838828348}
   druid: {fileID: 2064399971}
-  itemSet: Tier7-25
+  itemSet: Dungeon2
   gender: 1
-  screenshot: 0
-  core: 1
+  screenshot: 1
+  core: 0
   allied: 1
   race: 
 --- !u!4 &1809676661

@@ -97,7 +97,7 @@ namespace WoW.Characters
         private void ChangeJawJewelry(List<int> activeGeosets)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Jaw Jewelry");
-            activeGeosets.RemoveAll(x => x > 199 && x < 300);
+            activeGeosets.RemoveAll(x => x > 99 && x < 200);
             activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
         }
 

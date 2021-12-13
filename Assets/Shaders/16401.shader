@@ -38,12 +38,13 @@ Shader "Custom/16401"
 			sampler2D _Texture1;
 			sampler2D _Texture2;
 			fixed4 _Color;
+			int _SrcBlend;
+			int _DstBlend;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
-				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
+				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * tex2D(_Texture2, IN.uv2_Texture2) * _Color;
 				fixed4 mask = tex2D(_Texture2, IN.uv2_Texture2);
-				mask.a  = mask.r * 0.299f + mask.g * 0.587f + mask.b * 0.114f;
 				color.a *= mask.a;
 				fixed4 emission = tex2D(_Texture1, IN.uv_Texture1);
 				emission *= mask;

@@ -326,6 +326,8 @@ public class Character : ModelRenderer
             }
             else if (helmet == 24)
             {
+                activeGeosets.RemoveAll(x => x > 2399 && x < 2500);
+                activeGeosets.Add(2400);
                 if (racial.Loaded && !racial.ActiveGeosets.Contains(2400))
                 {
                     racial.ActiveGeosets.RemoveAll(x => x > 2399 && x < 2500);
@@ -1402,8 +1404,16 @@ public class Character : ModelRenderer
         {
             material.SetTexture("_Emission", helper.Emission);
         }
-        material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        if (Race == 34 && material.shader.name == "Custom/16401")
+        {
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcColor);
+            material.SetInt("_DstBlend", (int)BlendMode.One);
+        }
+        else
+        {
+            material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+            material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        }
         material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.5f : 0f);
         if (Model.Skin.Textures[i].Color != -1)
         {
