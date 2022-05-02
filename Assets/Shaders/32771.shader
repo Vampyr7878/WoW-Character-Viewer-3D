@@ -38,6 +38,8 @@ Shader "Custom/32771"
 			sampler2D _Texture1;
 			sampler2D _Emission;
 			fixed4 _Color;
+			int _SrcBlend;
+			int _DstBlend;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
@@ -47,7 +49,10 @@ Shader "Custom/32771"
 				OUT.Alpha = color.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
-				OUT.Emission = emission;
+				if (_SrcBlend ==  0 && _DstBlend == 1)
+				{
+					OUT.Emission = emission;
+				}
 			}
 		ENDCG
 	}
