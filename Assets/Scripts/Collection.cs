@@ -14,13 +14,9 @@ public class Collection : ModelRenderer
 {
     //Reference to the character wearing that collection
     public Character character;
-    //Reference to the Gilnean wearing that collection
-    public Gilnean gilnean;
 
     //List of geosets that are enabled for loading
     public List<int> ActiveGeosets { get; set; }
-    //Path where the model is located
-    public string Path { get; set; }
     //Changable texture from database
     public int Texture { get; set; }
     //File id of the model
@@ -81,6 +77,7 @@ public class Collection : ModelRenderer
             renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
             renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
             renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
+            Debug.Log(Model.Skin.Textures[i].Shader);
             SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
         }
         else
@@ -99,29 +96,31 @@ public class Collection : ModelRenderer
         {
             material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
         }
-        if (name == "racial" && character.Race == 37 && material.shader.name == "Custom/16401")
-        {
-            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.One);
-        }
-        else
-        {
-            material.SetInt("_SrcBlend", (int)SrcBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-            material.SetInt("_DstBlend", (int)DstBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        }
+        //if (name == "racial" && character.Race == 37 && material.shader.name == "Custom/16401")
+        //{
+        //    material.SetInt("_SrcColorBlend", (int)BlendMode.SrcAlpha);
+        //    material.SetInt("_DstColorBlend", (int)BlendMode.One);
+        //}
+        //else
+        //{
+        material.SetInt("_SrcColorBlend", (int)SrcColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        material.SetInt("_DstColorBlend", (int)DstColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
+        //}
         material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.5f : 0f);
-        Color color = Color.white;
+        Color32 color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
             color = colors[Model.Skin.Textures[i].Color];
         }
-        CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Front;
+        CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
         material.SetInt("_Cull", (int)cull);
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
-        color.a = Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]];
+        color.a = (byte)(Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]] * 255);
         material.SetColor("_Color", color);
-        material.renderQueue += Model.Skin.Textures[i].Priority;
+        //material.renderQueue += Model.Skin.Textures[i].Priority;
     }
 
     //Load specific texture
@@ -139,7 +138,7 @@ public class Collection : ModelRenderer
                 break;
             case 8:
                 index = Array.FindIndex(character.Options, o => o.Name == "Paint");
-                file = character.Choices[index][character.Customization[index]].Textures[0].Texture1;
+                file = character.Options[index].Choices[character.Customization[index]].Textures[0].ID;
                 break;
         }
         return file;
@@ -208,19 +207,28 @@ public class Collection : ModelRenderer
     }
 
     //Load the model from assets
+#if UNITY_EDITOR
+    public IEnumerator LoadModel(string collectionfile, Dictionary<int, string> listfile, string dataPath)
+#else
     public IEnumerator LoadModel(string collectionfile, CASCHandler casc)
+#endif
     {
         UnloadModel();
         bool done = false;
         converter = new System.Drawing.ImageConverter();
+#if UNITY_EDITOR
+        this.listfile = listfile;
+        this.dataPath = dataPath;
+#else
         this.casc = casc;
-        GameObject prefab = Resources.Load<GameObject>($"{Path}{collectionfile}");
+#endif
+        GameObject prefab = Resources.Load<GameObject>(collectionfile);
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
         M2Model m2 = GetComponentInChildren<M2Model>();
         byte[] data = m2.data.bytes;
         byte[] skin = m2.skin.bytes;
-        byte[] skel = m2.skel.bytes;
+        byte[] skel = m2.skel == null ? null : m2.skel.bytes;
         loadBinaries = new Thread(() => { Model = m2.LoadModel(data, skin, skel); done = true; });
         loadBinaries.Start();
         yield return null;
@@ -249,8 +257,43 @@ public class Collection : ModelRenderer
     }
 
     //Load the model from CASC
-    public IEnumerator LoadModel(int file, int texture, CASCHandler casc)
+#if UNITY_EDITOR
+    public IEnumerator LoadModel(int file, int texture, Dictionary<int, string> listfile, string dataPath)
     {
+        File = file;
+        if (file != 0)
+        {
+            Texture = texture;
+            this.listfile = listfile;
+            this.dataPath = dataPath;
+            converter = new System.Drawing.ImageConverter();
+            byte[] bytes;
+            yield return null;
+            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listfile[file]}", FileMode.Open)))
+            {
+                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+            }
+            yield return null;
+            Model = new M2();
+            Model.LoadFile(bytes);
+            yield return null;
+            if (Model.SkelFileID != 0)
+            {
+                using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listfile[Model.SkelFileID]}", FileMode.Open)))
+                {
+                    bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+                }
+            }
+            yield return null;
+            Model.Skeleton.LoadFile(bytes, Model.SkelFileID);
+            yield return null;
+            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listfile[Model.SkinFileID]}", FileMode.Open)))
+            {
+                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+            }
+#else
+    public IEnumerator LoadModel(int file, int texture, CASCHandler casc)
+        {
         File = file;
         if (file != 0)
         {
@@ -281,6 +324,7 @@ public class Collection : ModelRenderer
             {
                 bytes = reader.ReadBytes((int)reader.BaseStream.Length);
             }
+#endif
             yield return null;
             Model.Skin.LoadFile(bytes);
             yield return null;
@@ -307,14 +351,7 @@ public class Collection : ModelRenderer
                     yield return null;
                 }
             }
-            if (character.Form == 7)
-            {
-                MatchBones(gilnean);
-            }
-            else
-            {
-                MatchBones(character);
-            }
+            MatchBones(character);
             time = new float[Model.TextureAnimations.Length];
             frame = new int[Model.TextureAnimations.Length];
             for (int i = 0; i < time.Length; i++)

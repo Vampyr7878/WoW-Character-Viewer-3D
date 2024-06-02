@@ -10,9 +10,9 @@ public class FolderSetup : MonoBehaviour
     //Reference to the main object handling UI input
     public GameObject screenInput;
     //Reference to the main UI canvas
-    public Canvas canvas;
+    public GameObject main;
     //Reference to starter UI canvas
-    public Canvas folderPrompt;
+    public GameObject folderInput;
     //Reference to the input field where you put World of Warcraft path
     public InputField path;
 
@@ -36,8 +36,8 @@ public class FolderSetup : MonoBehaviour
     //Show main UI
     private void ShowMainCanvas()
     {
-        folderPrompt.gameObject.SetActive(false);
-        canvas.gameObject.SetActive(true);
+        folderInput.SetActive(false);
+        main.SetActive(true);
         screenInput.SetActive(true);
     }
 
@@ -71,10 +71,10 @@ public class FolderSetup : MonoBehaviour
     //Pressing Cancel button will close the applicatoin
     public void Cancel()
     {
-        #if UNITY_EDITOR
-             UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
                 Application.Quit();
-        #endif
+#endif
     }
 }

@@ -9,198 +9,94 @@ namespace WoW
         //Color for each item quality
         public static Color QualityColor(int quality)
         {
-            Color color;
-            switch (quality)
+            Color32 color = quality switch
             {
                 //Poor
-                case 0:
-                    color = new Color(0.62f, 0.62f, 0.62f);
-                    break;
+                0 => new Color32(157, 157, 157, 255),
                 //Uncommon
-                case 2:
-                    color = new Color(0.12f, 1f, 0f);
-                    break;
+                2 => new Color32(30, 255, 0, 255),
                 //Rare
-                case 3:
-                    color = new Color(0f, 0.44f, 0.87f);
-                    break;
+                3 => new Color32(0, 112, 221, 255),
                 //Epic
-                case 4:
-                    color = new Color(0.64f, 0.21f, 0.93f);
-                    break;
+                4 => new Color32(163, 53, 238, 255),
                 //Legendary
-                case 5:
-                    color = new Color(1f, 0.5f, 0f);
-                    break;
+                5 => new Color32(122, 128, 0, 255),
                 //Artifact
-                case 6:
-                    color = new Color(0.9f, 0.8f, 0.5f);
-                    break;
+                6 => new Color32(230, 204, 128, 255),
                 //Heirloom
-                case 7:
-                    color = new Color(0f, 0.8f, 1f);
-                    break;
+                7 => new Color32(0, 204, 255, 255),
                 //Common
-                default:
-                    color = new Color(1f, 1f, 1f);
-                    break;
-            }
+                _ => new Color32(255, 255, 255, 255),
+            };
             return color;
         }
 
         //Return slot name
         public static string Slot(int slot)
         {
-            string result;
-            switch (slot)
+            string result = slot switch
             {
-                case 1:
-                    result = "head";
-                    break;
-                case 3:
-                    result = "shoulder";
-                    break;
-                case 4:
-                    result = "shirt";
-                    break;
-                case 5:
-                    result = "chest";
-                    break;
-                case 6:
-                    result = "waist";
-                    break;
-                case 7:
-                    result = "legs";
-                    break;
-                case 8:
-                    result = "feet";
-                    break;
-                case 9:
-                    result = "wrist";
-                    break;
-                case 10:
-                    result = "hands";
-                    break;
-                case 16:
-                    result = "back";
-                    break;
-                case 19:
-                    result = "tabard";
-                    break;
-                case 21:
-                    result = "mainhand";
-                    break;
-                case 22:
-                    result = "offhand";
-                    break;
-                default:
-                    result = "";
-                    break;
-            }
+                1 => "head",
+                3 => "shoulder",
+                4 => "shirt",
+                5 => "chest",
+                6 => "waist",
+                7 => "legs",
+                8 => "feet",
+                9 => "wrist",
+                10 => "hands",
+                16 => "back",
+                19 => "tabard",
+                21 => "mainhand",
+                22 => "offhand",
+                _ => "",
+            };
             return result;
         }
 
         //Return slot ID
         public static int Slot(string slot)
         {
-            int result;
-            switch (slot.ToLower())
+            var result = slot.ToLower() switch
             {
-                case "head":
-                    result = 0;
-                    break;
-                case "shoulder":
-                    result = 1;
-                    break;
-                case "back":
-                    result = 2;
-                    break;
-                case "chest":
-                    result = 3;
-                    break;
-                case "shirt":
-                    result = 4;
-                    break;
-                case "tabard":
-                    result = 5;
-                    break;
-                case "wrist":
-                    result = 6;
-                    break;
-                case "mainhand":
-                    result = 7;
-                    break;
-                case "hands":
-                    result = 8;
-                    break;
-                case "waist":
-                    result = 9;
-                    break;
-                case "legs":
-                    result = 10;
-                    break;
-                case "feet":
-                    result = 11;
-                    break;
-                case "offhand":
-                    result = 12;
-                    break;
-                default:
-                    result = -1;
-                    break;
-            }
+                "head" => 0,
+                "shoulder" => 1,
+                "back" => 2,
+                "chest" => 3,
+                "shirt" => 4,
+                "tabard" => 5,
+                "wrist" => 6,
+                "mainhand" => 7,
+                "hands" => 8,
+                "waist" => 9,
+                "legs" => 10,
+                "feet" => 11,
+                "offhand" => 12,
+                _ => -1,
+            };
             return result;
         }
 
         //Internal slot names
         public static string SlotName(int slot)
         {
-            string result;
-            switch (slot)
+            string result = slot switch
             {
-                case 0:
-                    result = "head";
-                    break;
-                case 1:
-                    result = "shoulder";
-                    break;
-                case 2:
-                    result = "back";
-                    break;
-                case 3:
-                    result = "chest";
-                    break;
-                case 4:
-                    result = "shirt";
-                    break;
-                case 5:
-                    result = "tabard";
-                    break;
-                case 6:
-                    result = "wrist";
-                    break;
-                case 7:
-                    result = "mainhand";
-                    break;
-                case 8:
-                    result = "hands";
-                    break;
-                case 9:
-                    result = "waist";
-                    break;
-                case 10:
-                    result = "legs";
-                    break;
-                case 11:
-                    result = "feet";
-                    break;
-                case 12:
-                    result = "offhand";
-                    break;
-                default:
-                    result = "";
-                    break;
-            }
+                0 => "head",
+                1 => "shoulder",
+                2 => "back",
+                3 => "chest",
+                4 => "shirt",
+                5 => "tabard",
+                6 => "wrist",
+                7 => "mainhand",
+                8 => "hands",
+                9 => "waist",
+                10 => "legs",
+                11 => "feet",
+                12 => "offhand",
+                _ => "",
+            };
             return result;
         }
 
@@ -258,14 +154,35 @@ namespace WoW
             return result;
         }
 
+        //Return text describing the item version
+        public static string ItemVersion(int version)
+        {
+            string result = "";
+            switch(version)
+            {
+                case 1:
+                    result = "(Heroic)";
+                    break;
+                case 2:
+                    result = "(Raid Finder)";
+                    break;
+                case 3:
+                    result = "(Mythic)";
+                    break;
+            }
+            return result;
+        }
+
         //Generate 3D Mesh gameobject from m2 file
         public static GameObject Generate3DMesh(M2 file)
         {
-            GameObject model = new GameObject(file.Name);
+            GameObject model = new(file.Name);
             model.AddComponent<SkinnedMeshRenderer>();
             SkinnedMeshRenderer renderer = model.GetComponent<SkinnedMeshRenderer>();
-            Mesh mesh = new Mesh();
-            mesh.name = file.Name + "_mesh";
+            Mesh mesh = new()
+            {
+                name = file.Name + "_mesh"
+            };
             //Fill vertex data
             Vector3[] vertices = new Vector3[file.Vertices.Length];
             Vector3[] normals = new Vector3[file.Vertices.Length];
@@ -363,7 +280,7 @@ namespace WoW
         public static GameObject ParticleEffect(M2Particle particle)
         {
             //Create gameobject
-            GameObject element = new GameObject();
+            GameObject element = new();
             element.AddComponent<ParticleSystem>();
             ParticleSystem system = element.GetComponent<ParticleSystem>();
             //Setup lifetime and speed in main module

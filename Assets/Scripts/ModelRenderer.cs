@@ -1,6 +1,7 @@
 using BLPLib;
 using CASCLib;
 using M2Lib;
+using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -9,14 +10,21 @@ public abstract class ModelRenderer : MonoBehaviour
 {
     public Material hiddenMaterial;
 
-    //Reference to loaded casc data
+#if UNITY_EDITOR
+    //Listfile dictionary to speed up debugging
+    protected Dictionary<int, string> listfile;
+    //Path to locally unpacked game files
+    protected string dataPath;
+#else
+    //Referenece to the opened CASC storage
     protected CASCHandler casc;
+#endif
     //Image converter for loading textures
     protected System.Drawing.ImageConverter converter;
     //Reference to the instantiated prefab
     protected GameObject mesh;
     //Colors used by the model
-    protected Color[] colors;
+    protected Color32[] colors;
     //Path from where to laod the models
     protected string modelsPath;
     //Loaded textures
@@ -104,34 +112,88 @@ public abstract class ModelRenderer : MonoBehaviour
         return offset;
     }
 
-    //Get proper source blend option for alpha blending
-    protected BlendMode SrcBlend(short value)
+    //Get proper source color blend option for alpha blending
+    protected BlendMode SrcColorBlend(short value)
     {
         BlendMode blend = BlendMode.One;
         switch (value)
         {
             case 0:
             case 1:
-            case 7:
+            case 3:
                 blend = BlendMode.One;
                 break;
             case 2:
             case 4:
                 blend = BlendMode.SrcAlpha;
                 break;
-            case 3:
-                blend = BlendMode.SrcColor;
-                break;
             case 5:
+                blend = BlendMode.OneMinusSrcAlpha;
+                break;
             case 6:
                 blend = BlendMode.DstColor;
+                break;
+            case 7:
+                blend = BlendMode.SrcColor;
                 break;
         }
         return blend;
     }
 
-    //Get proper destination blend option for alpha blending
-    protected BlendMode DstBlend(short value)
+    //Get proper destination color blend option for alpha blending
+    protected BlendMode DstColorBlend(short value)
+    {
+        BlendMode blend = BlendMode.Zero;
+        switch (value)
+        {
+            case 0:
+            case 1:
+                blend = BlendMode.Zero;
+                break;
+            case 2:
+            case 7:
+                blend = BlendMode.OneMinusSrcAlpha;
+                break;
+            case 3:
+            case 4:
+                blend = BlendMode.One;
+                break;
+            case 5:
+            case 6:
+                blend = BlendMode.SrcColor;
+                break;
+        }
+        return blend;
+    }
+
+    //Get proper source alpha blend option for alpha blending
+    protected BlendMode SrcAlphaBlend(short value)
+    {
+        BlendMode blend = BlendMode.One;
+        switch (value)
+        {
+            case 0:
+            case 1:
+            case 2:
+                blend = BlendMode.One;
+                break;
+            case 3:
+            case 4:
+                blend = BlendMode.Zero;
+                break;
+            case 5:
+            case 7:
+                blend = BlendMode.SrcAlpha;
+                break;
+            case 6:
+                blend = BlendMode.DstAlpha;
+                break;
+        }
+        return blend;
+    }
+
+    //Get proper destination alpha blend option for alpha blending
+    protected BlendMode DstAlphaBlend(short value)
     {
         BlendMode blend = BlendMode.Zero;
         switch (value)
@@ -150,7 +212,7 @@ public abstract class ModelRenderer : MonoBehaviour
                 blend = BlendMode.One;
                 break;
             case 6:
-                blend = BlendMode.SrcColor;
+                blend = BlendMode.SrcAlpha;
                 break;
         }
         return blend;
@@ -158,28 +220,18 @@ public abstract class ModelRenderer : MonoBehaviour
 
     public Material ParticleMaterial(int blend)
     {
-        string material = "";
-        switch(blend)
+        string material;
+        switch (blend)
         {
-            case 0:
-                material = "particleopaquematerial";
-                break;
-            case 1:
-                material = "particlecutoutmaterial";
-                break;
             case 2:
-                material = "particlefadematerial";
+                material = "particlefademultiplymaterial";
                 break;
-            case 3:
             case 4:
-                material = "particleadditivematerial";
-                break;
-            case 5:
-            case 6:
-                material = "particlemodulatematerial";
+            default:
+                material = "particleadditivemultiplymaterial";
                 break;
             case 7:
-                material = "particletransparentmaterial";
+                material = "particleaddtivecolormaterial";
                 break;
         }
         if (material == "")
@@ -192,20 +244,42 @@ public abstract class ModelRenderer : MonoBehaviour
     //Load model colors
     protected void LoadColors()
     {
-        colors = new Color[Model.Colors.Length];
+        colors = new Color32[Model.Colors.Length];
         for (int i = 0; i < colors.Length; i++)
         {
-            colors[i] = new Color(Model.Colors[i].R / 255f, Model.Colors[i].G / 255f, Model.Colors[i].B / 255f, 1.0f);
+            colors[i] = new Color32(Model.Colors[i].R, Model.Colors[i].G, Model.Colors[i].B, 255);
         }
     }
 
     //Create texture from BLP file
     public Texture2D TextureFromBLP(int file)
     {
-        BLP blp = new BLP(casc.OpenFile(file));
+#if UNITY_EDITOR
+        BLP blp = new($@"{dataPath}\{listfile[file]}");
+#else
+            BLP blp = new(casc.OpenFile(file));
+#endif
         System.Drawing.Bitmap image = blp.GetImage();
         Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
         texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
+        return texture;
+    }
+
+    //Create texture from BLP file
+    public Texture2D TextureFromBLP(int file, int width, int height)
+    {
+#if UNITY_EDITOR
+        BLP blp = new($@"{dataPath}\{listfile[file]}");
+#else
+            BLP blp = new(casc.OpenFile(file));
+#endif
+        System.Drawing.Bitmap image = blp.GetImage();
+        Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
+        texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
+        if (width != image.Width && height != image.Height)
+        {
+            TextureScaler.scale(texture, width, height);
+        }
         return texture;
     }
 

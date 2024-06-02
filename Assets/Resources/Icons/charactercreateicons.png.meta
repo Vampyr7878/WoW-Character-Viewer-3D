@@ -195,7 +195,7 @@ TextureImporter:
       213: -3641017755934917341
     second: druid_travelform
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -215,6 +215,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -223,12 +225,12 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: -1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -246,10 +248,14 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 1
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -287,6 +293,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -306,7 +324,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 1052c4c9532f75441af68d366bbda901
-      internalID: -1665058245727746559
+      internalID: -6157378608290097827
       vertices: []
       indices: 
       edges: []
@@ -316,7 +334,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 130
-        y: 894
+        y: 764
         width: 130
         height: 130
       alignment: 0
@@ -327,7 +345,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 78f9f92cf42090a4bae4c38934c026bf
-      internalID: 4285344003133485644
+      internalID: -1768217499314803643
       vertices: []
       indices: 
       edges: []
@@ -337,7 +355,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 260
-        y: 894
+        y: 764
         width: 130
         height: 130
       alignment: 0
@@ -348,7 +366,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: bdfce65fd10d9fd4980f395d264098d6
-      internalID: 3479626777758827765
+      internalID: 216284531038188955
       vertices: []
       indices: 
       edges: []
@@ -358,7 +376,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 390
-        y: 894
+        y: 244
         width: 130
         height: 130
       alignment: 0
@@ -369,7 +387,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 8c81cb6150a7ecf40833c31fe4db0e35
-      internalID: -3874654486239252329
+      internalID: 4703951781639439176
       vertices: []
       indices: 
       edges: []
@@ -379,7 +397,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 520
-        y: 894
+        y: 244
         width: 130
         height: 130
       alignment: 0
@@ -390,7 +408,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 0b73458bf4cba4142852aadd63de08fa
-      internalID: 1293091660732414544
+      internalID: 2755254976417593175
       vertices: []
       indices: 
       edges: []
@@ -400,7 +418,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 650
-        y: 894
+        y: 244
         width: 130
         height: 130
       alignment: 0
@@ -411,7 +429,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 2a8db6fcd60f38e47a32f916b542765a
-      internalID: 7263695521634101973
+      internalID: -1229978480579731710
       vertices: []
       indices: 
       edges: []
@@ -421,7 +439,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 780
-        y: 894
+        y: 244
         width: 130
         height: 130
       alignment: 0
@@ -432,7 +450,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 24504c6f77fb9fe4e952fd0f48157348
-      internalID: 6217496732970451708
+      internalID: 5459114470503396851
       vertices: []
       indices: 
       edges: []
@@ -442,7 +460,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 910
-        y: 894
+        y: 244
         width: 130
         height: 130
       alignment: 0
@@ -453,7 +471,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: c92eda5a650f2784f9dc4b6b497d7f80
-      internalID: 1302789537338440007
+      internalID: 8120027386246697226
       vertices: []
       indices: 
       edges: []
@@ -463,7 +481,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1040
-        y: 894
+        y: 764
         width: 130
         height: 130
       alignment: 0
@@ -474,7 +492,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 1512ab3e5b0e70a418d5b91674f46a8d
-      internalID: -1962736680904532767
+      internalID: 2315457645511086962
       vertices: []
       indices: 
       edges: []
@@ -495,7 +513,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 368271f8def65394c8e6644d7d631636
-      internalID: 7539176922255469599
+      internalID: 3316818191647295154
       vertices: []
       indices: 
       edges: []
@@ -504,8 +522,8 @@ TextureImporter:
       name: class_rogue
       rect:
         serializedVersion: 2
-        x: 127
-        y: 763
+        x: 130
+        y: 634
         width: 130
         height: 130
       alignment: 0
@@ -516,7 +534,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: a18bdcc2995d3de468523169b38988d0
-      internalID: 6285296228396800261
+      internalID: 3330665078806126450
       vertices: []
       indices: 
       edges: []
@@ -526,7 +544,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 260
-        y: 764
+        y: 634
         width: 130
         height: 130
       alignment: 0
@@ -537,7 +555,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 4bf83b01736ac6743b2bf1cf2a05fbb8
-      internalID: -5816469026407198277
+      internalID: -2477451514153651876
       vertices: []
       indices: 
       edges: []
@@ -547,7 +565,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 390
-        y: 764
+        y: 114
         width: 130
         height: 130
       alignment: 0
@@ -558,7 +576,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 1c5f9144e507bfa4898a6edfad9ae230
-      internalID: -5924253172097203780
+      internalID: -6890883720760962229
       vertices: []
       indices: 
       edges: []
@@ -568,7 +586,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 520
-        y: 764
+        y: 114
         width: 130
         height: 130
       alignment: 0
@@ -579,7 +597,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: ed6fa30cff99a1d4fb9731ea2919c988
-      internalID: -3320811628330377697
+      internalID: 4547355071089692700
       vertices: []
       indices: 
       edges: []
@@ -589,7 +607,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 650
-        y: 764
+        y: 114
         width: 130
         height: 130
       alignment: 0
@@ -600,7 +618,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: e07a54e3f02d6654ab115d667bd91c0a
-      internalID: 2502570172500497481
+      internalID: -941180513604803198
       vertices: []
       indices: 
       edges: []
@@ -610,7 +628,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 780
-        y: 764
+        y: 114
         width: 130
         height: 130
       alignment: 0
@@ -621,34 +639,13 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: e86dd67be0e28a94eb9eb24918415e29
-      internalID: -5064552200459110838
+      internalID: -3366262110332926887
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
       name: race_voidelffemale
-      rect:
-        serializedVersion: 2
-        x: 910
-        y: 764
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9ae2e7fcb93c98146865bfeafb835007
-      internalID: 8797242870931880696
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_zandalarimale
       rect:
         serializedVersion: 2
         x: 1170
@@ -662,8 +659,29 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
+      spriteID: 9ae2e7fcb93c98146865bfeafb835007
+      internalID: -1675907590696026141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_zandalarimale
+      rect:
+        serializedVersion: 2
+        x: 1040
+        y: 634
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
       spriteID: 193b1abb061febe469407a85ae465073
-      internalID: -6051933384423768072
+      internalID: 1262224066317184777
       vertices: []
       indices: 
       edges: []
@@ -684,7 +702,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 81d99e8a347c3d949bf05e592752a08d
-      internalID: 8271959894415720112
+      internalID: 6971876503048279482
       vertices: []
       indices: 
       edges: []
@@ -694,7 +712,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 130
-        y: 634
+        y: 504
         width: 130
         height: 130
       alignment: 0
@@ -705,7 +723,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 4cfeb2e451b02b84c88efc7d014850cb
-      internalID: -4493137609896808500
+      internalID: 8313060317559456610
       vertices: []
       indices: 
       edges: []
@@ -714,8 +732,8 @@ TextureImporter:
       name: race_draeneifemale
       rect:
         serializedVersion: 2
-        x: 260
-        y: 634
+        x: 390
+        y: 894
         width: 130
         height: 130
       alignment: 0
@@ -726,7 +744,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 9dbd8ffcdd42a2944a05a17ba92e538f
-      internalID: 2953292336276045397
+      internalID: 6863253021995288105
       vertices: []
       indices: 
       edges: []
@@ -735,8 +753,8 @@ TextureImporter:
       name: race_goblinmale
       rect:
         serializedVersion: 2
-        x: 390
-        y: 634
+        x: 520
+        y: 894
         width: 130
         height: 130
       alignment: 0
@@ -747,7 +765,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 324d4e09c44bb8545aef45ec57a39131
-      internalID: 6580855173289405816
+      internalID: 5562526490247220580
       vertices: []
       indices: 
       edges: []
@@ -756,8 +774,8 @@ TextureImporter:
       name: race_lightforgedfemale
       rect:
         serializedVersion: 2
-        x: 520
-        y: 634
+        x: 650
+        y: 894
         width: 130
         height: 130
       alignment: 0
@@ -768,7 +786,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: dd305e55e06c16042996d9b89bed2bf6
-      internalID: 6073027675744675140
+      internalID: -186375885046707441
       vertices: []
       indices: 
       edges: []
@@ -777,8 +795,8 @@ TextureImporter:
       name: race_nightbornemale
       rect:
         serializedVersion: 2
-        x: 650
-        y: 634
+        x: 780
+        y: 894
         width: 130
         height: 130
       alignment: 0
@@ -789,7 +807,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 738ca81f7ae96b14292c348828a3e5d1
-      internalID: -8927964773529492107
+      internalID: 8592510896172237259
       vertices: []
       indices: 
       edges: []
@@ -798,8 +816,8 @@ TextureImporter:
       name: race_taurenfemale
       rect:
         serializedVersion: 2
-        x: 780
-        y: 634
+        x: 910
+        y: 894
         width: 130
         height: 130
       alignment: 0
@@ -810,13 +828,328 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 15079308be83df44a98e5740a7d5db20
-      internalID: -7787520417068117790
+      internalID: 2048021545123714309
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
       name: race_voidelfmale
+      rect:
+        serializedVersion: 2
+        x: 1300
+        y: 894
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49ef8d34257f4604ba6488596b759b7d
+      internalID: 810560645847438513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: class_hunter
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 374
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ccf8473af607f184c981736e89ea17a9
+      internalID: -5816469026407198277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: class_warlock
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 374
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aecae4ee7232bd9449c85abe34d6e318
+      internalID: -5924253172097203780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_draeneimale
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 764
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e57db849ddbfd934699ba35fb15c78d1
+      internalID: -3736722115584878780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_highmountainfemale
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 764
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd7cd662a927e6d48941d3f1553f0ef7
+      internalID: -6515080510394317413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_lightforgedmale
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 764
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6533f7e68243e7d4da5bac20db64a140
+      internalID: -4446049825249465405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_nightelffemale
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 764
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bf1f90b6864d99f478a8de908f70127a
+      internalID: -7780522529212521662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_taurenmale
+      rect:
+        serializedVersion: 2
+        x: 910
+        y: 764
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a95e956857d2d3449854d7b5727705a
+      internalID: -8082711804932548128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_vulperafemale
+      rect:
+        serializedVersion: 2
+        x: 1430
+        y: 894
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f696c03e5d104bb43b42854153d860be
+      internalID: -4270342874259765457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: class_mage
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 244
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9584a13304f24f84f9c1dc3240faa4e3
+      internalID: 1293091660732414544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: class_warrior
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 244
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03604c3bc1973c546b4b4ae4465b378a
+      internalID: 6580855173289405816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_dwarffemale
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 634
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 477bd1616bd58344db80bec0304c559c
+      internalID: -2781695047378173392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_highmountainmale
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 634
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c68225842def2c5419878b5d61f20ecf
+      internalID: -5403783312228365253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_magharfemale
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 634
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe98f9a6d96272d48aba7bcd26d4d7f2
+      internalID: 5739413726695630212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_nightelfmale
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 634
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 352ce8b4523c1764883f413f2ab3bd95
+      internalID: 6349697166914529310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_trollfemale
       rect:
         serializedVersion: 2
         x: 910
@@ -830,323 +1163,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 49ef8d34257f4604ba6488596b759b7d
-      internalID: -8759950486221228287
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: class_hunter
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ccf8473af607f184c981736e89ea17a9
-      internalID: -7178297938670133427
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: class_warlock
-      rect:
-        serializedVersion: 2
-        x: 130
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: aecae4ee7232bd9449c85abe34d6e318
-      internalID: -5443938663576236171
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_draeneimale
-      rect:
-        serializedVersion: 2
-        x: 260
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e57db849ddbfd934699ba35fb15c78d1
-      internalID: -6739711277485564048
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_highmountainfemale
-      rect:
-        serializedVersion: 2
-        x: 390
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: dd7cd662a927e6d48941d3f1553f0ef7
-      internalID: 8765665290849025069
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_lightforgedmale
-      rect:
-        serializedVersion: 2
-        x: 520
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6533f7e68243e7d4da5bac20db64a140
-      internalID: 444195858869856889
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_nightelffemale
-      rect:
-        serializedVersion: 2
-        x: 650
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bf1f90b6864d99f478a8de908f70127a
-      internalID: -1170309035550080590
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_taurenmale
-      rect:
-        serializedVersion: 2
-        x: 780
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3a95e956857d2d3449854d7b5727705a
-      internalID: 2705805365118220074
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_vulperafemale
-      rect:
-        serializedVersion: 2
-        x: 910
-        y: 504
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f696c03e5d104bb43b42854153d860be
-      internalID: 6557543363866330205
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: class_mage
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 374
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9584a13304f24f84f9c1dc3240faa4e3
-      internalID: 6462692194403511028
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: class_warrior
-      rect:
-        serializedVersion: 2
-        x: 130
-        y: 374
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 03604c3bc1973c546b4b4ae4465b378a
-      internalID: -5477130767043301945
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_dwarffemale
-      rect:
-        serializedVersion: 2
-        x: 260
-        y: 373
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 477bd1616bd58344db80bec0304c559c
-      internalID: -990244295403429513
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_highmountainmale
-      rect:
-        serializedVersion: 2
-        x: 390
-        y: 374
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c68225842def2c5419878b5d61f20ecf
-      internalID: -4657272681475896622
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_magharfemale
-      rect:
-        serializedVersion: 2
-        x: 520
-        y: 374
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fe98f9a6d96272d48aba7bcd26d4d7f2
-      internalID: -8402808080553956385
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_nightelfmale
-      rect:
-        serializedVersion: 2
-        x: 650
-        y: 374
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 352ce8b4523c1764883f413f2ab3bd95
-      internalID: -1097383637830700000
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_trollfemale
-      rect:
-        serializedVersion: 2
-        x: 780
-        y: 374
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
       spriteID: 3be700ef78e41744db13afc5caf8b102
-      internalID: 821645640727687449
+      internalID: 3842658373549472261
       vertices: []
       indices: 
       edges: []
@@ -1155,8 +1173,8 @@ TextureImporter:
       name: race_vulperamale
       rect:
         serializedVersion: 2
-        x: 910
-        y: 374
+        x: 1560
+        y: 894
         width: 130
         height: 130
       alignment: 0
@@ -1167,181 +1185,13 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 9ca24dde1bc677c498238036f707c245
-      internalID: -8508097019247929853
+      internalID: -4623816337996883098
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
       name: class_monk
-      rect:
-        serializedVersion: 2
-        x: 1
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4459827ee51c5fd428223659a203fadf
-      internalID: -4171266655790392729
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_bloodelffemale
-      rect:
-        serializedVersion: 2
-        x: 130
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 43b55634e7e52074a84e6ae7d55b4969
-      internalID: 578847908329796707
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_dwarfmale
-      rect:
-        serializedVersion: 2
-        x: 260
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8b08eabc654e25f47adcba7acbfe882d
-      internalID: -6762685892044443993
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_humanfemale
-      rect:
-        serializedVersion: 2
-        x: 390
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f79288526751f0d44a4bf6d359cbf607
-      internalID: 1478955872591202856
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_magharmale
-      rect:
-        serializedVersion: 2
-        x: 520
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e290e624fbdc3924bb8fa9f69257c284
-      internalID: -1638277139537319374
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_orcfemale
-      rect:
-        serializedVersion: 2
-        x: 650
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ddec58a2678edb941a5e5d2fbe44ff25
-      internalID: -4280740653111042931
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_trollmale
-      rect:
-        serializedVersion: 2
-        x: 780
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f022374bf55b6f548bd463235b2fa8d4
-      internalID: -3069300525586515423
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: race_worgenfemale
-      rect:
-        serializedVersion: 2
-        x: 909
-        y: 244
-        width: 130
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d1fa585a2551d8b478cf47739c07429e
-      internalID: -2160663914566635155
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: class_paladin
       rect:
         serializedVersion: 2
         x: 0
@@ -1355,14 +1205,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7000d489e75397b478dfa62dcb7fe3c8
-      internalID: 8785645109899616970
+      spriteID: 4459827ee51c5fd428223659a203fadf
+      internalID: -3320811628330377697
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: race_bloodelfmale
+      name: race_bloodelffemale
       rect:
         serializedVersion: 2
         x: 130
@@ -1376,8 +1226,176 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
+      spriteID: 43b55634e7e52074a84e6ae7d55b4969
+      internalID: 2502570172500497481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_dwarfmale
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 504
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b08eabc654e25f47adcba7acbfe882d
+      internalID: -5064552200459110838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_humanfemale
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 504
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f79288526751f0d44a4bf6d359cbf607
+      internalID: 8797242870931880696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_magharmale
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 504
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e290e624fbdc3924bb8fa9f69257c284
+      internalID: -6051933384423768072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_orcfemale
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 504
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ddec58a2678edb941a5e5d2fbe44ff25
+      internalID: 6557543363866330205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_trollmale
+      rect:
+        serializedVersion: 2
+        x: 910
+        y: 504
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f022374bf55b6f548bd463235b2fa8d4
+      internalID: 7539176922255469599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_worgenfemale
+      rect:
+        serializedVersion: 2
+        x: 1690
+        y: 894
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1fa585a2551d8b478cf47739c07429e
+      internalID: 6285296228396800261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: class_paladin
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 894
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7000d489e75397b478dfa62dcb7fe3c8
+      internalID: 6217496732970451708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: race_bloodelfmale
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 894
+        width: 130
+        height: 130
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
       spriteID: bf87c8f98ba6b8640bb8795ae3963b4e
-      internalID: 5201984641127180510
+      internalID: 1302789537338440007
       vertices: []
       indices: 
       edges: []
@@ -1386,8 +1404,8 @@ TextureImporter:
       name: race_gnomefemale
       rect:
         serializedVersion: 2
-        x: 260
-        y: 114
+        x: 390
+        y: 374
         width: 130
         height: 130
       alignment: 0
@@ -1398,7 +1416,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: bba4062bf058a5f4ab634be6c5d87a49
-      internalID: -1584437348406412470
+      internalID: -1962736680904532767
       vertices: []
       indices: 
       edges: []
@@ -1407,8 +1425,8 @@ TextureImporter:
       name: race_humanmale
       rect:
         serializedVersion: 2
-        x: 390
-        y: 114
+        x: 520
+        y: 374
         width: 130
         height: 130
       alignment: 0
@@ -1419,7 +1437,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: a881e7e657f19c24c9550335affeb790
-      internalID: -9122233182986592776
+      internalID: -8759950486221228287
       vertices: []
       indices: 
       edges: []
@@ -1428,8 +1446,8 @@ TextureImporter:
       name: race_mechagnomefemale
       rect:
         serializedVersion: 2
-        x: 520
-        y: 114
+        x: 650
+        y: 374
         width: 130
         height: 130
       alignment: 0
@@ -1440,7 +1458,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: f33f33abaf52111468e5ebadf10b3962
-      internalID: 5350537626421702026
+      internalID: -1665058245727746559
       vertices: []
       indices: 
       edges: []
@@ -1449,8 +1467,8 @@ TextureImporter:
       name: race_orcmale
       rect:
         serializedVersion: 2
-        x: 650
-        y: 114
+        x: 780
+        y: 374
         width: 130
         height: 130
       alignment: 0
@@ -1461,7 +1479,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 9631ef3ee1f6e344792903cf51fa3c87
-      internalID: 6120907467065415318
+      internalID: 4285344003133485644
       vertices: []
       indices: 
       edges: []
@@ -1470,8 +1488,8 @@ TextureImporter:
       name: race_undeadfemale
       rect:
         serializedVersion: 2
-        x: 780
-        y: 114
+        x: 910
+        y: 374
         width: 130
         height: 130
       alignment: 0
@@ -1482,7 +1500,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 64fd6fc646860fb42a8d7f8014fda518
-      internalID: 9079845976227039127
+      internalID: 3479626777758827765
       vertices: []
       indices: 
       edges: []
@@ -1491,8 +1509,8 @@ TextureImporter:
       name: race_worgenmale
       rect:
         serializedVersion: 2
-        x: 910
-        y: 114
+        x: 1820
+        y: 894
         width: 130
         height: 130
       alignment: 0
@@ -1503,17 +1521,17 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 701f2f938f0e45c4badd1b905b1daf34
-      internalID: -1970314431159745043
+      internalID: -3874654486239252329
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: druid_aquaticform
+      name: 15729
       rect:
         serializedVersion: 2
-        x: 1238
-        y: 828
+        x: 0
+        y: 48
         width: 66
         height: 66
       alignment: 0
@@ -1530,11 +1548,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: druid_bearform
+      name: 15730
       rect:
         serializedVersion: 2
-        x: 1304
-        y: 828
+        x: 130
+        y: 48
         width: 66
         height: 66
       alignment: 0
@@ -1551,11 +1569,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: druid_catform
+      name: 15731
       rect:
         serializedVersion: 2
-        x: 1370
-        y: 828
+        x: 260
+        y: 48
         width: 66
         height: 66
       alignment: 0
@@ -1572,11 +1590,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: druid_flightform
+      name: 15732
       rect:
         serializedVersion: 2
-        x: 1436
-        y: 828
+        x: 390
+        y: 48
         width: 66
         height: 66
       alignment: 0
@@ -1593,11 +1611,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: druid_moonkinform
+      name: 15733
       rect:
         serializedVersion: 2
-        x: 1501
-        y: 828
+        x: 520
+        y: 48
         width: 66
         height: 66
       alignment: 0
@@ -1614,11 +1632,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: druid_travelform
+      name: 15734
       rect:
         serializedVersion: 2
-        x: 1568
-        y: 828
+        x: 650
+        y: 48
         width: 66
         height: 66
       alignment: 0
@@ -1634,6 +1652,195 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: 24684
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 53
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8919427a077c1274f91230a712b07d30
+      internalID: -1916036886
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 24570
+      rect:
+        serializedVersion: 2
+        x: 914
+        y: 52
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0fdbf23c3c033854692533f44fd928a5
+      internalID: 1435457081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 24571
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 573
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76e36036c7fad1d4cbef63d751131d0a
+      internalID: -1158498962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 24685
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 507
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f10242c892e4c54e8f75f11251323d9
+      internalID: -1883964083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 24574
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 309
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c761df392f48ae74ab794cd5ab5b75c6
+      internalID: -859456554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 24575
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 243
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0fa2e4de1750f6b4ca0da5edbf6bd726
+      internalID: -2087414890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 26042
+      rect:
+        serializedVersion: 2
+        x: 1373
+        y: 701
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca6d163b4e98d8d468290db429e76433
+      internalID: 1371880052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 26043
+      rect:
+        serializedVersion: 2
+        x: 1439
+        y: 701
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a64d835810489c46b5aa24ecb5e5073
+      internalID: 857149994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: charactercreateicons_0
+      rect:
+        serializedVersion: 2
+        x: 1955
+        y: 963
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e002f9ea03223cd42a1d70ed516c9104
+      internalID: 2063896681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1644,6 +1851,80 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      15729: -2043671147928152446
+      15730: 6363080702471800444
+      15731: 5303775495317217350
+      15732: 3769977112511628507
+      15733: -3065329647164045044
+      15734: -3641017755934917341
+      24570: 1435457081
+      24571: -1158498962
+      24574: -859456554
+      24575: -2087414890
+      24684: -1916036886
+      24685: -1883964083
+      26042: 1371880052
+      26043: 857149994
+      charactercreateicons_0: 2063896681
+      class_deathknight: -6157378608290097827
+      class_demonhunter: 3316818191647295154
+      class_druid: 6971876503048279482
+      class_hunter: -5816469026407198277
+      class_mage: 1293091660732414544
+      class_monk: -3320811628330377697
+      class_paladin: 6217496732970451708
+      class_priest: -1768217499314803643
+      class_rogue: 3330665078806126450
+      class_shaman: 8313060317559456610
+      class_warlock: -5924253172097203780
+      class_warrior: 6580855173289405816
+      race_bloodelffemale: 2502570172500497481
+      race_bloodelfmale: 1302789537338440007
+      race_darkironfemale: 216284531038188955
+      race_darkironmale: -2477451514153651876
+      race_draeneifemale: 6863253021995288105
+      race_draeneimale: -3736722115584878780
+      race_dwarffemale: -2781695047378173392
+      race_dwarfmale: -5064552200459110838
+      race_gnomefemale: -1962736680904532767
+      race_gnomemale: 4703951781639439176
+      race_goblinfemale: -6890883720760962229
+      race_goblinmale: 5562526490247220580
+      race_highmountainfemale: -6515080510394317413
+      race_highmountainmale: -5403783312228365253
+      race_humanfemale: 8797242870931880696
+      race_humanmale: -8759950486221228287
+      race_kultiranfemale: 2755254976417593175
+      race_kultiranmale: 4547355071089692700
+      race_lightforgedfemale: -186375885046707441
+      race_lightforgedmale: -4446049825249465405
+      race_magharfemale: 5739413726695630212
+      race_magharmale: -6051933384423768072
+      race_mechagnomefemale: -1665058245727746559
+      race_mechagnomemale: -1229978480579731710
+      race_nightbornefemale: -941180513604803198
+      race_nightbornemale: 8592510896172237259
+      race_nightelffemale: -7780522529212521662
+      race_nightelfmale: 6349697166914529310
+      race_orcfemale: 6557543363866330205
+      race_orcmale: 4285344003133485644
+      race_pandarenfemale: 5459114470503396851
+      race_pandarenmale: -3366262110332926887
+      race_taurenfemale: 2048021545123714309
+      race_taurenmale: -8082711804932548128
+      race_trollfemale: 3842658373549472261
+      race_trollmale: 7539176922255469599
+      race_undeadfemale: 3479626777758827765
+      race_undeadmale: 8120027386246697226
+      race_voidelffemale: -1675907590696026141
+      race_voidelfmale: 810560645847438513
+      race_vulperafemale: -4270342874259765457
+      race_vulperamale: -4623816337996883098
+      race_worgenfemale: 6285296228396800261
+      race_worgenmale: -3874654486239252329
+      race_zandalarifemale: 2315457645511086962
+      race_zandalarimale: 1262224066317184777
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

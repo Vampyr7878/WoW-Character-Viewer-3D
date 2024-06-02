@@ -16,7 +16,7 @@ public class M2Model : MonoBehaviour
     //Load all the date into the object
     public M2 LoadModel(byte[] dataBytes, byte[] skinBytes, byte[] skelBytes)
     {
-        M2 model = new M2();
+        M2 model = new();
         model.LoadFile(dataBytes);
         model.Skin.LoadFile(skinBytes);
         model.Skeleton.LoadFile(model.SkelFileID == 0 ? dataBytes : skelBytes, model.SkelFileID);

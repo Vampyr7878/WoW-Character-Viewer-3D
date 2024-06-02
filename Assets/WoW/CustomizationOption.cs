@@ -1,27 +1,45 @@
-﻿namespace WoW
+﻿using System.Collections.Generic;
+
+namespace WoW
 {
     //Class to store Customization option data from database
     public class CustomizationOption
     {
-        //Option ID
-        public int ID { get; private set; }
-        //Option category
-        public int Category { get; private set; }
         //Option name
         public string Name { get; private set; }
-        //Form that option is available to
-        public int Form { get; private set; }
-        //ID used by Blizzard, value used for imprting from armory
-        public int Blizzard { get; private set; }
+        //Option ID
+        public int ID { get; private set; }
+        //Option model
+        public int Model { get; private set; }
+        //Option category
+        public int Category { get; private set; }
+        //Option type
+        public int Type { get; private set; }
+        //Option choices
+        public CustomizationChoice[] Choices { get; private set; }
+        //Option choices
+        public CustomizationChoice[] AllChoices { get; private set; }
 
         //Constructor
-        public CustomizationOption(int id, int category, string name, int form, int blizzard)
+        public CustomizationOption(string name, int id, int model, int category, int type)
         {
-            ID = id;
-            Category = category;
             Name = name;
-            Form = form;
-            Blizzard = blizzard;
+            ID = id;
+            Model = model;
+            Category = category;
+            Type = type;
+        }
+
+        //Load all available choices
+        public void LoadAllChoices(List<CustomizationChoice> choices)
+        {
+            AllChoices = choices.ToArray();
+        }
+
+        //Set choices that will be shown
+        public void SetChoices(CustomizationChoice[] choices)
+        {
+            Choices = choices;
         }
     }
 }

@@ -7,8 +7,10 @@ Shader "Custom/32782"
 		_Emission("Emission", 2D) = "black" {}
 		_Color("Color", Color) = (1,1,1,1)
 		_AlphaCut("Alpha Cutout", Range(0,1)) = 0.0
-		[Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend("Source Blend", Int) = 1
-		[Enum(UnityEngine.Rendering.BlendMode)] _DstBlend("Destination Blend", Int) = 0
+		[Enum(UnityEngine.Rendering.BlendMode)] _SrcColorBlend("Source Color Blend", Int) = 1
+		[Enum(UnityEngine.Rendering.BlendMode)] _DstColorBlend("Destination Color Blend", Int) = 0
+		[Enum(UnityEngine.Rendering.BlendMode)] _SrcAlphaBlend("Source Alpha Blend", Int) = 1
+		[Enum(UnityEngine.Rendering.BlendMode)] _DstAlphaBlend("Destination Alpha Blend", Int) = 0
 		[Enum(UnityEngine.Rendering.CullMode)] _Cull("Culling", Int) = 0
 		[ToggleOff] _DepthTest("Depth Test", Float) = 1.0
 		[ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 0.0
@@ -20,7 +22,7 @@ Shader "Custom/32782"
 		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
 		ZWrite[_DepthTest]
-		Blend[_SrcBlend][_DstBlend]
+		Blend[_SrcColorBlend][_DstColorBlend],[_SrcAlphaBlend][_DstAlphaBlend]
 		Cull[_Cull]
 
 		CGPROGRAM
@@ -42,12 +44,13 @@ Shader "Custom/32782"
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
-				fixed4 emission = tex2D(_Texture2, IN.uv_Texture2);
+				fixed4 layer = tex2D(_Texture2, IN.uv_Texture2);
+				color += layer * layer.a;
 				OUT.Albedo = color.rgb;
-				OUT.Alpha = color.a;
+				fixed4 alpha = tex2D(_Texture1, IN.uv_Texture1) * _Color;
+				OUT.Alpha = alpha.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
-				OUT.Emission = emission;
 			}
 		ENDCG
 	}

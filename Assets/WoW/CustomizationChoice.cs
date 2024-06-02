@@ -1,42 +1,54 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace WoW
 {
     //Class to store customization choice data
     public class CustomizationChoice
     {
-        //ID from database
-        public int Index { get; private set; }
-        //Choice's name
+        //Choice name
         public string Name { get; private set; }
-        //Choice's colors
-        public Color Color1 { get; set; }
-        public Color Color2 { get; set; }
-        //Druid form model
-        public int Model { get; private set; }
-        //Face boneset
-        public int Bone { get; private set; }
-        //Bit mask of available classes for tha option
-        public int Class { get; private set; }
-        //ID used by Blizzard for armory import
+        //Choice ID
         public int ID { get; private set; }
-
-        //Geosets used by this choice
-        public CustomizationGeosets[] Geosets { get; set; }
-        //Textures used by this choice
-        public CustomizationTextures[] Textures{ get; set; }
+        //Choice Requirement
+        public int Requirement { get; private set; }
+        //Choice first color
+        public Color32 Color1 { get; set; }
+        //Choice second color
+        public Color32 Color2 { get; set; }
+        //Choice geosets
+        public CustomizationGeoset[] Geosets { get; private set; }
+        //Choice skinned geosets
+        public CustomizationGeoset[] SkinnedGeosets { get;private set; }
+        //Choice textures
+        public CustomizationTexture[] Textures { get; private set; }
         
         //Constructor
-        public CustomizationChoice(int index, string name, Color color1, Color color2, int model, int bone, int c, int id)
+        public CustomizationChoice(string name, int id, int requirement, Color32 color1, Color32 color2)
         {
-            Index = index;
             Name = name;
+            ID = id;
+            Requirement = requirement;
             Color1 = color1;
             Color2 = color2;
-            Model = model;
-            Bone = bone;
-            Class = c;
-            ID = id;
+        }
+
+        //Load geosets for that choice
+        public void LoadGeosets(List<CustomizationGeoset> geosets)
+        {
+            Geosets = geosets.ToArray();
+        }
+
+        //Load goestes on skinned model for that choice
+        public void LoadSkinnedGeosets(List<CustomizationGeoset> geosets)
+        {
+            SkinnedGeosets = geosets.ToArray();
+        }
+
+        //Load textures for that choice
+        public void LoadTextures(List<CustomizationTexture> textures)
+        {
+            Textures = textures.ToArray();
         }
     }
 }

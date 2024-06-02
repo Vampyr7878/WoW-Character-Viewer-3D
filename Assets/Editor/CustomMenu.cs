@@ -15,15 +15,15 @@ public class CustomMenu : MonoBehaviour
         List<string> skel = ListFiles(@"Assets\Resources\", ".skel");
         foreach (string file in m2)
         {
-            File.Copy(file, Path.GetDirectoryName(file) + "\\data.bytes", true);
+            File.Copy(file, $"{Path.GetDirectoryName(file)}\\data.bytes", true);
         }
         foreach (string file in skin)
         {
-            File.Copy(file, Path.GetDirectoryName(file) + "\\skin.bytes", true);
+            File.Copy(file, $"{Path.GetDirectoryName(file)}\\skin.bytes", true);
         }
         foreach (string file in skel)
         {
-            File.Copy(file, Path.GetDirectoryName(file) + "\\skel.bytes", true);
+            File.Copy(file, $"{Path.GetDirectoryName(file)}\\skel.bytes", true);
         }
     }
 
@@ -51,15 +51,15 @@ public class CustomMenu : MonoBehaviour
         List<string> skel = ListFiles(path, ".skel");
         foreach (string file in m2)
         {
-            File.Copy(file, Path.GetDirectoryName(file) + "\\data.bytes", true);
+            File.Copy(file, $"{Path.GetDirectoryName(file)}\\data.bytes", true);
         }
         foreach (string file in skin)
         {
-            File.Copy(file, Path.GetDirectoryName(file) + "\\skin.bytes", true);
+            File.Copy(file, $"{Path.GetDirectoryName(file)}\\skin.bytes", true);
         }
         foreach (string file in skel)
         {
-            File.Copy(file, Path.GetDirectoryName(file) + "\\skel.bytes", true);
+            File.Copy(file, $"{Path.GetDirectoryName(file)}\\skel.bytes", true);
         }
     }
 

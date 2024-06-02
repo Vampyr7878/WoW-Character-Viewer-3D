@@ -8,145 +8,142 @@ namespace WoW.Characters
     //Class to handle worgen male customization
     public class WorgenMale : CharacterHelper
     {
+        private readonly Dictionary<int, int[]> furColorFaces;
+
+        private readonly Dictionary<int, int[]> skinColorFaces;
+
+        private readonly Dictionary<int, int[]> hairStyleColors;
+
+        private readonly Dictionary<int, int[]> beardSideburns;
+
         public WorgenMale(M2 model, Character character)
         {
             Model = model;
             Character = character;
+            furColorFaces = new()
+            {
+                { 134, new int[] { 2246, 2251, 2252, 2253, 2254, 2255 } },
+                { 322, new int[] { 2241, 2242, 2243, 2244, 2245, 2246, 2247, 2248, 2249, 2250, 2256, 2257, 2258, 2259 } }
+            };
+            skinColorFaces = new()
+            {
+                { 53, new int[] { 20, 22, 31 } },
+                { 291, new int[] { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 } },
+                { 295, new int[] { 15416, 15417, 15418, 15419, 15420, 15421, 15422, 15423, 15424, 15425, 15426, 15427 } },
+                { 296, new int[] { 15428, 15429, 15430, 15431, 15432, 15433, 15434, 15435, 15436, 15437, 15438, 15439 } }
+            };
+            hairStyleColors = new()
+            {
+                { 35, new int[] { 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 4988 } },
+                { 36, new int[] { 4989, 4990, 4991, 4992 } },
+                { 37, new int[] { 4993, 4994, 4995, 4996 } }
+            };
+            beardSideburns = new()
+            {
+                { 141, new int[] { 76, 77, 78, 79, 80, 81, 82, 83 } },
+                { 225, new int[] { 76, 77, 80, 81, 82, 83 } },
+                { 226, new int[] { 76, 77, 81, 82, 83 } }
+            };
         }
 
         public override void ChangeGeosets(List<int> activeGeosets)
         {
-            ChangeFurColor();
-            ChangeHairStyle(activeGeosets);
-            ChangeFacialHair(activeGeosets);
-            ChangeEars(activeGeosets);
+            HideOtherFormsOptions();
+            switch (Character.Form)
+            {
+                case 0:
+                    WorgenGeosets(activeGeosets);
+                    break;
+                case 10:
+                    HumanGeosets(activeGeosets);
+                    break;
+            }
+        }
+
+        private void WorgenGeosets(List<int> activeGeosets)
+        {
+            ChangeFace(activeGeosets);
+            ChangeEyes(activeGeosets);
+            ActivateRelatedTextureOptions("Fur Color", "Face", furColorFaces);
+            ChangeGeosetOption(activeGeosets, "Hair Style");
+            ChangeGeosetOption(activeGeosets, "Facial Hair");
+            ChangeGeosetOption(activeGeosets, "Ears");
             ChangeEyeColor(activeGeosets);
         }
 
-        private void ChangeFurColor()
+        private void HumanGeosets(List<int> activeGeosets)
         {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
-            int index2 = Array.FindIndex(Character.Options, o => o.Name == "Face");
-            if (Character.Choices[index2][Character.Customization[index2]].Textures[Character.Customization[index]].Texture1 == -1)
+            ChangeEyes(activeGeosets);
+            ChangeEars(activeGeosets);
+            ActivateRelatedTextureOptions("Skin Color", "Face", skinColorFaces);
+            ChangeGeosetOption(activeGeosets, "Face Shape");
+            ChangeRelatedGeosetOptions(activeGeosets, "Hair Style", "Hair Color", hairStyleColors);
+            ChangeGeosetOption(activeGeosets, "Mustache");
+            ChangeRelatedGeosetOptions(activeGeosets, "Beard", "Sideburns", beardSideburns);
+            ChangeGeosetOption(activeGeosets, "Sideburns");
+            ChangeGeosetOption(activeGeosets, "Eyebrows");
+            ChangeEyeColor(activeGeosets);
+        }
+
+        public override void ChangeForm()
+        {
+            switch(Character.Form)
             {
-                for (int i = 0; i < Character.Choices[index2].Length; i++)
-                {
-                    if (Character.Choices[index2][i].Textures[Character.Customization[index]].Texture1 >= 0)
-                    {
-                        Character.CustomizationDropdowns[index2].SetValue(i);
-                        break;
-                    }
-                }
+                case 0:
+                    Character.ModelID = 43;
+                    Character.ActivateMainMesh();
+                    break;
+                case 10:
+                    Character.ModelID = 1;
+                    Character.ActivateExtranMesh();
+                    break;
             }
-            Character.ChangeFaceDropdown(index, index2);
-        }
-
-        private void ChangeHairStyle(List<int> activeGeosets)
-        {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Hair Style");
-            activeGeosets.RemoveAll(x => x > 0 && x < 100);
-            activeGeosets.Add(HideHair ? Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset2 : Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
-        }
-
-        private void ChangeFacialHair(List<int> activeGeosets)
-        {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Facial Hair");
-            activeGeosets.RemoveAll(x => x > 99 && x < 200);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
-        }
-
-        private void ChangeEars(List<int> activeGeosets)
-        {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Ears");
-            activeGeosets.RemoveAll(x => x > 199 && x < 300);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
-        }
-
-        private void ChangeEyeColor(List<int> activeGeosets)
-        {
-            int index = Array.FindIndex(Character.Options, o => o.Name == "Eye Color");
-            activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
-            activeGeosets.RemoveAll(x => x > 3299 && x < 3400);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset1);
-            activeGeosets.Add(Character.Choices[index][Character.Customization[index]].Geosets[0].Geoset2);
         }
 
         protected override void LayeredTexture(Texture2D texture)
         {
-            int index, index2;
-            index = Array.FindIndex(Character.Options, o => o.Name == "Face");
-            index2 = Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
-            if (Character.Class == 6)
-            {
-                Texture2D face = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture2);
-                DrawTexture(texture, face, 512, 0);
-            }
-            else
-            {
-                Texture2D face = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[Character.Customization[index2]].Texture1);
-                DrawTexture(texture, face, 512, 0);
-            }
-            index = Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
-            if (!(Character.Items[3] != null && Character.Items[3].UpperLeg !> 0) && Character.Items[10] == null)
-            {
-                Texture2D underwear = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture3);
-                DrawTexture(texture, underwear, 256, 192);
-            }
-            index = Array.FindIndex(Character.Options, o => o.Name == "Eye Color");
-            if (Character.Choices[index][Character.Customization[index]].Textures[0].Texture2 >= 0)
-            {
-                Texture2D eyeglow = Character.TextureFromBLP(Character.Choices[index][Character.Customization[index]].Textures[0].Texture2);
-                DrawTexture(texture, eyeglow, 512, 0, 0.5f);
-            }
-            Character.TextureShirt(texture);
-            if (!(Character.Items[4] != null && Character.Items[4].Geoset1 != 0))
-            {
-                Character.TextureWrist(texture);
-            }
-            Character.TextureLegs(texture);
-            Character.TextureFeet(texture, true);
-            Character.TextureChest(texture);
-            if (!(Character.Items[3] != null && Character.Items[3].Geoset1 != 0))
-            {
-                Character.TextureWrist(texture);
-            }
-            Character.TextureHands(texture);
-            if (!(Character.Items[8] != null && Character.Items[8].Geoset1 != 0))
-            {
-                Character.TextureChest(texture);
-            }
-            Character.TextureTabard(texture);
-            Character.TextureWaist(texture);
-        }
-
-        protected override int LoadTexture(M2Texture texture, int i, out bool skin)
-        {
-            int file = -1;
-            int index;
-            skin = false;
-            switch (texture.Type)
+            switch (Character.Form)
             {
                 case 0:
-                    file = Model.TextureIDs[i];
+                    WorgenTextures(texture);
                     break;
-                case 1:
-                    index = Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
-                    file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
-                    skin = true;
-                    break;
-                case 2:
-                    file = Character.Items[2] != null ? Character.Items[2].LeftTexture : -1;
-                    break;
-                case 8:
-                    index = Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
-                    file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture2;
-                    break;
-                case 19:
-                    index = Array.FindIndex(Character.Options, o => o.Name == "Eye Color");
-                    file = Character.Choices[index][Character.Customization[index]].Textures[0].Texture1;
+                case 10:
+                    HumanTextures(texture);
                     break;
             }
-            return file;
+        }
+
+        private void WorgenTextures(Texture2D texture)
+        {
+            DrawLayer(texture, "Face", "Fur Color", 512, 0, 512, 512);
+            DrawUnderwear(texture, "Fur Color");
+            DrawLayer(texture, "Eyesight", "Eye Color", 512, 0, 512, 512);
+            DrawArmor(texture, true);
+        }
+
+        private void HumanTextures(Texture2D texture)
+        {
+            DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
+            OverlayLayer(texture, "Skin Color", 30, 0, 0, 1024, 512);
+            DrawUnderwear(texture);
+            DrawLayer(texture, "Eye Color", 36, 512, 0, 512, 512);
+            DrawLayer(texture, "Hair Style", "Hair Color", 512, 0, 512, 512);
+            DrawLayer(texture, "Eyebrows", "Hair Color", 512, 0, 512, 512);
+            DrawArmor(texture);
+        }
+
+        protected override int GetSkinColorIndex()
+        {
+            if (Character.Form == 0)
+                return Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
+            return base.GetSkinColorIndex();
+        }
+
+        protected override int GetSkinExtraIndex()
+        {
+            if (Character.Form == 0)
+                return Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
+            return base.GetSkinExtraIndex();
         }
     }
 }

@@ -29,6 +29,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4109476329765422789}
   m_RootOrder: 1
@@ -119,6 +120,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4109476329765422789}
   m_RootOrder: 2
@@ -198,6 +200,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4109476329765422789}
   m_RootOrder: 0
@@ -256,6 +259,7 @@ GameObject:
   - component: {fileID: 4109476329765422789}
   - component: {fileID: 4109476329765422794}
   - component: {fileID: 7536173889816719649}
+  - component: {fileID: 3115000107370812822}
   m_Layer: 5
   m_Name: scroll item
   m_TagString: Untagged
@@ -273,6 +277,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4109476329671507387}
   - {fileID: 4109476328235377809}
@@ -347,6 +352,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltip: {fileID: 2481646021427042833}
+--- !u!114 &3115000107370812822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4109476329765422788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2b89ea10a27f8b40817cef88d7d8044, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggle: {fileID: 4109476329765422794}
+  label: {fileID: 4109476329331567759}
+  background: {fileID: 4109476329671507384}
+  checkmark: {fileID: 4109476328235377814}
+  outline: {fileID: 2475240120481403908}
+  tooltip: {fileID: 2481646021427042833}
+  tooltipText: {fileID: 3803805279584684290}
 --- !u!1 &4986720586299644881
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,6 +400,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 128935276990249244}
   m_RootOrder: 0
@@ -471,6 +496,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1516086949988320480}
   m_Father: {fileID: 4109476329765422789}

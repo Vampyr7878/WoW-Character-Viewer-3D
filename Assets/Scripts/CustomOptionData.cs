@@ -9,10 +9,18 @@ public class CustomOptionData : UnityEngine.UI.Dropdown.OptionData
     //Property to hide current option
     public int Index { get; set; }
 
+    //Property to store first color
+    public Color32 Color1 { get; set; }
+
+    //Property to store second color
+    public Color32 Color2 { get; set; }
+
     //Constructor
-    public CustomOptionData(string text, Sprite image, int index) : base(text, image)
+    public CustomOptionData(string text, Color32 color1, Color32 color2, Sprite image, int index) : base(text, image)
     {
         Interactable = true;
         Index = index;
+        Color1 = color1;
+        Color2 = color2;
     }
 }
