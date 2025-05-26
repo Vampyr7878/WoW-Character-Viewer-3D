@@ -34,16 +34,17 @@ Shader "Custom/32773"
 			struct Input
 			{
 				float2 uv_Texture1;
-				float2 uv2_Texture1;
+				float2 uv_Texture2;
 			};
 
 			sampler2D _Texture1;
+			sampler2D _Texture2;
 			fixed4 _Color;
 
 			void surfaceFunction(Input IN, inout SurfaceOutputStandard OUT)
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
-				fixed4 layer = tex2D(_Texture1, IN.uv2_Texture1);
+				fixed4 layer = tex2D(_Texture2, IN.uv_Texture2);
 				color += layer * layer.a;
 				OUT.Albedo = color.rgb;
 				fixed4 alpha = _Color;

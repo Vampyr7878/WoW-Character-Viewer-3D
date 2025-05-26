@@ -3,27 +3,29 @@ using UnityEngine;
 
 namespace WoW
 {
-    //Class to store customization choice data
+    // Class to store customization choice data
     public class CustomizationChoice
     {
-        //Choice name
+        // Choice name
         public string Name { get; private set; }
-        //Choice ID
+        // Choice ID
         public int ID { get; private set; }
-        //Choice Requirement
+        // Choice Requirement
         public int Requirement { get; private set; }
-        //Choice first color
+        // Choice first color
         public Color32 Color1 { get; set; }
-        //Choice second color
+        // Choice second color
         public Color32 Color2 { get; set; }
-        //Choice geosets
+        // Choice geosets
         public CustomizationGeoset[] Geosets { get; private set; }
-        //Choice skinned geosets
+        // Choice skinned geosets
         public CustomizationGeoset[] SkinnedGeosets { get;private set; }
-        //Choice textures
+        // Choice textures
         public CustomizationTexture[] Textures { get; private set; }
-        
-        //Constructor
+        // Choice creature
+        public CustomizationDisplayInfo[] Creatures { get; private set; }
+
+        // Constructor
         public CustomizationChoice(string name, int id, int requirement, Color32 color1, Color32 color2)
         {
             Name = name;
@@ -33,22 +35,28 @@ namespace WoW
             Color2 = color2;
         }
 
-        //Load geosets for that choice
+        // Load geosets for that choice
         public void LoadGeosets(List<CustomizationGeoset> geosets)
         {
             Geosets = geosets.ToArray();
         }
 
-        //Load goestes on skinned model for that choice
+        // Load goestes on skinned model for that choice
         public void LoadSkinnedGeosets(List<CustomizationGeoset> geosets)
         {
             SkinnedGeosets = geosets.ToArray();
         }
 
-        //Load textures for that choice
+        // Load textures for that choice
         public void LoadTextures(List<CustomizationTexture> textures)
         {
             Textures = textures.ToArray();
+        }
+
+        // Load creature displayinfo for that choice
+        public void LoadCreature(List<CustomizationDisplayInfo> creatures)
+        {
+            Creatures = creatures.ToArray();
         }
     }
 }

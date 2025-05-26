@@ -4,19 +4,27 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle draenei female customization
+    // Class to handle draenei female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class DraeneiFemale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping circlets to hair styles
         private readonly Dictionary<int, int[]> hairStyleCirclets;
-
+        // Mapping decorations to hair styles
         private readonly Dictionary<int, int[]> hairStyleDecorations;
 
-        public DraeneiFemale(M2 model, Character character)
+        public DraeneiFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 132, new int[] { 1973, 1977, 1981 } },
@@ -36,6 +44,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -52,8 +61,12 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Tail");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawBra(texture);
             DrawUnderwear(texture);

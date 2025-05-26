@@ -4,15 +4,23 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle zandalari female customization
+    // Class to handle zandalari female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class ZandalariFemale : CharacterHelper
     {
-        public ZandalariFemale(M2 model, Character character)
+        public ZandalariFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -26,8 +34,12 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Necklace");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             Emission = null;
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawLayer(texture, "Tattoo", 16, 0, 0, 1024, 512);

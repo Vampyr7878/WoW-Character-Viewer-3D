@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 
-//Option Data for custom dropdown where you can disable certain options
+// Option Data for custom dropdown where you can disable certain options
 public class CustomOptionData : UnityEngine.UI.Dropdown.OptionData
 {
-    //Property to enable/disable current option
+    // Property to enable/disable current option
     public bool Interactable { get; set; }
 
-    //Property to hide current option
+    // Property to hide current option
     public int Index { get; set; }
 
-    //Property to store first color
+    // Property to store first color
     public Color32 Color1 { get; set; }
 
-    //Property to store second color
+    // Property to store second color
     public Color32 Color2 { get; set; }
 
-    //Constructor
+    // Constructor
     public CustomOptionData(string text, Color32 color1, Color32 color2, Sprite image, int index) : base(text, image)
     {
         Interactable = true;

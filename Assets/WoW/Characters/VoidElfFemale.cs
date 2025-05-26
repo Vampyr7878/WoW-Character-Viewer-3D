@@ -5,19 +5,27 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle void elf female customization
+    // Class to handle void elf female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class VoidElfFemale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping eye colors to skin colors
         private readonly Dictionary<int, int[]> skinColorEyes;
-
+        // Mapping tentacles to hair styles
         private readonly Dictionary<int, int[]> HairStyleTentacles;
 
-        public VoidElfFemale(M2 model, Character character)
+        public VoidElfFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 218, new int[] { 9791, 9794, 9799 } },
@@ -38,6 +46,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -51,6 +60,7 @@ namespace WoW.Characters
             ChangeTentacles(activeGeosets);
         }
 
+        // Change goesets in according to eye color and make sure left over geosets are removed
         private new void ChangeEyeColor(List<int> activeGeosets)
         {
             activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
@@ -58,21 +68,27 @@ namespace WoW.Characters
             ActivateRelatedGeosetOptions(activeGeosets, "Skin Color", "Eye Color", skinColorEyes);
             ChangeGeosetOption(activeGeosets, "Eye Color");
         }
-
+        
+        // Change hair tentacles
         private void ChangeTentacles(List<int> activeGeosets)
         {
             activeGeosets.RemoveAll(x => x > 2399 && x < 2500);
             ChangeGeosetOption(activeGeosets, "Tentacles", "Hair Style");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawBra(texture);
             DrawUnderwear(texture);
             DrawArmor(texture);
         }
 
+        // Get id of Hair Color Extra option
         protected override int GetHairExtraIndex()
         {
             return Array.FindIndex(Character.Options, o => o.Name == "Tentacles");

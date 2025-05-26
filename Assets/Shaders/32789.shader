@@ -46,9 +46,8 @@ Shader "Custom/32789"
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				color *= tex2D(_Texture2, IN.uv2_Texture2);
 				OUT.Albedo = color.rgb;
-				fixed4 alpha = tex2D(_Texture1, IN.uv_Texture1) * _Color;
-				alpha *= tex2D(_Texture2, IN.uv2_Texture2);
-				OUT.Alpha = alpha.a;
+				OUT.Alpha = color.a;
+				OUT.Emission = color;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
 			}

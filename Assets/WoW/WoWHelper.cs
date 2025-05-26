@@ -3,35 +3,115 @@ using UnityEngine;
 
 namespace WoW
 {
-    //Helper class for some WoW related things.
+    // Helper class for some WoW related things.
     public class WoWHelper
     {
-        //Color for each item quality
+        // Enum for various layered texture types
+        public enum LayeredTexture
+        {
+            None = 0,
+            Skin = 1,
+            Eye = 2,
+            Extra1 = 3,
+            Extra2 = 4,
+            Hair = 5
+        }
+
+        // Enum for forms used for druid and warlock extra customization
+        public enum CreatureForm
+        {
+            Imp = 148,
+            Felhunter = 176,
+            Voidwalker = 180,
+            Felguard = 181,
+            Doomguard = 182,
+            Sayaad = 183,
+            Infernal = 184,
+            BearForm = 189,
+            CatForm = 190,
+            AquaticForm = 191,
+            TravelForm = 192,
+            FlightForm = 193,
+            MoonkinForm = 194,
+            Darkglare = 197,
+            Tyrant = 198
+        }
+
+        // Enum for character races
+        public enum Race
+        {
+            Human = 1,
+            Orc = 2,
+            Dwarf = 3,
+            NightElf = 4,
+            Undead = 5,
+            Tauren = 6,
+            Gnome = 7,
+            Troll = 8,
+            Goblin = 9,
+            BloodElf = 10,
+            Draenei = 11,
+            Worgen = 22,
+            Pandaren = 24,
+            Nightborne = 27,
+            Highmountain = 28,
+            VoidElf = 29,
+            Lightforged = 30,
+            Zandalari = 31,
+            KulTiran = 32,
+            DarkIron = 34,
+            Vulpera = 35,
+            Maghar = 36,
+            Mechagnome = 37,
+            Dracthyr = 52,
+            Visage = 75,
+            Earthen = 84
+        }
+
+        // Enum for character classes
+        public enum Class
+        {
+            Warrior = 1,
+            Paladin = 2,
+            Hunter = 3,
+            Rogue = 4,
+            Priest = 5,
+            DeathKnight = 6,
+            Shaman = 7,
+            Mage = 8,
+            Warlock = 9,
+            Monk = 10,
+            Druid = 11,
+            DemonHunter = 12,
+            Evoker = 13
+        }
+
+        // Color for each item quality
         public static Color QualityColor(int quality)
         {
             Color32 color = quality switch
             {
-                //Poor
+                // Poor
                 0 => new Color32(157, 157, 157, 255),
-                //Uncommon
+                // Uncommon
                 2 => new Color32(30, 255, 0, 255),
-                //Rare
+                // Rare
                 3 => new Color32(0, 112, 221, 255),
-                //Epic
+                // Epic
                 4 => new Color32(163, 53, 238, 255),
-                //Legendary
+                // Legendary
                 5 => new Color32(122, 128, 0, 255),
-                //Artifact
+                // Artifact
                 6 => new Color32(230, 204, 128, 255),
-                //Heirloom
+                // Heirloom
                 7 => new Color32(0, 204, 255, 255),
-                //Common
+                // Common
                 _ => new Color32(255, 255, 255, 255),
             };
             return color;
         }
 
-        //Return slot name
+        // Return slot name
         public static string Slot(int slot)
         {
             string result = slot switch
@@ -54,7 +134,7 @@ namespace WoW
             return result;
         }
 
-        //Return slot ID
+        // Return slot ID
         public static int Slot(string slot)
         {
             var result = slot.ToLower() switch
@@ -77,7 +157,7 @@ namespace WoW
             return result;
         }
 
-        //Internal slot names
+        // Internal slot names
         public static string SlotName(int slot)
         {
             string result = slot switch
@@ -100,7 +180,7 @@ namespace WoW
             return result;
         }
 
-        //Translate race id to base race model id
+        // Translate race id to base race model id
         public static int RaceModel(int race)
         {
             int result = 0;
@@ -154,7 +234,7 @@ namespace WoW
             return result;
         }
 
-        //Return text describing the item version
+        // Return text describing the item version
         public static string ItemVersion(int version)
         {
             string result = "";
@@ -173,7 +253,7 @@ namespace WoW
             return result;
         }
 
-        //Generate 3D Mesh gameobject from m2 file
+        // Generate 3D Mesh gameobject from m2 file
         public static GameObject Generate3DMesh(M2 file)
         {
             GameObject model = new(file.Name);
@@ -183,7 +263,7 @@ namespace WoW
             {
                 name = file.Name + "_mesh"
             };
-            //Fill vertex data
+            // Fill vertex data
             Vector3[] vertices = new Vector3[file.Vertices.Length];
             Vector3[] normals = new Vector3[file.Vertices.Length];
             BoneWeight[] weights = new BoneWeight[file.Vertices.Length];
@@ -213,7 +293,7 @@ namespace WoW
             mesh.boneWeights = weights;
             mesh.uv = uv;
             mesh.uv2 = uv2;
-            //Fill Submesh data
+            // Fill Submesh data
             mesh.subMeshCount = file.Skin.Submeshes.Length;
             for (int i = 0; i < mesh.subMeshCount; i++)
             {
@@ -224,7 +304,7 @@ namespace WoW
                 }
                 mesh.SetTriangles(triangles, i);
             }
-            //Generate bones
+            // Generate bones
             Transform[] bones = new Transform[file.Skeleton.Bones.Length];
             for (int i = 0; i < bones.Length; i++)
             {
@@ -257,7 +337,7 @@ namespace WoW
             return model;
         }
 
-        //Particle shape
+        // Particle shape
         private static ParticleSystemShapeType ParticleShape(byte value)
         {
             ParticleSystemShapeType shape = ParticleSystemShapeType.Cone;
@@ -276,29 +356,29 @@ namespace WoW
             return shape;
         }
 
-        //Generate particle effect system based on the data
+        // Generate particle effect system based on the data
         public static GameObject ParticleEffect(M2Particle particle)
         {
-            //Create gameobject
+            // Create gameobject
             GameObject element = new();
             element.AddComponent<ParticleSystem>();
             ParticleSystem system = element.GetComponent<ParticleSystem>();
-            //Setup lifetime and speed in main module
+            // Setup lifetime and speed in main module
             ParticleSystem.MainModule main = system.main;
             float variation = particle.LifespanVariation * particle.Lifespan;
             main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2f, (particle.Lifespan + variation) / 2f);
             variation = particle.SpeedVariation * particle.Speed;
             main.startSpeed = new ParticleSystem.MinMaxCurve((particle.Speed - variation) / 2f, (particle.Speed + variation) / 2f);
-            //Setup emission rate in emission module
+            // Setup emission rate in emission module
             ParticleSystem.EmissionModule emission = system.emission;
             variation = particle.EmissionVariation * particle.EmissionRate;
             emission.rateOverTime = new ParticleSystem.MinMaxCurve((particle.EmissionRate - variation) / 2f, (particle.EmissionRate + variation) / 2f);
             emission.rateOverDistance = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
-            //Setup shape and scale in shape module
+            // Setup shape and scale in shape module
             ParticleSystem.ShapeModule shape = system.shape;
             shape.shapeType = ParticleShape(particle.Type);
             shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionWidth, particle.EmissionLength);
-            //Setup color and alpha gradients in color over lifetime module
+            // Setup color and alpha gradients in color over lifetime module
             ParticleSystem.ColorOverLifetimeModule color = system.colorOverLifetime;
             color.enabled = true;
             Gradient gradient = new Gradient();
@@ -326,7 +406,7 @@ namespace WoW
             }
             gradient.SetKeys(colorKeys, alphaKeys);
             color.color = gradient;
-            //Setup size in size over lifetime module
+            // Setup size in size over lifetime module
             ParticleSystem.SizeOverLifetimeModule size = system.sizeOverLifetime;
             size.enabled = true;
             AnimationCurve curve = new AnimationCurve();
@@ -335,7 +415,7 @@ namespace WoW
                 curve.AddKey(particle.Scale.Timestamps[i], particle.Scale.Values[i].X);
             }
             size.size = new ParticleSystem.MinMaxCurve(1f, curve);
-            //Setup texture sheet in texture sheet animation module
+            // Setup texture sheet in texture sheet animation module
             ParticleSystem.TextureSheetAnimationModule textureSheet = system.textureSheetAnimation;
             textureSheet.enabled = true;
             textureSheet.numTilesX = particle.TileColumns;

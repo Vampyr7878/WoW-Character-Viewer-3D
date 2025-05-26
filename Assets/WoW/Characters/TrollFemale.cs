@@ -4,19 +4,27 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle troll female customization
+    // Class to handle troll female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class TrollFemale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping face paint colors to face paints
         private readonly Dictionary<int, int[]> facePaintColors;
-
+        // Mapping body paint colors to body paints
         private readonly Dictionary<int, int[]> bodyPaintColors;
 
-        public TrollFemale(M2 model, Character character)
+        public TrollFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 123, new int[] { 1388, 1391, 1393 } },
@@ -34,6 +42,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -49,8 +58,12 @@ namespace WoW.Characters
             ChangeRelatedGeosetOptions(activeGeosets, "Body Paint", "Body Paint Color", bodyPaintColors);
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawLayer(texture, "Face Paint Color", "Face Paint", 512, 0, 512, 512);
             DrawLayer(texture, "Body Paint Color", "Body Paint", 0, 0, 512, 512);

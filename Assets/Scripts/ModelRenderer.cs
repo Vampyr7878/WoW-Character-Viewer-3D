@@ -1,6 +1,7 @@
-using BLPLib;
+using Assets.WoW;
 using CASCLib;
 using M2Lib;
+using SkelLib;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -8,46 +9,59 @@ using UnityEngine.Rendering;
 
 public abstract class ModelRenderer : MonoBehaviour
 {
+    // refernce to invisible material to hide some geosets
     public Material hiddenMaterial;
 
+    // Loaded textures
 #if UNITY_EDITOR
-    //Listfile dictionary to speed up debugging
-    protected Dictionary<int, string> listfile;
-    //Path to locally unpacked game files
+    public Texture2D[] textures;
+#else
+    protected Texture2D[] textures;
+#endif
+#if UNITY_EDITOR
+    // Listfile dictionary to speed up debugging
+    protected Dictionary<int, string> listFile;
+    // Path to locally unpacked game files
     protected string dataPath;
 #else
-    //Referenece to the opened CASC storage
+    // Referenece to the opened CASC storage
     protected CASCHandler casc;
 #endif
-    //Image converter for loading textures
+    // Image converter for loading textures
     protected System.Drawing.ImageConverter converter;
-    //Reference to the instantiated prefab
+    // Reference to the instantiated prefab
     protected GameObject mesh;
-    //Colors used by the model
-    protected Color32[] colors;
-    //Path from where to laod the models
+    // Colors used by the model
+    protected Color[] colors;
+    // Current time for color animations
+    protected float[] colorTime;
+    // Current texture color frame
+    protected int[] colorFrame;
+    // Current time for transparency animations
+    protected float[] transparencyTime;
+    // Current texture transparency frame
+    protected int[] transparencyFrame;
+    // Path from where to laod the models
     protected string modelsPath;
-    //Loaded textures
-    protected Texture2D[] textures;
-    //Current time for texture animations
-    protected float[] time;
-    //Current texture animation frame
-    protected int[] frame;
-    //Thread to load binary data
+    // Current time for texture animations
+    protected float[] textureTime;
+    // Current texture animation frame
+    protected int[] textureFrame;
+    // Thread to load binary data
     protected Thread loadBinaries;
-    //Renderer object for this model
+    // Renderer object for this model
     protected new SkinnedMeshRenderer renderer;
-    //Animator object for this model
+    // Animator object for this model
     protected Animator animator;
 
-    //Reference to the binary data
+    // Reference to the binary data
     public M2 Model { get; protected set; }
-    //Indicate if the all the data has been loaded
+    // Indicate if the all the data has been loaded
     public bool Loaded { get; protected set; }
-    //Trigger changes to rendered model
+    // Trigger changes to rendered model
     public bool Change { get; set; }
 
-    //Animate current texture unit
+    // Animate current texture unit
     protected void AnimateTextures(SkinnedMeshRenderer renderer, int i)
     {
         if (renderer.materials[Model.Skin.Textures[i].Id].shader != hiddenMaterial.shader)
@@ -74,7 +88,7 @@ public abstract class ModelRenderer : MonoBehaviour
         }
     }
 
-    //Animate current texture
+    // Animate current texture
     protected Vector2 AnimateTexture(int index, Vector2 offset)
     {
         if (index < Model.TextureAnimations.Length)
@@ -82,26 +96,26 @@ public abstract class ModelRenderer : MonoBehaviour
             TextureAnimation animation = Model.TextureAnimations[index];
             if (animation.Translation.Timestamps.Length > 0 && animation.Translation.Timestamps[0].Length > 1)
             {
-                if (time[index] >= animation.Translation.Timestamps[0][frame[index]] / 1000f)
+                if (textureTime[index] >= animation.Translation.Timestamps[0][textureFrame[index]] / 1000f)
                 {
-                    frame[index]++;
-                    if (frame[index] == animation.Translation.Timestamps[0].Length)
+                    textureFrame[index]++;
+                    if (textureFrame[index] == animation.Translation.Timestamps[0].Length)
                     {
-                        frame[index] = 0;
-                        time[index] = 0f;
+                        textureFrame[index] = 0;
+                        textureTime[index] = 0f;
                     }
                 }
-                if (frame[index] == 0)
+                if (textureFrame[index] == 0)
                 {
-                    offset.x = animation.Translation.Values[0][frame[index]].X;
-                    offset.y = animation.Translation.Values[0][frame[index]].Y;
+                    offset.x = animation.Translation.Values[0][textureFrame[index]].X;
+                    offset.y = animation.Translation.Values[0][textureFrame[index]].Y;
                 }
                 else
                 {
-                    float timestamp = (animation.Translation.Timestamps[0][frame[index]] - animation.Translation.Timestamps[0][frame[index] - 1]) / 1000f;
-                    timestamp = (time[index] - animation.Translation.Timestamps[0][frame[index] - 1] / 1000f) / timestamp;
-                    offset.x = Mathf.Lerp(animation.Translation.Values[0][frame[index] - 1].X, animation.Translation.Values[0][frame[index]].X, timestamp);
-                    offset.y = -Mathf.Lerp(animation.Translation.Values[0][frame[index] - 1].Y, animation.Translation.Values[0][frame[index]].Y, timestamp);
+                    float textureTimestamp = (animation.Translation.Timestamps[0][textureFrame[index]] - animation.Translation.Timestamps[0][textureFrame[index] - 1]) / 1000f;
+                    textureTimestamp = (textureTime[index] - animation.Translation.Timestamps[0][textureFrame[index] - 1] / 1000f) / textureTimestamp;
+                    offset.x = Mathf.Lerp(animation.Translation.Values[0][textureFrame[index] - 1].X, animation.Translation.Values[0][textureFrame[index]].X, textureTimestamp);
+                    offset.y = -Mathf.Lerp(animation.Translation.Values[0][textureFrame[index] - 1].Y, animation.Translation.Values[0][textureFrame[index]].Y, textureTimestamp);
                 }
                 offset.x = offset.x > 1 ? offset.x - 1 : offset.x;
                 offset.x = offset.x < -1 ? offset.x + 1 : offset.x;
@@ -112,7 +126,99 @@ public abstract class ModelRenderer : MonoBehaviour
         return offset;
     }
 
-    //Get proper source color blend option for alpha blending
+    // Animate current texture unit
+    protected void AnimateColors(SkinnedMeshRenderer renderer, int i)
+    {
+        if (renderer.materials[Model.Skin.Textures[i].Id].shader != hiddenMaterial.shader)
+        {
+            int index = Model.Skin.Textures[i].Color;
+            if (index >= 0)
+            {
+                if (Model.Colors[index].Color.Values[0].Length > 1)
+                {
+                    Color color = renderer.materials[Model.Skin.Textures[i].Id].GetColor("_Color");
+                    color = AnimateColor(index, color);
+                    renderer.materials[Model.Skin.Textures[i].Id].SetColor("_Color", color);
+                }
+                if (Model.Colors[index].Transparency.Values[0].Length > 1)
+                {
+                    Color color = renderer.materials[Model.Skin.Textures[i].Id].GetColor("_Color");
+                    color = AnimateTransparency(index, color);
+                    renderer.materials[Model.Skin.Textures[i].Id].SetColor("_Color", color);
+                }
+            }
+        }
+    }
+
+    // Animate current colors
+    protected Color AnimateColor(int index, Color color)
+    {
+        if (index < Model.TextureAnimations.Length)
+        {
+            Track<Vector3D> animation = Model.Colors[index].Color;
+            if (animation.Timestamps.Length > 0 && animation.Timestamps[0].Length > 1)
+            {
+                if (colorTime[index] >= animation.Timestamps[0][colorFrame[index]] / 1000f)
+                {
+                    colorFrame[index]++;
+                    if (colorFrame[index] == animation.Timestamps[0].Length)
+                    {
+                        colorFrame[index] = 0;
+                        colorTime[index] = 0f;
+                    }
+                }
+                if (colorFrame[index] == 0)
+                {
+                    color.r = animation.Values[0][colorFrame[index]].X;
+                    color.g = animation.Values[0][colorFrame[index]].Y;
+                    color.b = animation.Values[0][colorFrame[index]].Z;
+                }
+                else
+                {
+                    float colorTimestamp = (animation.Timestamps[0][colorFrame[index]] - animation.Timestamps[0][colorFrame[index] - 1]) / 1000f;
+                    colorTimestamp = (colorTime[index] - animation.Timestamps[0][colorFrame[index] - 1] / 1000f) / colorTimestamp;
+                    color.r = Mathf.Lerp(animation.Values[0][colorFrame[index] - 1].X, animation.Values[0][colorFrame[index]].X, colorTimestamp);
+                    color.g = Mathf.Lerp(animation.Values[0][colorFrame[index] - 1].Y, animation.Values[0][colorFrame[index]].Y, colorTimestamp);
+                    color.b = Mathf.Lerp(animation.Values[0][colorFrame[index] - 1].Z, animation.Values[0][colorFrame[index]].Z, colorTimestamp);
+                }
+            }
+        }
+        return color;
+    }
+
+    // Animate current transparency
+    protected Color AnimateTransparency(int index, Color color)
+    {
+        if (index < Model.TextureAnimations.Length)
+        {
+            Track<float> animation = Model.Colors[index].Transparency;
+            if (animation.Timestamps.Length > 0 && animation.Timestamps[0].Length > 1)
+            {
+                if (transparencyTime[index] >= animation.Timestamps[0][transparencyFrame[index]] / 1000f)
+                {
+                    transparencyFrame[index]++;
+                    if (transparencyFrame[index] == animation.Timestamps[0].Length)
+                    {
+                        transparencyFrame[index] = 0;
+                        transparencyTime[index] = 0f;
+                    }
+                }
+                if (transparencyFrame[index] == 0)
+                {
+                    color.a = animation.Values[0][transparencyFrame[index]];
+                }
+                else
+                {
+                    float transparencyTimestamp = (animation.Timestamps[0][transparencyFrame[index]] - animation.Timestamps[0][transparencyFrame[index] - 1]) / 1000f;
+                    transparencyTimestamp = (transparencyTime[index] - animation.Timestamps[0][transparencyFrame[index] - 1] / 1000f) / transparencyTimestamp;
+                    color.a = Mathf.Lerp(animation.Values[0][transparencyFrame[index] - 1], animation.Values[0][transparencyFrame[index]], transparencyTimestamp);
+                }
+            }
+        }
+        return color;
+    }
+
+    // Get proper source color blend option for alpha blending
     protected BlendMode SrcColorBlend(short value)
     {
         BlendMode blend = BlendMode.One;
@@ -140,7 +246,7 @@ public abstract class ModelRenderer : MonoBehaviour
         return blend;
     }
 
-    //Get proper destination color blend option for alpha blending
+    // Get proper destination color blend option for alpha blending
     protected BlendMode DstColorBlend(short value)
     {
         BlendMode blend = BlendMode.Zero;
@@ -166,7 +272,7 @@ public abstract class ModelRenderer : MonoBehaviour
         return blend;
     }
 
-    //Get proper source alpha blend option for alpha blending
+    // Get proper source alpha blend option for alpha blending
     protected BlendMode SrcAlphaBlend(short value)
     {
         BlendMode blend = BlendMode.One;
@@ -192,7 +298,7 @@ public abstract class ModelRenderer : MonoBehaviour
         return blend;
     }
 
-    //Get proper destination alpha blend option for alpha blending
+    // Get proper destination alpha blend option for alpha blending
     protected BlendMode DstAlphaBlend(short value)
     {
         BlendMode blend = BlendMode.Zero;
@@ -241,51 +347,32 @@ public abstract class ModelRenderer : MonoBehaviour
         return Resources.Load<Material>(@$"Materials\{material}");
     }
 
-    //Load model colors
+    // Load model colors
     protected void LoadColors()
     {
-        colors = new Color32[Model.Colors.Length];
+        colors = new Color[Model.Colors.Length];
         for (int i = 0; i < colors.Length; i++)
         {
-            colors[i] = new Color32(Model.Colors[i].R, Model.Colors[i].G, Model.Colors[i].B, 255);
+            colors[i] = new Color(Model.Colors[i].Color.Values[0][0].X, Model.Colors[i].Color.Values[0][0].Y, Model.Colors[i].Color.Values[0][0].Z,
+                Model.Colors[i].Transparency.Values[0].Length > 0 ? Model.Colors[i].Transparency.Values[0][0] : 1f);
         }
     }
 
-    //Create texture from BLP file
+    // Create texture from BLP file
     public Texture2D TextureFromBLP(int file)
     {
 #if UNITY_EDITOR
-        BLP blp = new($@"{dataPath}\{listfile[file]}");
+        BLP blp = new($@"{dataPath}\{listFile[file]}");
 #else
-            BLP blp = new(casc.OpenFile(file));
+        BLP blp = new(casc.OpenFile(file));
 #endif
-        System.Drawing.Bitmap image = blp.GetImage();
-        Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
-        texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
+        Texture2D texture = blp.GetImage();
         return texture;
     }
 
-    //Create texture from BLP file
-    public Texture2D TextureFromBLP(int file, int width, int height)
-    {
-#if UNITY_EDITOR
-        BLP blp = new($@"{dataPath}\{listfile[file]}");
-#else
-            BLP blp = new(casc.OpenFile(file));
-#endif
-        System.Drawing.Bitmap image = blp.GetImage();
-        Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
-        texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
-        if (width != image.Width && height != image.Height)
-        {
-            TextureScaler.scale(texture, width, height);
-        }
-        return texture;
-    }
-
-    //Set material with proper shader
+    // Set material with proper shader
     protected abstract void SetMaterial(SkinnedMeshRenderer renderer, int i);
 
-    //Setup all the material properties
+    // Setup all the material properties
     protected abstract void SetTexture(Material material, int i);
 }

@@ -4,19 +4,27 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle goblin female customization
+    // Class to handle goblin female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class GoblinFemale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping earrings to ears
         private readonly Dictionary<int, int[]> earringEars;
-
+        // Mapping nose rings to noses
         private readonly Dictionary<int, int[]> noseRingNoses;
 
-        public GoblinFemale(M2 model, Character character)
+        public GoblinFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 128, new int[] { 1536, 1542, 15730 } },
@@ -42,6 +50,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -56,8 +65,12 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Nose Ring");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawBra(texture);
             DrawUnderwear(texture);

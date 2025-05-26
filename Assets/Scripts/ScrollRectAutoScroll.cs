@@ -3,17 +3,23 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-//Script that autoscrolls scroll rect to currently selected item on show
+// Script that autoscrolls scroll rect to currently selected item on show
 [RequireComponent(typeof(ScrollRect))]
 public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    // Scrolling speed
     public float scrollSpeed = 10f;
 
+    // Check mouseover
     private bool mouseOver = false;
-    private List<Selectable> m_Selectables = new List<Selectable>();
+    // List of selectable elements
+    private List<Selectable> m_Selectables = new();
+    // Rectangle to be scrolled
     private ScrollRect m_ScrollRect;
+    // Next scroll position
     private Vector2 m_NextScrollPosition = Vector2.up;
 
+    // Handler for OnEnable event
     private void OnEnable()
     {
         if (m_ScrollRect)
@@ -38,11 +44,11 @@ public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void Update()
     {
-        // Scroll via input.
+        //  Scroll via input
         InputScroll();
         if (!mouseOver)
         {
-            // Lerp scrolling code.
+            //  Lerp scrolling code
             m_ScrollRect.normalizedPosition = Vector2.Lerp(m_ScrollRect.normalizedPosition, m_NextScrollPosition, scrollSpeed * Time.deltaTime);
         }
         else
@@ -50,6 +56,8 @@ public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointe
             m_NextScrollPosition = m_ScrollRect.normalizedPosition;
         }
     }
+
+    // scroll via input
     private void InputScroll()
     {
         if (m_Selectables.Count > 0)
@@ -61,6 +69,7 @@ public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    // scroll to selected element
     private void ScrollToSelected(bool quickScroll)
     {
         int selectedIndex = -1;
@@ -84,11 +93,13 @@ public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    // Set mouseover
     public void OnPointerEnter(PointerEventData eventData)
     {
         mouseOver = true;
     }
 
+    // Clear mosueover
     public void OnPointerExit(PointerEventData eventData)
     {
         mouseOver = false;

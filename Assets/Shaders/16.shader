@@ -19,9 +19,9 @@ Shader "Custom/16"
 
 	SubShader
 	{
-		Tags { "Queue" = "Transparent" "RenderType" = "TransparentCutout" }
+		Tags { "Queue" = "AlphaTest" "RenderType" = "Opaque" }
 		LOD 200
-		ZWrite[_DepthTest]
+		ZWrite [_DepthTest]
 		Blend[_SrcColorBlend][_DstColorBlend],[_SrcAlphaBlend][_DstAlphaBlend]
 		Cull[_Cull]
 

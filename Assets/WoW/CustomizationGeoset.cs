@@ -1,16 +1,16 @@
 namespace WoW
 {
-    //Class to store geosets set for customizaiton choice
+    // Class to store geosets set for customizaiton choice
     public class CustomizationGeoset
     {
-        //Geoset related choice
+        // Geoset related choice
         public int Related { get; private set; }
-        //Geoset type
+        // Geoset type
         public int Type { get; private set; }
-        //Geoset ID
+        // Geoset ID
         public int ID { get; private set; }
 
-        //Constructor
+        // Constructor
         public CustomizationGeoset(int related, int type, int id)
         {
             Related = related;

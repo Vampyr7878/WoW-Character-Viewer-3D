@@ -4,15 +4,23 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle orc female customization
+    // Class to handle orc female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class OrcFemale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
 
-        public OrcFemale(M2 model, Character character)
+        public OrcFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 89, new int[] { 481, 488, 489 } },
@@ -20,6 +28,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -32,8 +41,12 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Necklace");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             MultiplyLayer(texture, "Tattoo", 16, 0, 0, 1024, 512);
             DrawLayer(texture, "War Paint Color", "War Paint", 0, 0, 1024, 512);

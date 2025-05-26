@@ -4,17 +4,25 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle undead female customization
+    // Class to handle undead female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class UndeadFemale : CharacterHelper
     {
+        // Mapping skin colors to skin types
         private readonly Dictionary<int, int[]> skinTypeColors;
-
+        // Mapping eyesight to eye colors
         private readonly Dictionary<int, int[]> eyesightColors;
 
-        public UndeadFemale(M2 model, Character character)
+        public UndeadFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinTypeColors = new()
             {
                 { 64, new int[] { 6526 } },
@@ -28,6 +36,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeEyes(activeGeosets);
@@ -40,6 +49,7 @@ namespace WoW.Characters
             ChangeEyeColor(activeGeosets);
         }
 
+        // Change goesets in according to eye color and make sure left over geosets are removed
         private new void ChangeEyeColor(List<int> activeGeosets)
         {
             activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
@@ -47,8 +57,12 @@ namespace WoW.Characters
             ChangeRelatedGeosetOptions(activeGeosets, "Eye Color", "Eyesight", eyesightColors);
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawBra(texture);
             DrawUnderwear(texture);

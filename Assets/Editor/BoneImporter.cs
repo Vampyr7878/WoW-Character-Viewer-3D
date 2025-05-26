@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using Unity.VersionControl.Git.IO;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 

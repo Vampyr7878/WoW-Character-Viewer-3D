@@ -4,19 +4,27 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle undead male customization
+    // Class to handle undead male customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class UndeadMale : CharacterHelper
     {
+        // Mapping skin colors to skin types
         private readonly Dictionary<int, int[]> skinTypeColors;
-
+        // Mapping face features to jaw features
         private readonly Dictionary<int, int[]> jawFaceFeatures;
-
+        // Mapping eyesight to eye colors
         private readonly Dictionary<int, int[]> eyesightColors;
 
-        public UndeadMale(M2 model, Character character)
+        public UndeadMale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinTypeColors = new()
             {
                 { 61, new int[] { 6527 } },
@@ -36,6 +44,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeEyes(activeGeosets);
@@ -48,6 +57,7 @@ namespace WoW.Characters
             ChangeEyeColor(activeGeosets);
         }
 
+        // Change goesets in according to eye color and make sure left over geosets are removed
         private new void ChangeEyeColor(List<int> activeGeosets)
         {
             activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
@@ -55,8 +65,12 @@ namespace WoW.Characters
             ChangeRelatedGeosetOptions(activeGeosets, "Eye Color", "Eyesight", eyesightColors);
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawUnderwear(texture);
             DrawLayer(texture, "Hair Style", "Hair Color", 512, 0, 512, 512);

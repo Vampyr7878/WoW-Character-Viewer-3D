@@ -1,8 +1,6 @@
-﻿using BLPLib;
-using CASCLib;
+﻿using CASCLib;
 using SimpleFileBrowser;
 using Mono.Data.Sqlite;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
@@ -16,143 +14,142 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using WoW;
-using System.Xml.Linq;
-using UnityEditor;
-using static UnityEngine.EventSystems.EventTrigger;
-using System.Collections.ObjectModel;
+using Assets.WoW;
 
-//Class handling main UI input in the scene
+// Class handling main UI input in the scene
 public class ScreenInput : MonoBehaviour
 {
-    //Reference to the camera
+    // Reference to the camera
     public Camera mainCamera;
-    //Reference to prefeb for element on list of items to equip
+    // Reference to prefeb for element on list of items to equip
     public GameObject scrollItem;
-    //Reference to prefab that is used to create customization category button
+    // Reference to prefab that is used to create customization category button
     public GameObject customizationCategory;
-    //Reference to prefab that is used to create customization dropdown
+    // Reference to prefab that is used to create customization dropdown
     public GameObject customizationDropdown;
-    //Reference to prefab that is used to create customization toggle
+    // Reference to prefab that is used to create customization toggle
     public GameObject customizationToggle;
-    //Reference to prefab that is used to craete form button
+    // Reference to prefab that is used to craete form button
     public GameObject formButton;
-    //Reference to the panel containing gender options
+    // Reference to the panel containing gender options
     public GameObject genderPanel;
-    //Reference to the panel containig Alliance races
+    // Reference to the panel containig Alliance races
     public GameObject alliancePanel;
-    //Reference to the panel containing Horde races
+    // Reference to the panel containing Horde races
     public GameObject hordePanel;
-    //Reference to the pane containing class options
+    // Reference to the pane containing class options
     public GameObject classPanel;
-    //Reference to teh panel for shapeshift forms
+    // Reference to teh panel for shapeshift forms
     public GameObject formPanel;
-    //Reference to the panel containing all the customization options
+    // Reference to the panel containing all the customization options
     public GameObject customizationPanel;
-    //Reference to the panel containing equipment slots
+    // Reference to the panel containing equipment slots
     public GameObject gearPanel;
-    //Reference to the panel that lets you choose items on the left side
+    // Reference to the panel that lets you choose items on the left side
     public GameObject leftPanel;
-    //Reference to the panel that lets you choose items on the right side
+    // Reference to the panel that lets you choose items on the right side
     public GameObject rightPanel;
-    //Reference to the panel that handle character import options
+    // Reference to the panel that handle character import options
     public GameObject importPanel;
-    //References to all class buttons
+    // References to all class buttons
     public Button[] classButtons;
-    //Reference to the button for main character form
+    // Reference to the button for main character form
     public Button mainFormButton;
-    //Reference to the left bottom button: Exit/Back
+    // Reference to the left bottom button: Exit/Back
     public Button exitButton;
-    //Reference to the right bottom button: Customize/Save
+    // Reference to the right bottom button: Customize/Save
     public Button customizeButton;
-    //Referenec to the the button that toggles goear panel
+    // Referenec to the the button that toggles goear panel
     public Button gearButton;
-    //Reference to the button that allows opening saved character from file
+    // Reference to the button that allows opening saved character from file
     public Button openButton;
-    //Referene to the button that opens import panel
+    // Referene to the button that opens import panel
     public Button importButton;
-    //Reference to the "Loading..." text
+    // Reference to the "Loading..." text
     public Text loading;
-    //Reference to the main character object
+    // Reference to the main character object
     public Character character;
-    //Name of item set to equip in autoscreenshot mode
+    // Reference to the main creature object
+    public Creature creature;
+    // Name of item set to equip in autoscreenshot mode
     public string itemSet;
-    //Character's gender for start
+    // Character's gender for start
     public bool gender;
-    //Toggle on autoscreenshot mode
+    // Toggle on autoscreenshot mode
     public bool screenshot;
-    //Autoscreenshot core races
+    // Autoscreenshot core races
     public bool core;
-    //Autoscreenshot allied races
+    // Autoscreenshot allied races
     public bool allied;
-    //Autoscreenshot race
+    // Autoscreenshot race
     public string race;
 
-    //List of all customization option dropdowns
+    // List of all customization option dropdowns
     private List<GameObject> customizationOptions;
-    //List of all customization option dropdowns
+    // List of all customization option dropdowns
     private List<Button> customizationCategories;
-    //List of all instantiated form buttons
+    // List of all instantiated form buttons
     private List<Button> formButtons;
-    //Reference to the database connection object
+    // Reference to the database connection object
     private SqliteConnection connection;
-    //Dictionary mapping id to race name
+    // Dictionary mapping id to race name
     private Dictionary<int, string> races;
-    //Dictionary mapping id to class name
+    // Dictionary mapping id to class name
     private Dictionary<int, string> classes;
-    //Dictionary mapping id to druid form model
+    // Dictionary mapping id to druid form model
     private Dictionary<int, string> druidModels;
 #if UNITY_EDITOR
-    //Listfile dictionary to speed up debugging
-    private Dictionary<int, string> listfile;
-    //Path to locally unpacked game files
+    // Listfile dictionary to speed up debugging
+    private Dictionary<int, string> listFile;
+    // Path to locally unpacked game files
     private string dataPath;
 #else
-    //Referenece to the opened CASC storage
+    // Referenece to the opened CASC storage
     private CASCHandler casc;
 #endif
-    //List of all items for opened slot
+    // List of all items for opened slot
     private ScrollItem[] leftScrollItems;
-    //List of all items displayed on the right equipment panel
+    // List of all items displayed on the right equipment panel
     private ScrollItem[] rightScrollItems;
-    //max amount of items in equipment panel
+    // max amount of items in equipment panel
     private int maxScrollItems;
-    //Reference to teh ImageConverter object for converting Bitmaps into Textures
+    // Reference to teh ImageConverter object for converting Bitmaps into Textures
     protected System.Drawing.ImageConverter converter;
-    //Name for currently oepned equipment slot
+    // Name for currently oepned equipment slot
     private string slotName;
-    //Is UI in ucstomize mode?
+    // Is UI in ucstomize mode?
     private bool customize;
-    //Is gear panel opened?
+    // Is gear panel opened?
     private bool gear;
-    //This allows to block camera movement when using UI
+    // This allows to block camera movement when using UI
     private bool translate;
-    //This allows to block model rotation when using UI
+    // This allows to block model rotation when using UI
     private bool rotate;
-    //This allows to block camera zoom when using UI
+    // This allows to block camera zoom when using UI
     private bool zoom;
-    //Path to the database file
+    // Path to the database file
     private string dbPath;
-    //API access token
+    // API access token
     private string token;
-    //List of all the core races names
+    // List of all the core races names
     private List<string> coreRaceNames;
-    //List of all the allied races names
+    // List of all the allied races names
     private List<string> alliedRaceNames;
-    //List of all class names
+    // List of all class names
     private List<string> classNames;
-    //Index of a current race in autoscreenshot mode
+    // Index of a current race in autoscreenshot mode
     private int r;
-    //Index of a current class in autoscreenshot mode
+    // Index of a current class in autoscreenshot mode
     private int c;
 
     private void Start()
     {
-        //Open wow CASC storage
+        // Open wow CASC storage
 #if UNITY_EDITOR
         string listPath;
 #endif
         string path;
-        using (StreamReader reader = new StreamReader("config.ini"))
+        using (StreamReader reader = new("config.ini"))
         {
             path = reader.ReadLine();
 #if UNITY_EDITOR
@@ -163,8 +160,8 @@ public class ScreenInput : MonoBehaviour
         FileBrowser.SetFilters(true, new FileBrowser.Filter("character(.chr)", ".chr"));
         FileBrowser.SetDefaultFilter(".chr");
 #if UNITY_EDITOR
-        listfile = new Dictionary<int, string>();
-        using (StreamReader reader = new StreamReader($@"{listPath}\listfile.csv"))
+        listFile = new Dictionary<int, string>();
+        using (StreamReader reader = new($@"{listPath}\listFile.csv"))
         {
             string line;
             string[] tokens;
@@ -172,7 +169,7 @@ public class ScreenInput : MonoBehaviour
             {
                 line = reader.ReadLine();
                 tokens = line.Split(';');
-                listfile.Add(int.Parse(tokens[0]), tokens[1]);
+                listFile.Add(int.Parse(tokens[0]), tokens[1]);
             }
         }
 #else
@@ -180,18 +177,18 @@ public class ScreenInput : MonoBehaviour
         casc.Root.SetFlags(LocaleFlags.enUS, false, false);
 #endif
         converter = new System.Drawing.ImageConverter();
-        //Allow for translation, rotation and zoom
+        // Allow for translation, rotation and zoom
         translate = true;
         rotate = true;
         zoom = true;
-        //Prepare for autoscreemshot mode
+        // Prepare for autoscreemshot mode
         r = core ? 0 : 12;
         c = -1;
         classNames = new List<string> { "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid", "Monk", "DeathKnight", "DemonHunter" };
         coreRaceNames = new List<string> { "Human", "Orc", "Dwarf", "Undead", "NightElf", "Tauren", "Gnome", "Troll", "Draenei", "BloodElf", "Worgen", "Goblin" };
         alliedRaceNames = new List<string> { "Tushui", "Huojin", "VoidElf", "Nightborne", "Lightforged", "Highmountain", "DarkIron", "Maghar", "KulTiran", "Zandalari", "Mechagnome", "Vulpera" };
-        token = GetToken();
-        //Load initialize race, class and druid form dictionaries and load data into them
+        // token = GetToken();
+        // Load initialize race, class and druid form dictionaries and load data into them
         races = new Dictionary<int, string>();
         classes = new Dictionary<int, string>();
         druidModels = new Dictionary<int, string>();
@@ -241,13 +238,13 @@ public class ScreenInput : MonoBehaviour
 
     private void Update()
     {
-        //Display "Loading..," text when characrter is being loaded
+        // Display "Loading..," text when characrter is being loaded
         if (character.Race > 0)
         {
             loading.gameObject.SetActive(!character.Loaded);
         }
         customizeButton.gameObject.SetActive(!gear);
-        //Exit when autoscreenshotting is done
+        // Exit when autoscreenshotting is done
         if (screenshot && ((!allied && r >= coreRaceNames.Count) || r >= coreRaceNames.Count + alliedRaceNames.Count) && race == "")
         {
 #if UNITY_EDITOR
@@ -256,7 +253,7 @@ public class ScreenInput : MonoBehaviour
             Application.Quit();
 #endif
         }
-        //Tranlate, rotate and zoom
+        // Tranlate, rotate and zoom
         mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, mainCamera.transform.position.y, Mathf.Clamp(mainCamera.transform.position.z, -5f, -0.5f));
         if (!screenshot)
         {
@@ -264,7 +261,7 @@ public class ScreenInput : MonoBehaviour
             RotateCamera();
             ZoomCamera();
         }
-        //Select next ui element with Tab key
+        // Select next ui element with Tab key
         if (Input.GetKeyUp(KeyCode.Tab))
         {
             Selectable next = EventSystem.current.currentSelectedGameObject.GetComponent<Selectable>().FindSelectableOnDown();
@@ -273,12 +270,12 @@ public class ScreenInput : MonoBehaviour
                 EventSystem.current.SetSelectedGameObject(next.gameObject);
             }
         }
-        //Exit with Escape key
+        // Exit with Escape key
         if (Input.GetKeyUp(KeyCode.Escape))
         {
             Exit();
         }
-        //Screenshot with F12 key
+        // Screenshot with F12 key
         if (Input.GetKeyUp(KeyCode.F12))
         {
             StartCoroutine(TakeScreenshot());
@@ -288,20 +285,20 @@ public class ScreenInput : MonoBehaviour
     private void OnApplicationQuit()
     {
 #if UNITY_EDITOR
-        listfile.Clear();
+        listFile.Clear();
 #else
         casc.Clear();
 #endif
         GC.Collect();
     }
 
-    //Get API access token
-    string GetToken()
+    // Get API access token
+    private string GetToken()
     {
         try
         {
             using HttpClient client = new HttpClient();
-            using HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("POST"), "https://us.battle.net/oauth/token");
+            using HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("POST"), "https:// us.battle.net/oauth/token");
             TextAsset api = Resources.Load<TextAsset>("API");
             string auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(api.text));
             request.Headers.TryAddWithoutValidation("Authorization", $"Basic {auth}");
@@ -325,7 +322,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Make screenshot
+    // Make screenshot
     private IEnumerator TakeScreenshot()
     {
         if (!Directory.Exists("Screenshots"))
@@ -334,11 +331,12 @@ public class ScreenInput : MonoBehaviour
         }
         yield return new WaitForEndOfFrame();
         openButton.transform.parent.gameObject.SetActive(false);
-        //zzTransparencyCapture.captureScreenshot(@$"Screenshots\{(character.Gender ? "Male" : "Female")}{races[character.Race].Replace(" ", "").Replace("'", "")}{classes[character.Class].Replace(" ", "")}.png");
+        // zzTransparencyCapture.captureScreenshot(@$"Screenshots\{(character.Gender ? "Male" :
+        // "Female")}{races[character.Race].Replace(" ", "").Replace("'", "")}{classes[character.Class].Replace(" ", "")}.png");
         openButton.transform.parent.gameObject.SetActive(true);
     }
 
-    //Make autoscreenshot
+    // Make autoscreenshot
     private IEnumerator TakeScreenshot(string filename)
     {
         if (!Directory.Exists("Screenshots"))
@@ -356,26 +354,28 @@ public class ScreenInput : MonoBehaviour
             c = 0;
             r++;
         }
-        //string folder = character.Gender ? "Male" : "Female";
-        //if (r < coreRaceNames.Count)
-        //{
-        //    if (c < classNames.Count && File.Exists(@$"Save\{folder}\{itemSet}\{coreRaceNames[r]}\{coreRaceNames[r]}{classNames[c]}.chr"))
-        //    {
-        //        Open(@$"Save\{folder}\{itemSet}\{coreRaceNames[r]}\{coreRaceNames[r]}{classNames[c]}.chr");
-        //    }
-        //}
-        //else if (allied && r < coreRaceNames.Count + alliedRaceNames.Count)
-        //{
-        //    if (c < classNames.Count && File.Exists(@$"Save\{folder}\{itemSet}\{alliedRaceNames[r - coreRaceNames.Count]}\{alliedRaceNames[r - coreRaceNames.Count]}{classNames[c]}.chr"))
-        //    {
-        //        Open(@$"Save\{folder}\{itemSet}\{alliedRaceNames[r - coreRaceNames.Count]}\{alliedRaceNames[r - coreRaceNames.Count]}{classNames[c]}.chr");
-        //    }
-        //}
+        // string folder = character.Gender ? "Male" : "Female";
+        // if (r < coreRaceNames.Count)
+        // {
+        //     if (c < classNames.Count &&
+        //     File.Exists(@$"Save\{folder}\{itemSet}\{coreRaceNames[r]}\{coreRaceNames[r]}{classNames[c]}.chr"))
+        //     {
+        //         Open(@$"Save\{folder}\{itemSet}\{coreRaceNames[r]}\{coreRaceNames[r]}{classNames[c]}.chr");
+        //     }
+        // }
+        // else if (allied && r < coreRaceNames.Count + alliedRaceNames.Count)
+        // {
+        //     if (c < classNames.Count &&
+        //     File.Exists(@$"Save\{folder}\{itemSet}\{alliedRaceNames[r - coreRaceNames.Count]}\{alliedRaceNames[r - coreRaceNames.Count]}{classNames[c]}.chr"))
+        //     {
+        //         Open(@$"Save\{folder}\{itemSet}\{alliedRaceNames[r - coreRaceNames.Count]}\{alliedRaceNames[r - coreRaceNames.Count]}{classNames[c]}.chr");
+        //     }
+        // }
         yield return new WaitForSeconds(4);
         screenshot = true;
     }
 
-    //Translate camera
+    // Translate camera
     private void TranslateCamera()
     {
         if (translate && Input.GetMouseButton(1) && !FileBrowser.IsOpen)
@@ -388,16 +388,17 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Rotate model
+    // Rotate model
     private void RotateCamera()
     {
         if (rotate && Input.GetMouseButton(0) && !FileBrowser.IsOpen)
         {
             character.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
+            creature.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
         }
     }
 
-    //Zoom camare
+    // Zoom camare
     private void ZoomCamera()
     {
         if (zoom && !FileBrowser.IsOpen)
@@ -409,7 +410,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Load customization categories and prepare UI for them
+    // Load customization categories and prepare UI for them
     private void SetupCategories()
     {
         foreach (var customizaionCategory in customizationCategories)
@@ -453,7 +454,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Load customization options and prepare UI for them
+    // Load customization options and prepare UI for them
     private void SetupCustomizationPanel()
     {
         foreach (var customizaionOption in customizationOptions)
@@ -467,7 +468,7 @@ public class ScreenInput : MonoBehaviour
             List<CustomizationOption> options = new();
             command.CommandType = CommandType.Text;
             command.CommandText = $"SELECT Name_lang, ID, ChrModelID, ChrCustomizationCategoryID, OptionType FROM ChrCustomizationOption WHERE " +
-                $"ChrModelID = {character.ModelID} AND Requirement <> 10 AND Requirement <> 12 ORDER BY SecondaryOrderIndex;";
+                $"ChrModelID = {character.MainFormID} AND Requirement <> 10 AND Requirement <> 12 ORDER BY SecondaryOrderIndex;";
             using (SqliteDataReader reader = command.ExecuteReader())
             {
                 while (reader.Read())
@@ -480,20 +481,20 @@ public class ScreenInput : MonoBehaviour
                     options.Add(new CustomizationOption(name, id, model, category, type));
                 }
             }
-            if (character.Race == 22)
+            foreach (var form in character.CreatureForms)
             {
                 command.CommandText = $"SELECT Name_lang, ID, ChrModelID, ChrCustomizationCategoryID, OptionType FROM ChrCustomizationOption WHERE " +
-                    $"ChrModelID = {(character.Gender ? 1 : 2)} AND Requirement <> 10 AND Requirement <> 12 ORDER BY SecondaryOrderIndex;";
-                using (SqliteDataReader reader = command.ExecuteReader())
-                    while (reader.Read())
-                    {
-                        string name = reader.GetString(0);
-                        int id = reader.GetInt32(1);
-                        int model = reader.GetInt32(2);
-                        int category = reader.GetInt32(3);
-                        int type = reader.GetInt32(4);
-                        options.Add(new CustomizationOption(name, id, model, category, type));
-                    }
+                    $"ChrModelID = {form.ID} AND Requirement <> 10 AND Requirement <> 12 ORDER BY SecondaryOrderIndex;";
+                using SqliteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    string name = reader.GetString(0);
+                    int id = reader.GetInt32(1);
+                    int model = reader.GetInt32(2);
+                    int category = reader.GetInt32(3);
+                    int type = reader.GetInt32(4);
+                    options.Add(new CustomizationOption(name, id, model, category, type));
+                }
             }
             character.Options = options.ToArray();
             character.Customization = new int[options.Count];
@@ -541,7 +542,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Load customization choices and fill the panel with them
+    // Load customization choices and fill the panel with them
     private void GetCustomizationChoices()
     {
         Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color1");
@@ -554,9 +555,10 @@ public class ScreenInput : MonoBehaviour
                 command.CommandType = CommandType.Text;
                 command.CommandText = $"SELECT Name_lang, ChrCustomizationChoice.ID, ChrCustomizationReqID, SwatchColor_0, SwatchColor_1 FROM " +
                     $"ChrCustomizationChoice JOIN ChrCustomizationReq ON ChrCustomizationReqID = ChrCustomizationReq.ID WHERE ChrCustomizationOptionID = " +
-                    $"{character.Options[i].ID} AND ReqType & 1 AND (ClassMask = 0 OR ClassMask & {1 << (character.Class - 1)}) " +
+                    $"{character.Options[i].ID} AND ReqType & 1 AND (ClassMask = 0 OR ClassMask & {1 << ((int)character.Class - 1)}) " +
                     $"AND ChrCustomizationReqID <> 3128 AND ChrCustomizationReqID <> 407 ORDER BY UiOrderIndex;";
                 using (SqliteDataReader reader = command.ExecuteReader())
+                {
                     while (reader.Read())
                     {
                         string name = reader.GetString(0);
@@ -566,6 +568,7 @@ public class ScreenInput : MonoBehaviour
                         ColorUtility.TryParseHtmlString($"#{reader.GetInt32(4).ToString("X8").Substring(2)}", out Color color2);
                         choices.Add(new CustomizationChoice(name, id, requirement, color1, color2));
                     }
+                }
                 character.Options[i].LoadAllChoices(choices);
                 character.Options[i].SetChoices(character.Options[i].AllChoices);
             }
@@ -612,7 +615,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Load customization choices and fill the panel with them
+    // Load customization choices and fill the panel with them
     private void GetCustomizationElements()
     {
         connection.Open();
@@ -628,6 +631,7 @@ public class ScreenInput : MonoBehaviour
                         $"ChrCustomizationGeoset ON ChrCustomizationGeosetID = ChrCustomizationGeoset.ID WHERE " +
                         $"ChrCustomizationChoiceID = {character.Options[i].Choices[j].ID} AND ChrCustomizationGeosetID > 0;";
                     using (SqliteDataReader reader = command.ExecuteReader())
+                    {
                         while (reader.Read())
                         {
                             int related = reader.GetInt32(0);
@@ -636,6 +640,7 @@ public class ScreenInput : MonoBehaviour
                             geosets.Add(new CustomizationGeoset(related, type, id));
                         }
                     character.Options[i].Choices[j].LoadGeosets(geosets);
+                    }
                 }
                 using (SqliteCommand command = connection.CreateCommand())
                 {
@@ -645,6 +650,7 @@ public class ScreenInput : MonoBehaviour
                         $"ChrCustomizationSkinnedModel ON ChrCustomizationSkinnedModelID = ChrCustomizationSkinnedModel.ID WHERE " +
                         $"ChrCustomizationChoiceID = {character.Options[i].Choices[j].ID} AND ChrCustomizationSkinnedModelID > 0;";
                     using (SqliteDataReader reader = command.ExecuteReader())
+                    {
                         while (reader.Read())
                         {
                             int related = reader.GetInt32(0);
@@ -652,6 +658,7 @@ public class ScreenInput : MonoBehaviour
                             int id = reader.GetInt32(2);
                             geosets.Add(new CustomizationGeoset(related, type, id));
                         }
+                    }
                     character.Options[i].Choices[j].LoadSkinnedGeosets(geosets);
                 }
                 using (SqliteCommand command = connection.CreateCommand())
@@ -663,6 +670,7 @@ public class ScreenInput : MonoBehaviour
                         $"ChrCustomizationMAterial.MaterialResourcesID = TextureFileData.MaterialResourcesID WHERE " +
                         $"ChrCustomizationChoiceID = {character.Options[i].Choices[j].ID} AND ChrCustomizationMAterialID > 0;";
                     using (SqliteDataReader reader = command.ExecuteReader())
+                    {
                         while (reader.Read())
                         {
                             int related = reader.GetInt32(0);
@@ -671,49 +679,118 @@ public class ScreenInput : MonoBehaviour
                             int usage = reader.GetInt32(3);
                             textures.Add(new CustomizationTexture(related, target, id, usage));
                         }
+                    }
                     character.Options[i].Choices[j].LoadTextures(textures);
+                }
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    List<CustomizationDisplayInfo> creatures = new();
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, CreatureDisplayInfo.ID, Path, CreatureDisplayInfo.ParticleColorID," +
+                        $" TextureVariationFileDataID_0, TextureVariationFileDataID_1, TextureVariationFileDataID_2, TextureVariationFileDataID_3 FROM " +
+                        $"ChrCustomizationElement JOIN ChrCustomizationDisplayInfo ON ChrCustomizationDisplayInfoID = ChrCustomizationDisplayInfo.ID JOIN " +
+                        $"CreatureDisplayInfo ON CreatureDisplayInfoID = CreatureDisplayInfo.ID JOIN CreatureModels ON ModelID = CreatureModels.ID WHERE " +
+                        $"ChrCustomizationChoiceID = {character.Options[i].Choices[j].ID} AND ChrCustomizationDisplayInfoID > 0;";
+                    using (SqliteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int related = reader.GetInt32(0);
+                            int id = reader.GetInt32(1);
+                            string model = reader.GetString(2);
+                            int particle = reader.GetInt32(3);
+                            int texture0 = reader.GetInt32(4);
+                            int texture1 = reader.GetInt32(5);
+                            int texture2 = reader.GetInt32(6);
+                            int texture3 = reader.GetInt32(7);
+                            creatures.Add(new(related, id, model, particle, texture0, texture1, texture2, texture3));
+                        }
+                    }
+                    character.Options[i].Choices[j].LoadCreature(creatures);
+                }
+                if (character.Options[i].Choices[j].Creatures.Length > 0)
+                {
+                    using (SqliteCommand command = connection.CreateCommand())
+                    {
+                        List<CustomizationGeoset> geosets = new();
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = $"SELECT GeosetIndex, GeosetValue FROM CreatureDisplayInfoGeosetData WHERE" +
+                            $" CreatureDisplayInfoID = {character.Options[i].Choices[j].Creatures[0].ID};";
+                        using (SqliteDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                int type = reader.GetInt32(0);
+                                int id = reader.GetInt32(1);
+                                geosets.Add(new(-1, type + 1, id));
+                            }
+                        }
+                        character.Options[i].Choices[j].Creatures[0].LoadGeosets(geosets);
+                    }
+                    using (SqliteCommand command = connection.CreateCommand())
+                    {
+                        List<ParticleColor> colors = new();
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = $"SELECT Start_0, MID_0, End_0, Start_1, MID_1, End_1, Start_2, MID_2, End_2 " +
+                            $"FROM ParticleColor WHERE ID = {character.Options[i].Choices[j].Creatures[0].ParticleColor};";
+                        using (SqliteDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                int start = reader.GetInt32(0);
+                                int mid = reader.GetInt32(1);
+                                int end = reader.GetInt32(2);
+                                colors.Add(new ParticleColor(start, mid, end));
+                                start = reader.GetInt32(3);
+                                mid = reader.GetInt32(4);
+                                end = reader.GetInt32(5);
+                                colors.Add(new ParticleColor(start, mid, end));
+                                start = reader.GetInt32(6);
+                                mid = reader.GetInt32(7);
+                                end = reader.GetInt32(8);
+                                colors.Add(new ParticleColor(start, mid, end));
+                            }
+                        }
+                        character.Options[i].Choices[j].Creatures[0].LoadParticleColors(colors);
+                    }
                 }
             }
         }
         connection.Close();
     }
 
-    //Create icon from BLP file
+    // Create icon from BLP file
     private Sprite IconFromBLP(int file)
     {
         try
         {
 #if UNITY_EDITOR
-            BLP blp = new($@"{dataPath}\{listfile[file]}");
+            BLP blp = new($@"{dataPath}\{listFile[file]}");
 #else
             BLP blp = new(casc.OpenFile(file));
 #endif
-            System.Drawing.Bitmap image = blp.GetImage();
-            Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
-            texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
+            Texture2D texture = blp.GetImage();
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
         }
         catch
         {
             Debug.LogWarning($"Can't load icon: {file}");
 #if UNITY_EDITOR
-            BLP blp = new($@"{dataPath}\{listfile[134400]}");
+            BLP blp = new($@"{dataPath}\{listFile[134400]}");
 #else
             BLP blp = new(casc.OpenFile(134400));
 #endif
-            System.Drawing.Bitmap image = blp.GetImage();
-            Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.ARGB32, true);
-            texture.LoadImage((byte[])converter.ConvertTo(image, typeof(byte[])));
+            Texture2D texture = blp.GetImage();
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
         }
     }
 
-    //Change colors for ui buttons for hero classes
+    // Change colors for ui buttons for hero classes
     private void ChangeButtonColors()
     {
         Color32 color = character.Class switch
         {
-            6 => new Color32(0, 128, 255, 255),
+            WoWHelper.Class.DeathKnight => new Color32(0, 128, 255, 255),
             _ => new Color32(192, 0, 0, 255),
         };
         exitButton.GetComponent<Image>().color = color;
@@ -731,7 +808,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Change circle button's border so only selected one glows
+    // Change circle button's border so only selected one glows
     private void ChangeBorder(GameObject selected)
     {
         if (selected != null)
@@ -756,7 +833,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Setup shadpeshift forms panel
+    // Setup shadpeshift forms panel
     private void SetupFormPanel()
     {
         foreach (var button in formButtons)
@@ -764,22 +841,50 @@ public class ScreenInput : MonoBehaviour
             Destroy(button.transform.parent.parent.gameObject);
         }
         formButtons.Clear();
-        if (character.Race == 22)
+        connection.Open();
+        using (SqliteCommand command = connection.CreateCommand())
         {
-            Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
+            List<CreatureForm> forms = new();
+            if (character.Race == WoWHelper.Race.Worgen)
+            {
+                forms.Add(new CreatureForm(character.Gender ? 1 : 2, "Gilnean", character.Gender ? "race_humanmale" : "race_humanfemale", false));
+            }
+            else if (character.Race == WoWHelper.Race.Dracthyr)
+            {
+                forms.Add(new CreatureForm(character.Gender ? 127 : 128, "Visage", character.Gender ? "race_visagemale" : "race_visagefemale", false));
+            }
+            command.CommandType = CommandType.Text;
+            command.CommandText = $"SELECT ID, Name, Icon FROM CreatureForms WHERE Class = {(int)character.Class} ORDER BY OrderIndex;";
+            using (SqliteDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id = reader.GetInt32(0);
+                    string name = reader.GetString(1);
+                    string icon = reader.GetInt32(2).ToString();
+                    forms.Add(new CreatureForm(id, name, icon));
+                }
+            }
+            character.CreatureForms = forms.ToArray();
+        }
+        connection.Close();
+        Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
+        for (int i = 0; i < character.CreatureForms.Length; i++)
+        {
+            int formIndex = i + 1;
             GameObject uiElement = Instantiate(formButton, formPanel.transform);
             uiElement.transform.SetAsFirstSibling();
             Button button = uiElement.GetComponentInChildren<Button>();
-            button.onClick.AddListener(delegate { FormButton(10); });
-            string icon = character.Gender ? "race_humanmale" : "race_humanfemale";
-            Sprite sprite = sprites.Single(s => s.name == icon);
+            button.onClick.AddListener(delegate { FormButton(formIndex); });
+            Sprite sprite = sprites.Single(s => s.name == character.CreatureForms[i].Icon);
             button.image.sprite = sprite;
+            button.transform.localScale = new Vector3(character.CreatureForms[i].Flip ? -1f : 1f, 1f, 1f);
             formButtons.Add(button);
         }
         ChangeBorder(mainFormButton.gameObject);
     }
 
-    //Reset round buttons borders
+    // Reset round buttons borders
     private void ResetBorder()
     {
         Image[] images = classPanel.GetComponentsInChildren<Image>(true);
@@ -799,7 +904,7 @@ public class ScreenInput : MonoBehaviour
         images.Single(i => i.name == "glow").gameObject.SetActive(true);
     }
 
-    //Change border for race buttons so only one is glowing
+    // Change border for race buttons so only one is glowing
     private void ChangeRaceBorder(GameObject selected)
     {
         if (selected != null)
@@ -835,7 +940,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Swap race buttons icons depending on the gender
+    // Swap race buttons icons depending on the gender
     private void SwapIcons(bool gender)
     {
         Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
@@ -863,7 +968,7 @@ public class ScreenInput : MonoBehaviour
         mainFormButton.image.sprite = sprite;
     }
 
-    //Link customization dropdowns to customization options stored in Character object
+    // Link customization dropdowns to customization options stored in Character object
     private void LinkDropdowns()
     {
         character.CustomizationDropdowns.Clear();
@@ -873,7 +978,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Link customization dropdowns to customization options stored in Character object
+    // Link customization dropdowns to customization options stored in Character object
     private void LinkToggles()
     {
         character.CustomizationToggles.Clear();
@@ -883,7 +988,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Set gender and load current race model for that gender
+    // Set gender and load current race model for that gender
     public void GenderButton(bool gender)
     {
         if (character.Gender == gender)
@@ -897,43 +1002,67 @@ public class ScreenInput : MonoBehaviour
         {
             return;
         }
-        string model, extra, collection;
+        string model, extra, collection, armor, extraCollection;
         connection.Open();
         using (SqliteCommand command = connection.CreateCommand())
         {
             command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {character.Race} AND Gender = {gender};";
+            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {(int)character.Race} AND Gender = {character.Race == WoWHelper.Race.Dracthyr || gender};";
             using SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
-            character.ModelID = reader.GetInt32(0);
+            character.ModelID = character.MainFormID = reader.GetInt32(0);
             model = reader.GetString(4);
-            extra = reader.IsDBNull(5) ? null : reader.GetString(5);
+            if (character.Race == WoWHelper.Race.Dracthyr)
+            {
+                extra = null;
+                armor = reader.GetString(5);
+            }
+            else
+            {
+                extra = reader.IsDBNull(5) ? null : reader.GetString(5);
+                armor = null;
+            }
             character.RacePath = reader.GetString(6);
             collection = reader.IsDBNull(7) ? null : reader.GetString(7);
         }
+        if (character.Race == WoWHelper.Race.Dracthyr)
+        {
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandType = CommandType.Text;
+            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = 75 AND Gender = {gender};";
+            using SqliteDataReader reader = command.ExecuteReader();
+            reader.Read();
+            extra = reader.GetString(4);
+            character.ExtraPath = reader.GetString(6);
+            extraCollection = reader.GetString(7);
+        }
+        else
+        {
+            extraCollection = null;
+        }
         connection.Close();
-        int c = character.Class;
-        character.Class = 1;
+        WoWHelper.Class c = character.Class;
+        character.Class = WoWHelper.Class.Warrior;
+        SetupFormPanel();
         SetupCustomizationPanel();
         SetupCategories();
         GetCustomizationChoices();
         GetCustomizationElements();
-        SetupFormPanel();
         LinkDropdowns();
         LinkToggles();
         ChangeButtonColors();
         Category(0);
-        ClassButton(c);
+        ClassButton((int)c);
         Resources.UnloadUnusedAssets();
         GC.Collect();
 #if UNITY_EDITOR
-        character.LoadModel(model, extra, collection, listfile, dataPath);
+        character.LoadModel(model, extra, collection, armor, extraCollection, listFile, dataPath);
 #else
-        character.LoadModel(model, extra, collection, casc);
+        character.LoadModel(model, extra, collection, armor, extraCollection, casc);
 #endif
     }
 
-    //Set Race and load current gender model for that race
+    // Set Race and load current gender model for that race
     public void RaceButton(int race)
     {
         Button current;
@@ -947,12 +1076,12 @@ public class ScreenInput : MonoBehaviour
         }
         mainFormButton.image.sprite = current.image.sprite;
         ChangeRaceBorder(EventSystem.current.currentSelectedGameObject);
-        if (character.Race == race)
+        if ((int)character.Race == race)
         {
             return;
         }
         bool value;
-        string model, extra, collection;
+        string model, extra, collection, armor, extraCollection;
         connection.Open();
         using (SqliteCommand command = connection.CreateCommand())
         {
@@ -969,23 +1098,48 @@ public class ScreenInput : MonoBehaviour
         using (SqliteCommand command = connection.CreateCommand())
         {
             command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {race} AND Gender = {character.Gender};";
+            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {race} AND Gender = {race == (int)WoWHelper.Race.Dracthyr || character.Gender};";
             using SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
-            character.ModelID = reader.GetInt32(0);
+            character.ModelID = character.MainFormID = reader.GetInt32(0);
             model = reader.GetString(4);
-            extra = reader.IsDBNull(5) ? null : reader.GetString(5);
+            if (race == (int)WoWHelper.Race.Dracthyr)
+            {
+                extra = null;
+                armor = reader.GetString(5);
+            }
+            else
+            {
+                extra = reader.IsDBNull(5) ? null : reader.GetString(5);
+                armor = null;
+            }
             character.RacePath = reader.GetString(6);
             collection = reader.IsDBNull(7) ? null : reader.GetString(7);
         }
+        if (race == (int)WoWHelper.Race.Dracthyr)
+        {
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandType = CommandType.Text;
+            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = 75 AND Gender = {character.Gender};";
+            using SqliteDataReader reader = command.ExecuteReader();
+            reader.Read();
+            extra = reader.GetString(4);
+            character.ExtraPath = reader.GetString(6);
+            extraCollection = reader.GetString(7);
+        }
+        else
+        {
+            character.ExtraPath = "";
+            extraCollection = null;
+        }
         connection.Close();
-        character.Race = race;
-        character.Class = 1;
+        character.Race = (WoWHelper.Race)race;
+        character.Class = WoWHelper.Class.Warrior;
+        SetupFormPanel();
         SetupCustomizationPanel();
         SetupCategories();
         GetCustomizationChoices();
         GetCustomizationElements();
-        SetupFormPanel();
         LinkDropdowns();
         LinkToggles();
         ResetBorder();
@@ -994,13 +1148,13 @@ public class ScreenInput : MonoBehaviour
         Resources.UnloadUnusedAssets();
         GC.Collect();
 #if UNITY_EDITOR
-        character.LoadModel(model, extra, collection, listfile, dataPath);
+        character.LoadModel(model, extra, collection, armor, extraCollection, listFile, dataPath);
 #else
-        character.LoadModel(model, extra, collection, casc);
+        character.LoadModel(model, extra, collection, armor, extraCollection, casc);
 #endif
     }
 
-    //Toggle different shapeshift form
+    // Toggle different shapeshift form
     public void FormButton(int form)
     {
         if (character.Form == form)
@@ -1025,27 +1179,31 @@ public class ScreenInput : MonoBehaviour
         character.Change = character.Loaded;
     }
 
-    //Set class
+    // Set class
     public void ClassButton(int id)
     {
-        if (id == character.Class)
+        if (!character.Loaded || id == (int)character.Class)
         {
             return;
         }
         ChangeBorder(EventSystem.current.currentSelectedGameObject);
-        character.Class = id;
+        character.Class = (WoWHelper.Class)id;
         int[] customization = character.Customization;
+        SetupFormPanel();
         SetupCustomizationPanel();
         SetupCategories();
         GetCustomizationChoices();
         GetCustomizationElements();
-        SetupFormPanel();
         LinkDropdowns();
         LinkToggles();
         ChangeButtonColors();
         Category(0);
         for (int i = 0; i < character.Customization.Length; i++)
         {
+            if (customization.Length >= i)
+            {
+                break;
+            }
             if (character.Options[i].Type == 0)
             {
                 customization[i] = customization[i] >= character.Options[i].Choices.Length ? character.Options[i].Choices.Length - 1 : customization[i];
@@ -1056,23 +1214,42 @@ public class ScreenInput : MonoBehaviour
                 customizationOptions[i].GetComponentInChildren<Toggle>().isOn = customization[i] == 1;
             }
         }
+        character.creature.ChangeRacialOptions();
         character.Change = true;
     }
 
-    //Select customization category
+    // Select customization category
     public void Category(int index)
     {
         string icon;
         Sprite sprite;
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreate");
+        Sprite[] sprites1 = Resources.LoadAll<Sprite>("Icons/charactercreate");
+        Sprite[] sprites2 = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
+        Sprite[] sprites3 = Resources.LoadAll<Sprite>("Icons/dragonridingcustomization");
         for (int i = 0; i < customizationCategories.Count; i++)
         {
             icon = character.Categories[i].Icon.ToString();
-            sprite = sprites.Single(s => s.name == icon);
+            sprite = sprites1.FirstOrDefault(s => s.name == icon);
+            if (sprite == null)
+            {
+                sprite = sprites2.FirstOrDefault(s => s.name == icon);
+            }
+            if (sprite == null)
+            {
+                sprite = sprites3.FirstOrDefault(s => s.name == icon);
+            }
             customizationCategories[i].image.sprite = sprite;
         }
         icon = character.Categories[index].Selected.ToString();
-        sprite = sprites.Single(s => s.name == icon);
+        sprite = sprites1.FirstOrDefault(s => s.name == icon);
+        if (sprite == null)
+        {
+            sprite = sprites2.FirstOrDefault(s => s.name == icon);
+        }
+        if (sprite == null)
+        {
+            sprite = sprites3.FirstOrDefault(s => s.name == icon);
+        }
         customizationCategories[index].image.sprite = sprite;
         for (int i = 0; i < customizationOptions.Count; i++)
         {
@@ -1082,7 +1259,7 @@ public class ScreenInput : MonoBehaviour
         character.Category = character.Categories[index].ID;
     }
 
-    //Handle dropdown value change
+    // Handle dropdown value change
     public void Dropdown(int index)
     {
         CustomDropdown dropdown = customizationOptions[index].GetComponentInChildren<CustomDropdown>();
@@ -1110,7 +1287,7 @@ public class ScreenInput : MonoBehaviour
         character.Change = true;
     }
 
-    //Handle toggle value change
+    // Handle toggle value change
     public void Toggle(int index)
     {
         Toggle toggle = customizationOptions[index].GetComponentInChildren<Toggle>();
@@ -1118,7 +1295,7 @@ public class ScreenInput : MonoBehaviour
         character.Change = true;
     }
 
-    //When mouse enters UI element block translation, rotation and zoom
+    // When mouse enters UI element block translation, rotation and zoom
     public void PointerEnter()
     {
         translate = false;
@@ -1126,7 +1303,7 @@ public class ScreenInput : MonoBehaviour
         zoom = false;
     }
 
-    //When mouse leaves UI element allow translation, rotation and zoom
+    // When mouse leaves UI element allow translation, rotation and zoom
     public void PointerExit()
     {
         translate = true;
@@ -1134,7 +1311,7 @@ public class ScreenInput : MonoBehaviour
         zoom = true;
     }
 
-    //Select previous customization option in Dropdown
+    // Select previous customization option in Dropdown
     public void PrevButton(int index)
     {
         Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
@@ -1158,7 +1335,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //Select next customization option in Dropdown
+    // Select next customization option in Dropdown
     public void NextButton(int index)
     {
         Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
@@ -1182,7 +1359,7 @@ public class ScreenInput : MonoBehaviour
         }
     }
 
-    //If in customize mode go back, else exit the application
+    // If in customize mode go back, else exit the application
     public void Exit()
     {
         if (!customize)
@@ -1211,7 +1388,7 @@ public class ScreenInput : MonoBehaviour
         customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
     }
 
-    //If in customize mode open save file window, else go into customzie mode
+    // If in customize mode open save file window, else go into customzie mode
     public void Customize()
     {
         if (character.Loaded)
@@ -1229,20 +1406,20 @@ public class ScreenInput : MonoBehaviour
             }
             else
             {
-                //Save();
+                // Save();
             }
         }
         customizeButton.GetComponentInChildren<Text>().text = customize ? "Save" : "Customize";
         exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
     }
 
-    //Show import panel
+    // Show import panel
     public void Import()
     {
         importPanel.SetActive(true);
     }
 
-    //Close import panel without importing with Cancel button
+    // Close import panel without importing with Cancel button
     public void CancelImportButton()
     {
         importPanel.SetActive(false);

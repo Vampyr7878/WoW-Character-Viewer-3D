@@ -2,25 +2,25 @@
 
 namespace WoW
 {
-    //Class to store Customization option data from database
+    // Class to store Customization option data from database
     public class CustomizationOption
     {
-        //Option name
+        // Option name
         public string Name { get; private set; }
-        //Option ID
+        // Option ID
         public int ID { get; private set; }
-        //Option model
+        // Option model
         public int Model { get; private set; }
-        //Option category
+        // Option category
         public int Category { get; private set; }
-        //Option type
+        // Option type
         public int Type { get; private set; }
-        //Option choices
+        // Option choices
         public CustomizationChoice[] Choices { get; private set; }
-        //Option choices
+        // Option choices
         public CustomizationChoice[] AllChoices { get; private set; }
 
-        //Constructor
+        // Constructor
         public CustomizationOption(string name, int id, int model, int category, int type)
         {
             Name = name;
@@ -30,13 +30,13 @@ namespace WoW
             Type = type;
         }
 
-        //Load all available choices
+        // Load all available choices
         public void LoadAllChoices(List<CustomizationChoice> choices)
         {
             AllChoices = choices.ToArray();
         }
 
-        //Set choices that will be shown
+        // Set choices that will be shown
         public void SetChoices(CustomizationChoice[] choices)
         {
             Choices = choices;

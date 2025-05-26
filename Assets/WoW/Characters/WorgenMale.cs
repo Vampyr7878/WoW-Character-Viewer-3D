@@ -5,21 +5,29 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle worgen male customization
+    // Class to handle worgen male customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class WorgenMale : CharacterHelper
     {
+        // Mapping faces to fur colors
         private readonly Dictionary<int, int[]> furColorFaces;
-
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping hair colors to hair styles
         private readonly Dictionary<int, int[]> hairStyleColors;
-
+        // Mapping sideburns to beards
         private readonly Dictionary<int, int[]> beardSideburns;
 
-        public WorgenMale(M2 model, Character character)
+        public WorgenMale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             furColorFaces = new()
             {
                 { 134, new int[] { 2246, 2251, 2252, 2253, 2254, 2255 } },
@@ -46,6 +54,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             HideOtherFormsOptions();
@@ -54,12 +63,13 @@ namespace WoW.Characters
                 case 0:
                     WorgenGeosets(activeGeosets);
                     break;
-                case 10:
+                case 1:
                     HumanGeosets(activeGeosets);
                     break;
             }
         }
 
+        // Change Worgen form geosets according to chosen character customization
         private void WorgenGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -71,6 +81,7 @@ namespace WoW.Characters
             ChangeEyeColor(activeGeosets);
         }
 
+        // Change Human form geosets according to chosen character customization
         private void HumanGeosets(List<int> activeGeosets)
         {
             ChangeEyes(activeGeosets);
@@ -85,6 +96,7 @@ namespace WoW.Characters
             ChangeEyeColor(activeGeosets);
         }
 
+        // Swap model id for current form
         public override void ChangeForm()
         {
             switch(Character.Form)
@@ -93,26 +105,35 @@ namespace WoW.Characters
                     Character.ModelID = 43;
                     Character.ActivateMainMesh();
                     break;
-                case 10:
+                case 1:
                     Character.ModelID = 1;
-                    Character.ActivateExtranMesh();
+                    Character.ActivateExtraMesh();
+                    break;
+                default:
+                    Character.ModelID = Character.CreatureForms[Character.Form - 1].ID;
+                    Character.ActivateCreature();
                     break;
             }
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             switch (Character.Form)
             {
                 case 0:
                     WorgenTextures(texture);
                     break;
-                case 10:
+                case 1:
                     HumanTextures(texture);
                     break;
             }
         }
 
+        // Generate Worgen form skin texture from many layers
         private void WorgenTextures(Texture2D texture)
         {
             DrawLayer(texture, "Face", "Fur Color", 512, 0, 512, 512);
@@ -121,6 +142,7 @@ namespace WoW.Characters
             DrawArmor(texture, true);
         }
 
+        // Generate Human form skin texture from many layers
         private void HumanTextures(Texture2D texture)
         {
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
@@ -132,13 +154,15 @@ namespace WoW.Characters
             DrawArmor(texture);
         }
 
-        protected override int GetSkinColorIndex()
+        // Get id of Skin Color option
+        public override int GetSkinColorIndex()
         {
             if (Character.Form == 0)
                 return Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
             return base.GetSkinColorIndex();
         }
 
+        // Get id of Skin Color Extra option
         protected override int GetSkinExtraIndex()
         {
             if (Character.Form == 0)

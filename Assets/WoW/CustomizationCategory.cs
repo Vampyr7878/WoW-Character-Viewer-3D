@@ -1,18 +1,18 @@
 namespace WoW
 {
-    //Class to store Customization category data from database
+    // Class to store Customization category data from database
     public class CustomizationCategory
     {
-        //Category ID
+        // Category ID
         public int ID { get; private set; }
-        //Category name
+        // Category name
         public string Name { get; private set; }
-        //Category icon
+        // Category icon
         public int Icon { get; private set; }
-        //Category icon when selected
+        // Category icon when selected
         public int Selected { get; private set; }
 
-        //Constructor
+        // Constructor
         public CustomizationCategory(int id, string name, int icon, int selected)
         {
             ID = id;

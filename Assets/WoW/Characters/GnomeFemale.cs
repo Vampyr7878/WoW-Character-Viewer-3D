@@ -5,17 +5,25 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle gnome female customization
+    // Class to handle gnome female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class GnomeFemale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping earring colors to earrings
         private readonly Dictionary<int, int[]> earringsColors;
 
-        public GnomeFemale(M2 model, Character character)
+        public GnomeFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 119, new int[] { 1253, 1256, 1258 } },
@@ -30,6 +38,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -41,8 +50,12 @@ namespace WoW.Characters
             ChangeRelatedGeosetOptions(activeGeosets, "Earrings", "Earring Color", earringsColors);
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawBra(texture);
             DrawUnderwear(texture);
@@ -50,7 +63,8 @@ namespace WoW.Characters
             DrawArmor(texture);
         }
 
-        protected override int GetJewelryColorIndex()
+        // Get id of Jewelry Color option
+        public override int GetJewelryColorIndex()
         {
             return Array.FindIndex(Character.Options, o => o.Name == "Earring Color");
         }

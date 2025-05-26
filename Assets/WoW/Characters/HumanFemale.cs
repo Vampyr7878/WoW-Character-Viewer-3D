@@ -4,17 +4,25 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle human female customization
+    // Class to handle human female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class HumanFemale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping hair colors to hair styles
         private readonly Dictionary<int, int[]> hairStyleColors;
 
-        public HumanFemale(M2 model, Character character)
+        public HumanFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 318, new int[] { 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116 } },
@@ -30,12 +38,12 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeEyes(activeGeosets);
-            ChangeEars(activeGeosets);
+            ChangeGeosetOption(activeGeosets, "Ears");
             ActivateRelatedTextureOptions("Skin Color", "Face", skinColorFaces);
-            ChangeEars(activeGeosets);
             ChangeRelatedGeosetOptions(activeGeosets, "Hair Style", "Hair Color", hairStyleColors);
             ChangeGeosetOption(activeGeosets, "Face Shape");
             ChangeEyeColor(activeGeosets);
@@ -43,8 +51,12 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Necklace");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             OverlayLayer(texture, "Skin Color", 30, 0, 0, 1024, 512);
             DrawBra(texture);

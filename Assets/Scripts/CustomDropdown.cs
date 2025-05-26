@@ -1,22 +1,25 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-//Custom dropdown that allows you to disable some options
+// Custom dropdown that allows you to disable some options
 public class CustomDropdown : Dropdown
 {
+    // First image
     public Image captionImage1;
+    // Second image
     public Image captionImage2;
 
+    // counter to track down next index value
     private int index = 0;
 
-    //Constructor
+    // Constructor
     protected override GameObject CreateDropdownList(GameObject template)
     {
         index = 0;
         return base.CreateDropdownList(template);
     }
 
-    //Make disabled options half transparent
+    // Make disabled options half transparent
     protected override DropdownItem CreateItem(DropdownItem itemTemplate)
     {
         DropdownItem item = base.CreateItem(itemTemplate);
@@ -47,7 +50,7 @@ public class CustomDropdown : Dropdown
         return item;
     }
 
-    //Remove Number from option that contains text on Awake
+    // Remove Number from option that contains text on Awake
     protected override void Awake()
     {
         base.Awake();
@@ -74,7 +77,7 @@ public class CustomDropdown : Dropdown
         }
     }
 
-    //Remove Number from option that contains text on Start
+    // Remove Number from option that contains text on Start
     protected override void Start()
     {
         base.Start();
@@ -101,7 +104,7 @@ public class CustomDropdown : Dropdown
         }
     }
 
-    //Remove Number from option that contains text on Refresh
+    // Remove Number from option that contains text on Refresh
     public new void RefreshShownValue()
     {
         base.RefreshShownValue();
@@ -131,13 +134,13 @@ public class CustomDropdown : Dropdown
         }
     }
 
-    //Get current dropdown value index
+    // Get current dropdown value index
     public int GetValue()
     {
         return ((CustomOptionData)options[value]).Index;
     }
 
-    //Set current dropdown value based on index
+    // Set current dropdown value based on index
     public void SetValue(int val)
     {
         value = options.FindIndex(x => ((CustomOptionData)x).Index == val);

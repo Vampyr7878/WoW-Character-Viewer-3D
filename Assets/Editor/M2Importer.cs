@@ -1,5 +1,7 @@
 ﻿using M2Lib;
+using Newtonsoft.Json.Linq;
 using SkelLib;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -159,7 +161,7 @@ public class M2Importer : ScriptedImporter
         }
         if (bones[bone].Parent == -1)
         {
-            return "Skeleton/Bone0/";
+            return $"Skeleton/Bone{bone}/";
         }
         else
         {
@@ -168,14 +170,14 @@ public class M2Importer : ScriptedImporter
     }
 
     //Create animation seqence clip
-    private AnimationClip GetSeqence(int sequence, Skel skeleton, string[] bonePaths, Transform[] bones)
+    private AnimationClip GetSeqence(short sequence, Skel skeleton, string[] bonePaths, Transform[] bones)
     {
         AnimationClip clip = new()
         {
             name = $"Seqence{sequence}"
         };
         AnimationCurve curve;
-        short index = skeleton.SequenceLookup[sequence];
+        int index = Array.IndexOf(skeleton.Sequences, sequence);
         for (int i = 0; i < skeleton.Bones.Length; i++)
         {
             Bone bone = skeleton.Bones[i];
@@ -326,20 +328,14 @@ public class M2Importer : ScriptedImporter
     private AnimationCurve TranslationCurve(short interpolation, int[] timestamps, float[] values, float position)
     {
         AnimationCurve curve = null;
-        List<Keyframe> keys = new();
-        if (interpolation < 2 || values.Length < 3)
+        List<Keyframe> keys;
+        if (interpolation < 2)
         {
-            for (int j = 0; j < values.Length; j++)
-            {
-                keys.Add(new Keyframe(timestamps[j] / 1000f, position + values[j]));
-            }
+            keys = AddTranslationKeyframes(timestamps, values, position);
         }
         else
         {
-            for (int j = 0; j < values.Length / 3; j++)
-            {
-                keys.Add(new Keyframe(timestamps[j * 3] / 1000f, position + values[j * 3]));
-            }
+            keys = AddTranslationKeyframes(timestamps, values, position, 2);
         }
         if (keys.Count > 0)
         {
@@ -353,20 +349,14 @@ public class M2Importer : ScriptedImporter
     private AnimationCurve RotationCurve(short interpolation, int[] timestamps, float[] values)
     {
         AnimationCurve curve = null;
-        List<Keyframe> keys = new();
-        if (interpolation < 2 || values.Length < 3)
+        List<Keyframe> keys;
+        if (interpolation < 2)
         {
-            for (int j = 0; j < values.Length; j++)
-            {
-                keys.Add(new Keyframe(timestamps[j] / 1000f, values[j]));
-            }
+            keys = AddRotationKeyframes(timestamps, values);
         }
         else
         {
-            for (int j = 0; j < values.Length / 3; j++)
-            {
-                keys.Add(new Keyframe(timestamps[j * 3] / 1000f, values[j * 3]));
-            }
+            keys = AddRotationKeyframes(timestamps, values, 2);
         }
         if (keys.Count > 0)
         {
@@ -380,20 +370,14 @@ public class M2Importer : ScriptedImporter
     private AnimationCurve ScaleCurve(short interpolation, int[] timestamps, float[] values)
     {
         AnimationCurve curve = null;
-        List<Keyframe> keys = new();
-        if (interpolation < 2 || values.Length < 3)
+        List<Keyframe> keys;
+        if (interpolation < 2)
         {
-            for (int j = 0; j < values.Length; j++)
-            {
-                keys.Add(new Keyframe(timestamps[j] / 1000f, values[j]));
-            }
+            keys = AddScaleKeyframes(timestamps, values);
         }
         else
         {
-            for (int j = 0; j < values.Length / 3; j++)
-            {
-                keys.Add(new Keyframe(timestamps[j * 3] / 1000f, values[j * 3]));
-            }
+            keys = AddScaleKeyframes(timestamps, values, 2);
         }
         if (keys.Count > 0)
         {
@@ -401,6 +385,63 @@ public class M2Importer : ScriptedImporter
             SetInterpolation(curve, interpolation);
         }
         return curve;
+    }
+
+    //Add translation keyframes
+    private List<Keyframe> AddTranslationKeyframes(int[] timestamps, float[] values, float position, int step = 1)
+    {
+        List<Keyframe> keys = new();
+        for (int j = 0; j < values.Length / step; j++)
+        {
+            if (j > 0 && timestamps[j * step] == 0)
+            {
+                continue;
+            }
+            if (values[j * step] == float.NaN)
+            {
+                values[j * step] = 0;
+            }
+            keys.Add(new Keyframe(timestamps[j] / 1000f, position + values[j * step]));
+        }
+        return keys;
+    }
+
+    //Add rotation keyframes
+    private List<Keyframe> AddRotationKeyframes(int[] timestamps, float[] values, int step = 1)
+    {
+        List<Keyframe> keys = new();
+        for (int j = 0; j < values.Length / step; j++)
+        {
+            if (j > 0 && timestamps[j * step] == 0)
+            {
+                continue;
+            }
+            if (values[j * step] == float.NaN)
+            {
+                values[j * step] = 0;
+            }
+            keys.Add(new Keyframe(timestamps[j] / 1000f, values[j * step]));
+        }
+        return keys;
+    }
+
+    //Add scale keyframes
+    private List<Keyframe> AddScaleKeyframes(int[] timestamps, float[] values, int step = 1)
+    {
+        List<Keyframe> keys = new();
+        for (int j = 0; j < values.Length / step; j++)
+        {
+            if (j > 0 && timestamps[j * step] == 0)
+            {
+                continue;
+            }
+            if (values[j * step] == float.NaN)
+            {
+                values[j * step] = 0;
+            }
+            keys.Add(new Keyframe(timestamps[j] / 1000f, values[j * step]));
+        }
+        return keys;
     }
 
     //Set proper interpolation mode for given curve

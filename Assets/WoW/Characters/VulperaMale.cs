@@ -5,15 +5,23 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle vulpera male customization
+    // Class to handle vulpera male customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class VulperaMale : CharacterHelper
     {
-        public VulperaMale(M2 model, Character character)
+        public VulperaMale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -24,17 +32,23 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Snout");
             ChangeEyeColor(activeGeosets);
             ChangeGeosetOption(activeGeosets, "Earrings");
+            ChangeGeosetOption(activeGeosets, "Earrings", "Ears");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Fur Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Pattern", "Fur Color", 512, 0, 512, 512);
+            DrawLayer(texture, "Pattern", "Fur Color", 0, 0, 1024, 512);
             DrawUnderwear(texture, "Fur Color");
             DrawArmor(texture, true);
         }
 
-        protected override int GetSkinColorIndex()
+        // Get id of Skin Color option
+        public override int GetSkinColorIndex()
         {
             return Array.FindIndex(Character.Options, o => o.Name == "Fur Color");
         }

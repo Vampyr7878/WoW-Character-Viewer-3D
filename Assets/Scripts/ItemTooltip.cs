@@ -2,12 +2,12 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-//Custom tooltip
+// Custom tooltip
 public class ItemTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Image tooltip;
 
-    //Show tooltip
+    // Show tooltip
     public void OnPointerEnter(PointerEventData eventData)
     {
         tooltip.gameObject.SetActive(true);
@@ -17,11 +17,12 @@ public class ItemTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         width += width / 4 + pos.x;
         if (width > Screen.width)
         {
-            tooltip.rectTransform.position = new Vector3(tooltip.rectTransform.position.x - width + Screen.width, tooltip.rectTransform.position.y, tooltip.rectTransform.position.z);
+            tooltip.rectTransform.position = new Vector3(tooltip.rectTransform.position.x - width + Screen.width,
+                tooltip.rectTransform.position.y, tooltip.rectTransform.position.z);
         }
     }
 
-    //Hide tooltip
+    // Hide tooltip
     public void OnPointerExit(PointerEventData eventData)
     {
         tooltip.gameObject.SetActive(false);

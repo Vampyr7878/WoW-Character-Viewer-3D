@@ -4,15 +4,23 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle dwarf male customization
+    // Class to handle dwarf male customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class DwarfMale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
 
-        public DwarfMale(M2 model, Character character)
+        public DwarfMale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 91, new int[] { 561, 562, 570 } },
@@ -20,6 +28,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -35,8 +44,12 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Eyebrows");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawLayer(texture, "Tattoo Color", "Tattoo", 0, 0, 1024, 512);
             DrawUnderwear(texture);

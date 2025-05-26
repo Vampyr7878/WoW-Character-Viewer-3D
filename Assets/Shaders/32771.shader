@@ -19,14 +19,14 @@ Shader "Custom/32771"
 
 	SubShader
 	{
-		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" }
+		Tags { "Queue" = "AlphaTest" "RenderType" = "Opaque" }
 		LOD 200
 		ZWrite[_DepthTest]
 		Blend[_SrcColorBlend][_DstColorBlend],[_SrcAlphaBlend][_DstAlphaBlend]
 		Cull[_Cull]
 
 		CGPROGRAM
-			#pragma surface surfaceFunction Standard fullforwardshadows
+			#pragma surface surfaceFunction Standard fullforwardshadows keepalpha alphatest:_AlphaCut
 			#pragma target 3.0
 			#pragma shader_feature _ _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature _ _GLOSSYREFLECTIONS_OFF
@@ -34,12 +34,10 @@ Shader "Custom/32771"
 			struct Input
 			{
 				float2 uv_Texture1;
-				float2 uv_Texture2;
 				float2 uv_Emission;
 			};
 
 			sampler2D _Texture1;
-			sampler2D _Texture2;
 			sampler2D _Emission;
 			fixed4 _Color;
 
@@ -47,7 +45,8 @@ Shader "Custom/32771"
 			{
 				fixed4 color = tex2D(_Texture1, IN.uv_Texture1) * _Color;
 				OUT.Albedo = color.rgb;
-				fixed4 alpha =  _Color + tex2D(_Emission, IN.uv_Emission);
+				fixed4 alpha = _Color;
+				OUT.Emission = tex2D(_Emission, IN.uv_Emission);
 				OUT.Alpha = alpha.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;

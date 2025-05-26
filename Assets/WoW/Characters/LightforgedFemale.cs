@@ -4,19 +4,27 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle lightforged female customization
+    // Class to handle lightforged female customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class LightforgedFemale : CharacterHelper
     {
+        // Mapping decorations to hair styles
         private readonly Dictionary<int, int[]> hairStyleDecorations;
-
+        // Mapping headdresses to hair styles
         private readonly Dictionary<int, int[]> hairStyleHeaddress;
-
+        // Mapping horn decorations to horns
         private readonly Dictionary<int, int[]> hornsDecorations;
 
-        public LightforgedFemale(M2 model, Character character)
+        public LightforgedFemale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             hairStyleDecorations = new()
             {
                 { 141, new int[] { 2970, 2971, 2972, 2973, 2974, 2975, 2976, 7483, 18261, 18262, 18263, 18264, 18265 } },
@@ -40,6 +48,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
@@ -60,8 +69,12 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Tail");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             Emission = null;
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             DrawLayer(texture, "Tattoo", 16, 0, 0, 512, 512);

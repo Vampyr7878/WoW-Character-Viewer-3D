@@ -5,21 +5,29 @@ using UnityEngine;
 
 namespace WoW.Characters
 {
-    //Class to handle night elf male customization
+    // Class to handle night elf male customization
+#if UNITY_EDITOR
+    [System.Serializable]
+#endif
     public class NightElfMale : CharacterHelper
     {
+        // Mapping faces to skin colors
         private readonly Dictionary<int, int[]> skinColorFaces;
-
+        // Mapping eye colors to skin colors
         private readonly Dictionary<int, int[]> skinColorEyes;
-
+        // Mapping eye colors to blindfolds
         private readonly Dictionary<int, int[]> blindfoldEyes;
-
+        // Mapping tattoo colors to tattoos
         private readonly Dictionary<int, int[]> tattooColors;
 
-        public NightElfMale(M2 model, Character character)
+        public NightElfMale(M2 model, Character character, ComputeShader shader)
         {
+#if UNITY_EDITOR
+            textures = new();
+#endif
             Model = model;
             Character = character;
+            layerShader = shader;
             skinColorFaces = new()
             {
                 { 95, new int[] { 728, 729, 732 } },
@@ -53,6 +61,7 @@ namespace WoW.Characters
             };
         }
 
+        // Change geosets according to chosen character customization
         public override void ChangeGeosets(List<int> activeGeosets)
         {
             Character.racial.ActiveGeosets.Clear();
@@ -74,20 +83,25 @@ namespace WoW.Characters
             ChangeRelatedTextureOptions("Tattoo", "Tattoo Color", tattooColors);
         }
 
+        // Change goesets in according to eye color and make sure left over geosets are removed
         private new void ChangeEyeColor(List<int> activeGeosets)
         {
             activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
             activeGeosets.RemoveAll(x => x > 5099 && x < 5200);
             ActivateRelatedGeosetOptions(activeGeosets, "Skin Color", "Eye Color", skinColorEyes);
-            if (Character.Class == 6)
+            if (Character.Class == WoWHelper.Class.DeathKnight)
             {
                 ActivateRelatedGeosetOptions(activeGeosets, "Blindfold", "Eye Color", blindfoldEyes);
             }
             ChangeGeosetOption(activeGeosets, "Eye Color");
         }
 
-        protected override void LayeredTexture(Texture2D texture)
+        // Generate skin texture from many layers
+        public override void LayeredTexture(Texture2D texture)
         {
+#if UNITY_EDITOR
+            textures.Clear();
+#endif
             Emission = null;
             DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
             MultiplyLayer(texture, "Markings", 17, 512, 0, 512, 512);
@@ -102,6 +116,7 @@ namespace WoW.Characters
             DrawArmor(texture);
         }
 
+        // Get id of Accesories option
         protected override int GetAccessoriesIndex()
         {
             return Array.FindIndex(Character.Options, o => o.Name == "Vine Color");

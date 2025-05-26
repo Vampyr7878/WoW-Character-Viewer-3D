@@ -1,30 +1,32 @@
 ﻿using CASCLib;
 using M2Lib;
+using SkelLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
 using WoW;
 
-//Class to render any collection system models
+// Class to render any collection system models
 public class Collection : ModelRenderer
 {
-    //Reference to the character wearing that collection
+    // Reference to the character wearing that collection
     public Character character;
 
-    //List of geosets that are enabled for loading
+    // List of geosets that are enabled for loading
     public List<int> ActiveGeosets { get; set; }
-    //Changable texture from database
+    // Changable texture from database
     public int Texture { get; set; }
-    //File id of the model
+    // File id of the model
     public int File { get; private set; }
 
     private void Start()
     {
-        //Set the model to not loaded at start
+        // Set the model to not loaded at start
         Change = false;
         Loaded = false;
     }
@@ -33,7 +35,7 @@ public class Collection : ModelRenderer
     {
         if (Loaded)
         {
-            //Render the model
+            // Render the model
             if (Change)
             {
                 Resources.UnloadUnusedAssets();
@@ -45,16 +47,24 @@ public class Collection : ModelRenderer
                 }
                 Change = false;
             }
-            //Animate textures
+            // Animate textures
             if (character.Loaded)
             {
                 for (int i = 0; i < Model.Skin.Textures.Length; i++)
                 {
                     AnimateTextures(renderer, i);
                 }
-                for (int i = 0; i < time.Length; i++)
+                for (int i = 0; i < textureTime.Length; i++)
                 {
-                    time[i] += Time.deltaTime;
+                    textureTime[i] += Time.deltaTime;
+                }
+                for (int i = 0; i < colorTime.Length; i++)
+                {
+                    colorTime[i] += Time.deltaTime;
+                }
+                for (int i = 0; i < transparencyTime.Length; i++)
+                {
+                    transparencyTime[i] += Time.deltaTime;
                 }
             }
         }
@@ -64,7 +74,7 @@ public class Collection : ModelRenderer
         }
     }
 
-    //Set material with proper shader
+    // Set material with proper shader
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
         if (ActiveGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
@@ -88,7 +98,7 @@ public class Collection : ModelRenderer
         }
     }
 
-    //Setup all the material properties
+    // Setup all the material properties
     protected override void SetTexture(Material material, int i)
     {
         material.SetTexture("_Texture1", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture]]);
@@ -96,20 +106,12 @@ public class Collection : ModelRenderer
         {
             material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
         }
-        //if (name == "racial" && character.Race == 37 && material.shader.name == "Custom/16401")
-        //{
-        //    material.SetInt("_SrcColorBlend", (int)BlendMode.SrcAlpha);
-        //    material.SetInt("_DstColorBlend", (int)BlendMode.One);
-        //}
-        //else
-        //{
         material.SetInt("_SrcColorBlend", (int)SrcColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstColorBlend", (int)DstColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        //}
         material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.5f : 0f);
-        Color32 color = Color.white;
+        Color color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
             color = colors[Model.Skin.Textures[i].Color];
@@ -118,39 +120,70 @@ public class Collection : ModelRenderer
         material.SetInt("_Cull", (int)cull);
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
-        color.a = (byte)(Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]] * 255);
+        if (Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]].Transparency.Values[0].Length > 0)
+        {
+            color.a *= Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]].Transparency.Values[0][0];
+        }
         material.SetColor("_Color", color);
-        //material.renderQueue += Model.Skin.Textures[i].Priority;
+        material.renderQueue += Model.Skin.Textures[i].Priority;
     }
 
-    //Load specific texture
-    private int LoadTexture(M2Texture texture, int i)
+    // Load specific texture
+    private int LoadTexture(M2Texture texture, int i, out WoWHelper.LayeredTexture layered)
     {
-        int file = -1;
-        int index;
+        int? file = null;
+        int index, index2;
+        layered = WoWHelper.LayeredTexture.None;
+        Debug.Log($"Texture: {texture.Type}");
         switch (texture.Type)
         {
             case 0:
                 file = Model.TextureIDs[i];
                 break;
+            case 1:
+                index = character.helper.GetSkinColorIndex();
+                file = character.Options[index].Choices[character.Customization[index]].Textures.First(t => t.Target == 1).ID;
+                layered = WoWHelper.LayeredTexture.Skin;
+                break;
             case 2:
                 file = Texture;
                 break;
-            case 8:
-                index = Array.FindIndex(character.Options, o => o.Name == "Paint");
+            case 6:
+                index = character.helper.GetHairColorIndex();
                 file = character.Options[index].Choices[character.Customization[index]].Textures[0].ID;
                 break;
+            case 8:
+                index = character.helper.GetArmorColorIndex();
+                file = character.Options[index].Choices[character.Customization[index]].Textures[0].ID;
+                break;
+            case 9:
+                index = character.helper.GetOrnamentColorIndex();
+                file = character.Options[index].Choices[character.Customization[index]].Textures.FirstOrDefault(t => t.Target == (character.ModelID == 89 ? 10 : 11))?.ID;
+                break;
+            case 20:
+                index = character.helper.GetJewelryColorIndex();
+                if (character.Options[index].Choices[character.Customization[index]].Textures.Length > 0)
+                {
+                    file = character.Options[index].Choices[character.Customization[index]].Textures[0].ID;
+                }
+                break;
+            case 25:
+                index = character.helper.GetArmorColorIndex();
+                index2 = character.helper.GetArmorStyleIndex();
+                file = character.Options[index].Choices[character.Customization[index]].Textures.
+                    First(t => t.Related == character.Options[index2].Choices[character.Customization[index2]].ID).ID;
+                break;
         }
-        return file;
+        return file == null ? -1 : file.Value;
     }
 
-    //Load and prepare all model textures
+    // Load and prepare all model textures
     public void LoadTextures()
     {
         for (int i = 0; i < textures.Length; i++)
         {
-            int file = LoadTexture(Model.Textures[i], i);
-            if (file == -1)
+            int file = LoadTexture(Model.Textures[i], i, out WoWHelper.LayeredTexture layered);
+            if (file <= 0)
             {
                 textures[i] = new Texture2D(200, 200);
             }
@@ -162,11 +195,17 @@ public class Collection : ModelRenderer
                 textures[i].wrapModeU = (Model.Textures[i].Flags & 1) != 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
                 textures[i].wrapModeV = (Model.Textures[i].Flags & 2) != 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
                 textures[i].Apply();
+                switch (layered)
+                {
+                    case WoWHelper.LayeredTexture.Skin:
+                        character.helper.LayeredTexture(textures[i]);
+                        break;
+                }
             }
         }
     }
 
-    //Unload the model
+    // Unload the model
     public void UnloadModel()
     {
         DestroyImmediate(mesh);
@@ -177,15 +216,15 @@ public class Collection : ModelRenderer
         }
     }
 
-    //Find matching bones in character model
-    private void MatchBones(ModelRenderer modelRenderer)
+    // Find matching bones in character model
+    private void MatchBones(GameObject modelRenderer, Bone[] parentBones)
     {
         renderer = mesh.GetComponentInChildren<SkinnedMeshRenderer>();
         SkinnedMeshRenderer renderer2 = modelRenderer.GetComponentInChildren<SkinnedMeshRenderer>();
         Dictionary<int, int> boneMap = new Dictionary<int, int>();
         for (int i = 0, j = 0; i < Model.Skeleton.Bones.Length; i++, j++)
         {
-            if (Model.Skeleton.Bones[i].Name == modelRenderer.Model.Skeleton.Bones[j].Name)
+            if (Model.Skeleton.Bones[i].Name == parentBones[j].Name)
             {
                 boneMap.Add(i, j);
             }
@@ -206,18 +245,18 @@ public class Collection : ModelRenderer
         renderer.sharedMesh.bindposes = bind;
     }
 
-    //Load the model from assets
+    // Load the model from assets
 #if UNITY_EDITOR
-    public IEnumerator LoadModel(string collectionfile, Dictionary<int, string> listfile, string dataPath)
+    public IEnumerator LoadModel(string collectionfile, GameObject parent, Bone[] parentBones, Dictionary<int, string> listFile, string dataPath)
 #else
-    public IEnumerator LoadModel(string collectionfile, CASCHandler casc)
+    public IEnumerator LoadModel(string collectionfile, GameObject parent, Bone[] parentBones, CASCHandler casc)
 #endif
     {
         UnloadModel();
         bool done = false;
         converter = new System.Drawing.ImageConverter();
 #if UNITY_EDITOR
-        this.listfile = listfile;
+        this.listFile = listFile;
         this.dataPath = dataPath;
 #else
         this.casc = casc;
@@ -242,34 +281,50 @@ public class Collection : ModelRenderer
             LoadColors();
             yield return null;
             textures = new Texture2D[Model.Textures.Length];
-            MatchBones(character);
-            time = new float[Model.TextureAnimations.Length];
-            frame = new int[Model.TextureAnimations.Length];
-            for (int i = 0; i < time.Length; i++)
+            MatchBones(parent, parentBones);
+            textureTime = new float[Model.TextureAnimations.Length];
+            textureFrame = new int[Model.TextureAnimations.Length];
+            colorTime = new float[Model.TextureAnimations.Length];
+            colorFrame = new int[Model.TextureAnimations.Length];
+            transparencyTime = new float[Model.TextureAnimations.Length];
+            transparencyFrame = new int[Model.TextureAnimations.Length];
+            for (int i = 0; i < textureTime.Length; i++)
             {
-                time[i] = 0f;
-                frame[i] = 0;
+                textureTime[i] = 0f;
+                textureFrame[i] = 0;
+                yield return null;
+            }
+            for (int i = 0; i < colorTime.Length; i++)
+            {
+                colorTime[i] = 0f;
+                colorFrame[i] = 0;
+                yield return null;
+            }
+            for (int i = 0; i < transparencyTime.Length; i++)
+            {
+                transparencyTime[i] = 0f;
+                transparencyFrame[i] = 0;
                 yield return null;
             }
             Loaded = !loadBinaries.IsAlive;
-            Change = true;
+            Change = false;
         }
     }
 
-    //Load the model from CASC
+    // Load the model from CASC
 #if UNITY_EDITOR
-    public IEnumerator LoadModel(int file, int texture, Dictionary<int, string> listfile, string dataPath)
+    public IEnumerator LoadModel(int file, int texture, GameObject parent, Bone[] parentBones, Dictionary<int, string> listFile, string dataPath)
     {
         File = file;
         if (file != 0)
         {
             Texture = texture;
-            this.listfile = listfile;
+            this.listFile = listFile;
             this.dataPath = dataPath;
             converter = new System.Drawing.ImageConverter();
             byte[] bytes;
             yield return null;
-            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listfile[file]}", FileMode.Open)))
+            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listFile[file]}", FileMode.Open)))
             {
                 bytes = reader.ReadBytes((int)reader.BaseStream.Length);
             }
@@ -279,7 +334,7 @@ public class Collection : ModelRenderer
             yield return null;
             if (Model.SkelFileID != 0)
             {
-                using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listfile[Model.SkelFileID]}", FileMode.Open)))
+                using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listFile[Model.SkelFileID]}", FileMode.Open)))
                 {
                     bytes = reader.ReadBytes((int)reader.BaseStream.Length);
                 }
@@ -287,12 +342,12 @@ public class Collection : ModelRenderer
             yield return null;
             Model.Skeleton.LoadFile(bytes, Model.SkelFileID);
             yield return null;
-            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listfile[Model.SkinFileID]}", FileMode.Open)))
+            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listFile[Model.SkinFileID]}", FileMode.Open)))
             {
                 bytes = reader.ReadBytes((int)reader.BaseStream.Length);
             }
 #else
-    public IEnumerator LoadModel(int file, int texture, CASCHandler casc)
+    public IEnumerator LoadModel(int file, int texture, GameObject parent, Bone[] parentBones, CASCHandler casc)
         {
         File = file;
         if (file != 0)
@@ -351,17 +406,33 @@ public class Collection : ModelRenderer
                     yield return null;
                 }
             }
-            MatchBones(character);
-            time = new float[Model.TextureAnimations.Length];
-            frame = new int[Model.TextureAnimations.Length];
-            for (int i = 0; i < time.Length; i++)
+            MatchBones(parent, parentBones);
+            textureTime = new float[Model.TextureAnimations.Length];
+            textureFrame = new int[Model.TextureAnimations.Length];
+            colorTime = new float[Model.TextureAnimations.Length];
+            colorFrame = new int[Model.TextureAnimations.Length];
+            transparencyTime = new float[Model.TextureAnimations.Length];
+            transparencyFrame = new int[Model.TextureAnimations.Length];
+            for (int i = 0; i < textureTime.Length; i++)
             {
-                time[i] = 0f;
-                frame[i] = 0;
+                textureTime[i] = 0f;
+                textureFrame[i] = 0;
+                yield return null;
+            }
+            for (int i = 0; i < colorTime.Length; i++)
+            {
+                colorTime[i] = 0f;
+                colorFrame[i] = 0;
+                yield return null;
+            }
+            for (int i = 0; i < transparencyTime.Length; i++)
+            {
+                transparencyTime[i] = 0f;
+                transparencyFrame[i] = 0;
                 yield return null;
             }
             Loaded = true;
-            Change = true;
+            Change = false;
         }
     }
 }

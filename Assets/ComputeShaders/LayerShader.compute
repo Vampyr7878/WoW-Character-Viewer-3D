@@ -1,0 +1,87 @@
+#pragma kernel DrawTexture
+#pragma kernel DoubleTexture
+#pragma kernel OverlayTexture
+#pragma kernel MultiplyTexture
+#pragma kernel BlackTexture
+#pragma kernel ScaleTexture
+
+Texture2D<float4> Layer;
+RWTexture2D<float4> Result;
+int2 Offset;
+int2 Size;
+int2 Target;
+
+[numthreads(8, 8, 1)]
+void DrawTexture(uint3 id : SV_DispatchThreadID)
+{
+    int2 target = int2(id.xy);
+    int2 source = target - Offset;
+    if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
+    {
+        Result[target] = lerp(Result[target], Layer[source], Layer[source].a);
+    }
+}
+
+[numthreads(8, 8, 1)]
+void DoubleTexture(uint3 id : SV_DispatchThreadID)
+{
+    int2 target = int2(id.xy);
+    int2 source = target - Offset;
+    if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
+    {
+        Result[target] = lerp(Result[target], Layer[source], Layer[source].a);
+        Result[target] = lerp(Result[target], Layer[source], Layer[source].a);
+    }
+}
+
+[numthreads(8, 8, 1)]
+void OverlayTexture(uint3 id : SV_DispatchThreadID)
+{
+    int2 target = int2(id.xy);
+    int2 source = target - Offset;
+    if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
+    {
+        float4 layerPixel = Layer[source];
+        float4 resultPixel = Result[target];
+        float4 color = Result[target] * 255.0;
+        color.r = resultPixel.r * (color.r + 2 * layerPixel.r * (255.0 - color.r));
+        color.g = resultPixel.g * (color.g + 2 * layerPixel.g * (255.0 - color.g));
+        color.b = resultPixel.b * (color.b + 2 * layerPixel.b * (255.0 - color.b));
+        color.a = resultPixel.a * (color.a + 2 * layerPixel.a * (255.0 - color.a));
+        Result[target] = color / 255.0;
+    }
+}
+
+[numthreads(8, 8, 1)]
+void MultiplyTexture(uint3 id : SV_DispatchThreadID)
+{
+    int2 target = int2(id.xy);
+    int2 source = target - Offset;
+    if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
+    {
+        Result[target] = Result[target] * Layer[source];
+    }
+}
+
+[numthreads(8, 8, 1)]
+void BlackTexture(uint3 id : SV_DispatchThreadID)
+{
+    float4 color = float4(0.0, 0.0, 0.0, 0.0);
+    if (Layer[id.xy].a > 0.5)
+    {
+        color.a = 1.0;
+    }
+    Result[id.xy] = color;
+}
+
+[numthreads(8, 8, 1)]
+void ScaleTexture(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= Target.x || id.y >= Target.y)
+    {
+        return;
+    }
+    float2 uv = id.xy * Size / Target;
+    Result[id.xy] = Layer.Load(int3(uv, 0));
+
+}
