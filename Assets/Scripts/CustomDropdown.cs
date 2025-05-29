@@ -134,15 +134,15 @@ public class CustomDropdown : Dropdown
         }
     }
 
-    // Get current dropdown value index
+    // Get current dropdown value
     public int GetValue()
     {
-        return ((CustomOptionData)options[value]).Index;
+        return ((CustomOptionData)options[value]).ID;
     }
 
-    // Set current dropdown value based on index
+    // Set current dropdown value
     public void SetValue(int val)
     {
-        value = options.FindIndex(x => ((CustomOptionData)x).Index == val);
+        value = options.FindIndex(x => ((CustomOptionData)x).ID == val);
     }
 }

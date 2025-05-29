@@ -52,6 +52,8 @@ public class Creature : ModelRenderer
     private Dictionary<int, int[]> kulTiranForms;
     // Mapping of Zandalari druid forms
     private Dictionary<int, int[]> zandalariForms;
+    // List of options that disable customization
+    private int[] fullTransformations;
     // Particle colors used by the model
     private ParticleColor[] particleColors;
     // model file name
@@ -208,6 +210,7 @@ public class Creature : ModelRenderer
                 { (int)WoWHelper.CreatureForm.FlightForm, new int[] { 4184, 4186, 4187, 4232, 4237, 4239, 4243, 4244, 4245, 4246, 4247, 4248, 4249 } },
                 { (int)WoWHelper.CreatureForm.MoonkinForm, new int[] { 141, 4164 } }
             };
+        fullTransformations = new int[] { 15383, 15384, 15385, 15386, 15412, 15414, 15410, 15408, 15404, 15406 };
     }
 
     private void FixedUpdate()
@@ -394,6 +397,27 @@ public class Creature : ModelRenderer
                     character.helper.ChangeRacialOptions("Flight Form", kulTiranForms[(int)WoWHelper.CreatureForm.FlightForm]);
                     character.helper.ChangeRacialOptions("Full Transformation", kulTiranForms[(int)WoWHelper.CreatureForm.MoonkinForm]);
                     break;
+            }
+        }
+    }
+
+    // Change visibility of other dropdowns based on selected Full Transformation option
+    public void ChangeFullTransformation()
+    {
+        if (character.ModelID == (int)WoWHelper.CreatureForm.MoonkinForm)
+        {
+            int index = Array.FindIndex(character.Options, o => o.Name == "Full Transformation" && o.Model == character.ModelID);
+            bool full = fullTransformations.Contains(character.Options[index].Choices[character.Customization[index]].ID);
+            foreach (var category in character.CustomizationCategories)
+            {
+                category.gameObject.SetActive(!full);
+            }
+            for (int i = 0; i < character.Options.Length; i++)
+            {
+                if (character.Options[i].Model == character.ModelID && character.Options[i].Category == character.Category && i != index)
+                {
+                    character.CustomizationDropdowns[i]?.transform.parent.gameObject.SetActive(!full);
+                }
             }
         }
     }

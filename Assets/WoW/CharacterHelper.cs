@@ -544,10 +544,10 @@ namespace WoW
             int id = Character.Options[index].Choices[Character.Customization[index]].ID;
             if (Character.Options[index2].Choices[Character.Customization[index2]].Textures.FirstOrDefault(t => t.Related == id) == null)
             {
-                var choice = Character.Options[index2].Choices.FirstOrDefault(c => c.Textures.FirstOrDefault(t => t.Related == id) != null);
-                if (choice != null)
+                var choice = Character.Options[index2].Choices.FirstOrDefault(c => c.Value.Textures.FirstOrDefault(t => t.Related == id) != null);
+                if (choice.Value != null)
                 {
-                    Character.CustomizationDropdowns[index2].SetValue(Array.IndexOf(Character.Options[index2].Choices, choice));
+                    Character.CustomizationDropdowns[index2].SetValue(choice.Key);
                 }
             }
             Character.ActivateRelatedChoices(index, index2);
@@ -561,8 +561,8 @@ namespace WoW
             int[] choices = reqRelations[Character.Options[index].Choices[Character.Customization[index]].Requirement];
             if (!choices.Contains(Character.Options[index2].Choices[Character.Customization[index2]].ID))
             {
-                var choice = Character.Options[index2].Choices.First(c => choices.Contains(c.ID));
-                Character.CustomizationDropdowns[index2].SetValue(Array.IndexOf(Character.Options[index2].Choices, choice));
+                var choice = Character.Options[index2].Choices.First(c => choices.Contains(c.Value.ID));
+                Character.CustomizationDropdowns[index2].SetValue(choice.Key);
             }
             Character.ActivateUsingIds(index2, choices);
         }
@@ -572,8 +572,10 @@ namespace WoW
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
-            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).Select(x => x.Key).ToArray();
-            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.Where(c => requirements.Contains(c.Requirement)).ToArray());
+            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
+                Select(x => x.Key).ToArray();
+            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.
+                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value));
             Character.ChangeDropdownOptions(index2);
         }
 
@@ -582,11 +584,12 @@ namespace WoW
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
-            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).Select(x => x.Key).ToArray();
+            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
+                Select(x => x.Key).ToArray();
             if (!requirements.Contains(Character.Options[index2].Choices[Character.Customization[index2]].Requirement))
             {
-                var choice = Character.Options[index2].Choices.First(c => requirements.Contains(c.Requirement));
-                Character.CustomizationDropdowns[index2].SetValue(Array.IndexOf(Character.Options[index2].Choices, choice));
+                var choice = Character.Options[index2].Choices.First(c => requirements.Contains(c.Value.Requirement));
+                Character.CustomizationDropdowns[index2].SetValue(choice.Key);
             }
             Character.ActivateUsingRequirmenets(index2, requirements);
             ChangeGeosetOption(activeGeosets, name);
@@ -597,8 +600,10 @@ namespace WoW
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
-            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).Select(x => x.Key).ToArray();
-            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.Where(c => requirements.Contains(c.Requirement)).ToArray());
+            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
+                Select(x => x.Key).ToArray();
+            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.
+                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value));
             Character.ChangeDropdownOptions(index2);
             ChangeGeosetOption(activeGeosets, name);
         }
@@ -607,7 +612,8 @@ namespace WoW
         public void ChangeRacialOptions(string name, int[] requirements)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name);
-            Character.Options[index].SetChoices(Character.Options[index].AllChoices.Where(c => requirements.Contains(c.Requirement)).ToArray());
+            Character.Options[index].SetChoices(Character.Options[index].AllChoices.
+                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value));
             Character.ChangeDropdownOptions(index);
         }
 
@@ -666,8 +672,10 @@ namespace WoW
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
-            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).Select(x => x.Key).ToArray();
-            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.Where(c => requirements.Contains(c.Requirement)).ToArray());
+            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
+                Select(x => x.Key).ToArray();
+            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.Where(c => requirements.Contains(c.Value.Requirement)).
+                ToDictionary(c => c.Key, c => c.Value));
             Character.ChangeDropdownOptions(index2);
             ChangeSkinnedGeosetOption(activeGeosets, name2, name);
         }
@@ -677,7 +685,8 @@ namespace WoW
         {
             for (int i = 0; i < Character.Options.Length; i++)
             {
-                bool active = Character.Options[i].Model == Character.ModelID && Character.Options[i].Category == Character.Category && Character.Options[i].Choices.Length > 1;
+                bool active = Character.Options[i].Model == Character.ModelID && Character.Options[i].Category == Character.Category
+                    && Character.Options[i].Choices.Count > 1;
                 if (Character.Options[i].Type == 0)
                 {
                     Character.CustomizationDropdowns[i].transform.parent.gameObject.SetActive(active);
@@ -787,8 +796,9 @@ namespace WoW
                     break;
                 case 7:
                     index = GetHairExtraIndex();
-                    file = Character.Race == WoWHelper.Race.Dracthyr ? Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 2).ID :
-                        Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == 11)?.ID;
+                    file = Character.Race == WoWHelper.Race.Dracthyr ? Character.Options[index].Choices[Character.Customization[index]].Textures.
+                        First(t => t.Target == 2).ID : Character.Options[index].Choices[Character.Customization[index]].Textures.
+                        FirstOrDefault(t => t.Target == 11)?.ID;
                     layered = WoWHelper.LayeredTexture.Extra1;
                     break;
                 case 8:
@@ -796,14 +806,10 @@ namespace WoW
                     file = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 2).ID;
                     layered = WoWHelper.LayeredTexture.Extra1;
                     break;
-                case 9:
-                    index = GetOrnamentColorIndex();
-                    file = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == (Character.ModelID == 89 ? 10 : 11))?.ID;
-                    break;
                 case 10:
                     index = GetAccessoriesIndex();
-                    file = Character.Race == WoWHelper.Race.Dracthyr ? Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 3).ID :
-                        Character.Options[index].Choices[Character.Customization[index]].Textures[0].ID;
+                    file = Character.Race == WoWHelper.Race.Dracthyr ? Character.Options[index].Choices[Character.Customization[index]].Textures.
+                        First(t => t.Target == 3).ID : Character.Options[index].Choices[Character.Customization[index]].Textures[0].ID;
                     layered = WoWHelper.LayeredTexture.Extra2;
                     break;
                 case 19:

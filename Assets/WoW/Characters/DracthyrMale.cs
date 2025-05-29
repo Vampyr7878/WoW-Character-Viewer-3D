@@ -48,8 +48,10 @@ namespace WoW.Characters
             };
             hornJewerly = new()
             {
-                { 141,  new int[] { 19507, 26861, 26862, 26863, 26864, 26865, 26866, 26867, 26868, 26869, 26870, 26871, 26872, 26873, 26874, 26875, 26876, 26877, 29775, 29776 } },
-                { 3133, new int[] { 26861, 26862, 26863, 26864, 26865, 26866, 26867, 26868, 26869, 26870, 26871, 26872, 26873, 26874, 26875, 26876, 26877, 29775, 29776 } }
+                { 141,  new int[] { 19507, 26861, 26862, 26863, 26864, 26865, 26866, 26867, 26868, 26869,
+                    26870, 26871, 26872, 26873, 26874, 26875, 26876, 26877, 29775, 29776 } },
+                { 3133, new int[] { 26861, 26862, 26863, 26864, 26865, 26866, 26867, 26868, 26869,
+                    26870, 26871, 26872, 26873, 26874, 26875, 26876, 26877, 29775, 29776 } }
             };
             jewerlyColors = new()
             {
@@ -74,18 +76,23 @@ namespace WoW.Characters
             };
             highlightStyles = new()
             {
-                { 141, new int[] { 27651, 27652, 27653, 27654, 27655, 27656, 27657, 27658, 27659, 27660, 27661, 27662, 27663, 27664, 27665, 27666, 27667, 27668, 27669, 27670, 27791 } },
-                { 470, new int[] { 27651, 27652, 27653, 27654, 27655, 27656, 27657, 27658, 27659, 27660, 27661, 27662, 27663, 27664, 27665, 27666, 27667, 27668, 27669, 27670 } }
+                { 141, new int[] { 27651, 27652, 27653, 27654, 27655, 27656, 27657, 27658, 27659, 27660,
+                    27661, 27662, 27663, 27664, 27665, 27666, 27667, 27668, 27669, 27670, 27791 } },
+                { 470, new int[] { 27651, 27652, 27653, 27654, 27655, 27656, 27657, 27658, 27659, 27660,
+                    27661, 27662, 27663, 27664, 27665, 27666, 27667, 27668, 27669, 27670 } }
             };
             visageHorns = new()
             {
-                { 466, new int[] { 28100, 28101, 28102, 28103, 28104, 28105, 28106, 28107, 28108, 28109, 28110, 28111, 28112, 28113, 28114, 28115, 28116, 29864, 29865 } },
+                { 466, new int[] { 28100, 28101, 28102, 28103, 28104, 28105, 28106, 28107, 28108,
+                    28109, 28110, 28111, 28112, 28113, 28114, 28115, 28116, 29864, 29865 } },
                 { 472, new int[] { 28099 } }
             };
             visageJewelry = new()
             {
-                { 141, new int[] { 28099, 28100, 28101, 28102, 28103, 28104, 28105, 28106, 28107, 28108, 28109, 28110, 28111, 28112, 28113, 28114, 28115, 28116, 29864, 29865 } },
-                { 466, new int[] { 28100, 28101, 28102, 28103, 28104, 28105, 28106, 28107, 28108, 28109, 28110, 28111, 28112, 28113, 28114, 28115, 28116, 29864, 29865 } }
+                { 141, new int[] { 28099, 28100, 28101, 28102, 28103, 28104, 28105, 28106, 28107, 28108,
+                    28109, 28110, 28111, 28112, 28113, 28114, 28115, 28116, 29864, 29865 } },
+                { 466, new int[] { 28100, 28101, 28102, 28103, 28104, 28105, 28106, 28107, 28108,
+                    28109, 28110, 28111, 28112, 28113, 28114, 28115, 28116, 29864, 29865 } }
             };
             scalePatterns = new()
             {
@@ -183,8 +190,8 @@ namespace WoW.Characters
             ChangeGeosetOption(activeGeosets, "Hair Decoration", "Hair Style");
             ChangeGeosetOption(activeGeosets, "Mustache");
             ChangeGeosetOption(activeGeosets, "Beard");
-            ChangeRelatedTextureOptions("Horns", "Horn Color", visageHorns);
             ChangeSkinnedGeosetOption(Character.extraRacial.ActiveGeosets, "Horns");
+            ChangeRelatedTextureOptions("Horns", "Horn Color", visageHorns);
             ChangeRelatedSkinnedGeosetOption(Character.extraRacial.ActiveGeosets, "Horns", "Horn Jewelry", visageJewelry);
             ChangeGeosetOption(activeGeosets, "Scale Pattern");
             ChangeRelatedTextureOptions("Scale Pattern", "Scale Markings", scalePatterns);
@@ -328,7 +335,7 @@ namespace WoW.Characters
             {
                 return Array.FindIndex(Character.Options, o => o.Name == "Armor Color");
             }
-            return base.GetOrnamentColorIndex();
+            return base.GetArmorColorIndex();
         }
 
         // Get id of Armor Style option
@@ -338,7 +345,7 @@ namespace WoW.Characters
             {
                 return Array.FindIndex(Character.Options, o => o.Name == "Armor Style");
             }
-            return base.GetOrnamentColorIndex();
+            return base.GetArmorStyleIndex();
         }
     }
 }

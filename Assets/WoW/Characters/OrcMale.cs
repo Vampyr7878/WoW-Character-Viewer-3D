@@ -1,7 +1,9 @@
 ﻿using M2Lib;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 namespace WoW.Characters
 {
@@ -49,13 +51,13 @@ namespace WoW.Characters
         private void ChangeUpright()
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Upright");
-            if (Character.Customization[index] == 1)
+            if (Character.Customization[index] == Character.Options[index].Choices.First().Key)
             {
-                Character.ActivateExtraMesh();
+                Character.ActivateMainMesh();
             }
             else
             {
-                Character.ActivateMainMesh();
+                Character.ActivateExtraMesh();
             }    
         }
 

@@ -68,10 +68,10 @@ namespace Assets.WoW
             pallete = new Color32[256];
             for (i = 0; i < 256; i++)
             {
-                a = reader.ReadByte();
-                r = reader.ReadByte();
-                g = reader.ReadByte();
                 b = reader.ReadByte();
+                g = reader.ReadByte();
+                r = reader.ReadByte();
+                a = reader.ReadByte();
                 pallete[i] = new Color32(r, g, b, a);
             }
             pixels = new Color32[width * height];
@@ -107,6 +107,7 @@ namespace Assets.WoW
                 {
                     index = reader.ReadByte();
                     pixels[(height - 1 - i) * width + j] = pallete[index];
+                    pixels[(height - 1 - i) * width + j].a = 255;
                 }
             }
             if (alpha == 1)
@@ -227,7 +228,7 @@ namespace Assets.WoW
                     colors[0] = new Color32((byte)(((color0 >> 11) & 31) * 255 / 31), (byte)(((color0 >> 5) & 63) * 255 / 63),
                         (byte)((color0 & 31) * 255 / 31), 255);
                     colors[1] = new Color32((byte)(((color1 >> 11) & 31) * 255 / 31), (byte)(((color1 >> 5) & 63) * 255 / 63),
-                        (byte)((color1 & 31) * 255 / 3), 255);
+                        (byte)((color1 & 31) * 255 / 31), 255);
                     colors[2] = new Color32((byte)((2 * colors[0].r + colors[1].r) / 3), (byte)((2 * colors[0].g + colors[1].g) / 3),
                         (byte)((2 * colors[0].b + colors[1].b) / 3), 255);
                     colors[3] = new Color32((byte)((colors[0].r + 2 * colors[1].r) / 3), (byte)((colors[0].g + 2 * colors[1].g) / 3),

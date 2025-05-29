@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace WoW
 {
@@ -14,11 +15,11 @@ namespace WoW
         // Option category
         public int Category { get; private set; }
         // Option type
-        public int Type { get; private set; }
+        public WoWHelper.CustomizationType Type { get; private set; }
         // Option choices
-        public CustomizationChoice[] Choices { get; private set; }
+        public Dictionary<int, CustomizationChoice> Choices { get; private set; }
         // Option choices
-        public CustomizationChoice[] AllChoices { get; private set; }
+        public Dictionary<int, CustomizationChoice> AllChoices { get; private set; }
 
         // Constructor
         public CustomizationOption(string name, int id, int model, int category, int type)
@@ -27,17 +28,17 @@ namespace WoW
             ID = id;
             Model = model;
             Category = category;
-            Type = type;
+            Type = (WoWHelper.CustomizationType)type;
         }
 
         // Load all available choices
-        public void LoadAllChoices(List<CustomizationChoice> choices)
+        public void LoadAllChoices(Dictionary<int, CustomizationChoice> choices)
         {
-            AllChoices = choices.ToArray();
+            AllChoices = choices;
         }
 
         // Set choices that will be shown
-        public void SetChoices(CustomizationChoice[] choices)
+        public void SetChoices(Dictionary<int, CustomizationChoice> choices)
         {
             Choices = choices;
         }

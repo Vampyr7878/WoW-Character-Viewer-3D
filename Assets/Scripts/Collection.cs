@@ -158,7 +158,8 @@ public class Collection : ModelRenderer
                 break;
             case 9:
                 index = character.helper.GetOrnamentColorIndex();
-                file = character.Options[index].Choices[character.Customization[index]].Textures.FirstOrDefault(t => t.Target == (character.ModelID == 89 ? 10 : 11))?.ID;
+                file = character.Options[index].Choices[character.Customization[index]].Textures.
+                    FirstOrDefault(t => t.Target == (character.ModelID == 89 ? 10 : (character.Race == WoWHelper.Race.Earthen ? 16: 11)))?.ID;
                 break;
             case 20:
                 index = character.helper.GetJewelryColorIndex();

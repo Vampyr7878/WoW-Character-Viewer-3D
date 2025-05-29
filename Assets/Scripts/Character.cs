@@ -47,6 +47,8 @@ public class Character : ModelRenderer
     public List<CustomDropdown> CustomizationDropdowns { get; set; }
     // Toggles containing customization options
     public List<Toggle> CustomizationToggles { get; set; }
+    // Buttons containing customization categories
+    public List<Button> CustomizationCategories { get; set; }
     // Path from where the model is loaded
     public string RacePath { get; set; }
     // Extra path from where the model is loaded
@@ -81,6 +83,7 @@ public class Character : ModelRenderer
         converter = new System.Drawing.ImageConverter();
         CustomizationDropdowns = new List<CustomDropdown>();
         CustomizationToggles = new List<Toggle>();
+        CustomizationCategories = new List<Button>();
         Gender = true;
         Change = false;
         Loaded = false;
@@ -111,7 +114,7 @@ public class Character : ModelRenderer
                             SetMaterial(renderer, i);
                         }
                         int index = Array.FindIndex(Options, o => o.Name == "Face" && o.Model == ModelID);
-                        animator.SetInteger("Face", Customization[index] + 1);
+                        animator.SetInteger("Face", ChoiceIndex(index) + 1);
                         animator.SetBool("DeathKnight", Class == WoWHelper.Class.DeathKnight);
                     }
                     else
@@ -120,6 +123,7 @@ public class Character : ModelRenderer
                         creature.ChangeRelatedOptions();
                         creature.ChangeRelatedOptions();
                         creature.ChangeRelatedOptions();
+                        creature.ChangeFullTransformation();
 #if UNITY_EDITOR
                         creature.ChangeModel(listFile, dataPath);
 #else
@@ -161,6 +165,12 @@ public class Character : ModelRenderer
         }
     }
 
+    // Get Choice's index
+    private int ChoiceIndex(int index)
+    {
+        return Options[index].Choices.Select((c, i) => new { c, i }).First(x => x.c.Key == Customization[index]).i;
+    }
+
     // Mark dropdown options active/inactive depending on if they are available for the first option
     public void ActivateRelatedChoices(int index, int index2)
     {
@@ -168,7 +178,7 @@ public class Character : ModelRenderer
         List<Dropdown.OptionData> options = CustomizationDropdowns[index2].options;
         for (int i = 0; i < CustomizationDropdowns[index2].options.Count; i++)
         {
-            if (Options[index2].Choices[((CustomOptionData)options[i]).Index].Textures.FirstOrDefault(t => t.Related == firstID) == null)
+            if (Options[index2].Choices[((CustomOptionData)options[i]).ID].Textures.FirstOrDefault(t => t.Related == firstID) == null)
             {
                 ((CustomOptionData)options[i]).Interactable = false;
             }
@@ -185,7 +195,7 @@ public class Character : ModelRenderer
         List<Dropdown.OptionData> options = CustomizationDropdowns[index].options;
         for (int i = 0; i < CustomizationDropdowns[index].options.Count; i++)
         {
-            if (requirements.Contains(Options[index].Choices[((CustomOptionData)options[i]).Index].Requirement))
+            if (requirements.Contains(Options[index].Choices[((CustomOptionData)options[i]).ID].Requirement))
             {
                 ((CustomOptionData)options[i]).Interactable = true;
             }
@@ -202,7 +212,7 @@ public class Character : ModelRenderer
         List<Dropdown.OptionData> options = CustomizationDropdowns[index].options;
         for (int i = 0; i < CustomizationDropdowns[index].options.Count; i++)
         {
-            if (list.Contains(Options[index].Choices[((CustomOptionData)options[i]).Index].ID))
+            if (list.Contains(((CustomOptionData)options[i]).ID))
             {
                 ((CustomOptionData)options[i]).Interactable = true;
             }
@@ -216,11 +226,11 @@ public class Character : ModelRenderer
     // Load only options in the dropdown that are meant to be shown
     public void ChangeDropdownOptions(int index)
     {
-        if (Options[index].Type == 1)
+        if (Options[index].Type == WoWHelper.CustomizationType.Toggle)
         {
             bool on = CustomizationToggles[index].isOn;
-            CustomizationToggles[index].transform.parent.gameObject.SetActive(Options[index].Choices.Length == 2 && Options[index].Category == Category);
-            CustomizationToggles[index].isOn = on && Options[index].Choices.Length == 2;
+            CustomizationToggles[index].transform.parent.gameObject.SetActive(Options[index].Choices.Count == 2 && Options[index].Category == Category);
+            CustomizationToggles[index].isOn = on && Options[index].Choices.Count == 2;
             return;
         }
         Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color1");
@@ -229,23 +239,24 @@ public class Character : ModelRenderer
         foreach (var choice in Options[index].Choices)
         {
             string name;
-            if (choice.Color1 != Color.black)
+            if (choice.Value.Color1 != Color.black)
             {
                 name = $"{j + 1}:";
             }
-            else if (string.IsNullOrEmpty(choice.Name))
+            else if (string.IsNullOrEmpty(choice.Value.Name))
             {
                 name = $"{j + 1}";
             }
             else
             {
-                name = $"{j + 1}: {choice.Name}";
+                name = $"{j + 1}: {choice.Value.Name}";
             }
-            CustomOptionData data = new(name, choice.Color1, choice.Color2, sprite, j);
+            CustomOptionData data = new(name, choice.Value.Color1, choice.Value.Color2, sprite, j, choice.Key);
             CustomizationDropdowns[index].options.Add(data);
             j++;
         }
-        value = value >= CustomizationDropdowns[index].options.Count ? CustomizationDropdowns[index].options.Count - 1 : value;
+        value = Options[index].Choices.ContainsKey(value) ? value : Options[index].Choices.First().Key;
+        Customization[index] = value;
         CustomizationDropdowns[index].SetValue(value);
         CustomizationDropdowns[index].RefreshShownValue();
         CustomizationDropdowns[index].transform.parent.gameObject.SetActive(CustomizationDropdowns[index].options.Count > 1 && Options[index].Category == Category);
@@ -845,6 +856,7 @@ public class Character : ModelRenderer
         bool done = false;
         DestroyImmediate(mainMesh);
         DestroyImmediate(extraMesh);
+        extraMesh = null;
         mainModel = null;
         extraModel = null;
         string path = $"{modelsPath}{RacePath}{modelFile}_prefab";
@@ -987,7 +999,8 @@ public class Character : ModelRenderer
 
     // Load the model
 #if UNITY_EDITOR
-    public void LoadModel(string modelFile, string extraFile, string collectionFile, string armorFile, string extraCollectionFile, Dictionary<int, string> listFile, string dataPath)
+    public void LoadModel(string modelFile, string extraFile, string collectionFile, string armorFile,
+        string extraCollectionFile, Dictionary<int, string> listFile, string dataPath)
 #else
     public void LoadModel(string modelFile, string extraFile, string collectionFile, string armorFile, string extraCollectionFile, CASCHandler casc)
 #endif

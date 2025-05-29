@@ -1,5 +1,6 @@
 ﻿using M2Lib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace WoW
 {
@@ -84,6 +85,13 @@ namespace WoW
             Druid = 11,
             DemonHunter = 12,
             Evoker = 13
+        }
+
+        // Enum for customization UI type
+        public enum CustomizationType
+        {
+            Dropdown = 0,
+            Toggle = 1
         }
 
         // Color for each item quality
@@ -253,6 +261,20 @@ namespace WoW
             return result;
         }
 
+        public static string WoWRegion(int value)
+        {
+            string region = value switch
+            {
+                0 => "us",
+                1 => "eu",
+                2 => "kr",
+                3 => "tw",
+                4 => "cn",
+                _ => "",
+            };
+            return region;
+        }
+
         // Generate 3D Mesh gameobject from m2 file
         public static GameObject Generate3DMesh(M2 file)
         {
@@ -385,7 +407,8 @@ namespace WoW
             GradientColorKey[] colorKeys = new GradientColorKey[particle.Colors.Values.Length];
             for (int i = 0; i < colorKeys.Length; i++)
             {
-                colorKeys[i] = new GradientColorKey(new Color(particle.Colors.Values[i].X / 255f, particle.Colors.Values[i].Y / 255f, particle.Colors.Values[i].Z / 255f), particle.Colors.Timestamps[i]);
+                colorKeys[i] = new GradientColorKey(new Color(particle.Colors.Values[i].X / 255f, particle.Colors.Values[i].Y / 255f,
+                    particle.Colors.Values[i].Z / 255f), particle.Colors.Timestamps[i]);
             }
             GradientAlphaKey[] alphaKeys;
             if (particle.Alpha.Values.Length > 8)
