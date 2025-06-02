@@ -49,6 +49,8 @@ public class Character : ModelRenderer
     public List<Toggle> CustomizationToggles { get; set; }
     // Buttons containing customization categories
     public List<Button> CustomizationCategories { get; set; }
+    //Equipped items
+    public ItemInstance[] Items { get; set; }
     // Path from where the model is loaded
     public string RacePath { get; set; }
     // Extra path from where the model is loaded
@@ -79,6 +81,7 @@ public class Character : ModelRenderer
     private void Start()
     {
         // Initialize
+        Items = new ItemInstance[14];
         modelsPath = @"character\";
         converter = new System.Drawing.ImageConverter();
         CustomizationDropdowns = new List<CustomDropdown>();

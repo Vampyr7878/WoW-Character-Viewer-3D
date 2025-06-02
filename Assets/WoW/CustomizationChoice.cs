@@ -17,13 +17,13 @@ namespace WoW
         // Choice second color
         public Color32 Color2 { get; set; }
         // Choice geosets
-        public CustomizationGeoset[] Geosets { get; private set; }
+        public CustomizationGeoset[] Geosets { get; set; }
         // Choice skinned geosets
-        public CustomizationGeoset[] SkinnedGeosets { get;private set; }
+        public CustomizationGeoset[] SkinnedGeosets { get;set; }
         // Choice textures
-        public CustomizationTexture[] Textures { get; private set; }
+        public CustomizationTexture[] Textures { get; set; }
         // Choice creature
-        public CustomizationDisplayInfo[] Creatures { get; private set; }
+        public CustomizationDisplayInfo[] Creatures { get; set; }
 
         // Constructor
         public CustomizationChoice(string name, int id, int requirement, Color32 color1, Color32 color2)
@@ -33,30 +33,6 @@ namespace WoW
             Requirement = requirement;
             Color1 = color1;
             Color2 = color2;
-        }
-
-        // Load geosets for that choice
-        public void LoadGeosets(List<CustomizationGeoset> geosets)
-        {
-            Geosets = geosets.ToArray();
-        }
-
-        // Load goestes on skinned model for that choice
-        public void LoadSkinnedGeosets(List<CustomizationGeoset> geosets)
-        {
-            SkinnedGeosets = geosets.ToArray();
-        }
-
-        // Load textures for that choice
-        public void LoadTextures(List<CustomizationTexture> textures)
-        {
-            Textures = textures.ToArray();
-        }
-
-        // Load creature displayinfo for that choice
-        public void LoadCreature(List<CustomizationDisplayInfo> creatures)
-        {
-            Creatures = creatures.ToArray();
         }
     }
 }

@@ -6,20 +6,25 @@ using UnityEngine.UI;
 public class ItemTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Image tooltip;
+    public new Text name;
+    public Text description;
+    public RectTransform c;
+    public Text slot;
+    public Text type;
+    public ScrollItem item;
+
+    private readonly int minWidth = 150;
 
     // Show tooltip
     public void OnPointerEnter(PointerEventData eventData)
     {
         tooltip.gameObject.SetActive(true);
-        tooltip.GetComponent<ContentSizeFitter>().SetLayoutHorizontal();
-        Vector3 pos = tooltip.rectTransform.position;
-        float width = tooltip.GetComponentInChildren<Text>().preferredWidth + 20;
-        width += width / 4 + pos.x;
-        if (width > Screen.width)
-        {
-            tooltip.rectTransform.position = new Vector3(tooltip.rectTransform.position.x - width + Screen.width,
-                tooltip.rectTransform.position.y, tooltip.rectTransform.position.z);
-        }
+        //tooltip.GetComponent<ContentSizeFitter>().SetLayoutVertical();
+        //tooltip.GetComponent<ContentSizeFitter>().SetLayoutHorizontal();
+        float width = name.preferredWidth;
+        width = width < minWidth ? minWidth : width;
+        description.rectTransform.sizeDelta = new Vector2(width, description.rectTransform.sizeDelta.y);
+        c.sizeDelta = new Vector2(width, c.sizeDelta.y);
     }
 
     // Hide tooltip

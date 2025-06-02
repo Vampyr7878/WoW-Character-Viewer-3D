@@ -22,9 +22,9 @@ namespace WoW
         // DisplayInfo Texture3
         public int Texture3 { get; private set; }
         // DisplayInfo Geoset
-        public CustomizationGeoset[] Geosets { get; private set; }
+        public CustomizationGeoset[] Geosets { get; set; }
         // DisplayInfo Particle Colors
-        public ParticleColor[] ParticleColors { get; private set; }
+        public ParticleColor[] ParticleColors { get; set; }
 
         // Constructor
         public CustomizationDisplayInfo(int related, int id, string model, int particle, int texture0, int texture1, int texture2, int texture3)
@@ -37,18 +37,6 @@ namespace WoW
             Texture1 = texture1;
             Texture2 = texture2;
             Texture3 = texture3;
-        }
-
-        // Load geosets for that DisplayInfo
-        public void LoadGeosets(List<CustomizationGeoset> geosets)
-        {
-            Geosets = geosets.ToArray();
-        }
-
-        // Load Particle Colors for that DisplayInfo
-        public void LoadParticleColors(List<ParticleColor> colors)
-        {
-            ParticleColors = colors.ToArray();
         }
     }
 }

@@ -6,12 +6,12 @@
         public bool gender;
         public int classid;
         public int[] customization;
-        public SerializableItems[] items;
+        public SerializableItem[] items;
     }
 
-    public class SerializableItems
+    public class SerializableItem
     {
         public int id;
-        public int version;
+        public int appearance;
     }
 }

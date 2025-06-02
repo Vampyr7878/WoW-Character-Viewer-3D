@@ -574,8 +574,8 @@ namespace WoW
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
             int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
                 Select(x => x.Key).ToArray();
-            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.
-                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value));
+            Character.Options[index2].Choices = Character.Options[index2].AllChoices.
+                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value);
             Character.ChangeDropdownOptions(index2);
         }
 
@@ -602,8 +602,8 @@ namespace WoW
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
             int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
                 Select(x => x.Key).ToArray();
-            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.
-                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value));
+            Character.Options[index2].Choices = Character.Options[index2].AllChoices.
+                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value);
             Character.ChangeDropdownOptions(index2);
             ChangeGeosetOption(activeGeosets, name);
         }
@@ -612,8 +612,8 @@ namespace WoW
         public void ChangeRacialOptions(string name, int[] requirements)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name);
-            Character.Options[index].SetChoices(Character.Options[index].AllChoices.
-                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value));
+            Character.Options[index].Choices = Character.Options[index].AllChoices.
+                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value);
             Character.ChangeDropdownOptions(index);
         }
 
@@ -674,8 +674,8 @@ namespace WoW
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
             int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
                 Select(x => x.Key).ToArray();
-            Character.Options[index2].SetChoices(Character.Options[index2].AllChoices.Where(c => requirements.Contains(c.Value.Requirement)).
-                ToDictionary(c => c.Key, c => c.Value));
+            Character.Options[index2].Choices = Character.Options[index2].AllChoices.Where(c => requirements.Contains(c.Value.Requirement)).
+                ToDictionary(c => c.Key, c => c.Value);
             Character.ChangeDropdownOptions(index2);
             ChangeSkinnedGeosetOption(activeGeosets, name2, name);
         }

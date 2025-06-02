@@ -1,12 +1,13 @@
 ﻿using M2Lib;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace WoW
 {
     // Helper class for some WoW related things.
     public class WoWHelper
     {
+        public static readonly int Heroic = 0x8;
+
         // Enum for various layered texture types
         public enum LayeredTexture
         {
@@ -41,6 +42,7 @@ namespace WoW
         // Enum for character races
         public enum Race
         {
+            All = 0,
             Human = 1,
             Orc = 2,
             Dwarf = 3,
@@ -72,6 +74,7 @@ namespace WoW
         // Enum for character classes
         public enum Class
         {
+            All = 0,
             Warrior = 1,
             Paladin = 2,
             Hunter = 3,
@@ -92,6 +95,106 @@ namespace WoW
         {
             Dropdown = 0,
             Toggle = 1
+        }
+
+        // Enum for equipment slots
+        public enum ItemSlot
+        {
+            Head = 1,
+            Shoulder = 3,
+            Shirt = 4,
+            Chest = 5,
+            Waist = 6,
+            Legs = 7,
+            Feet = 8,
+            Wrist = 9,
+            Hands = 10,
+            OneHand = 13,
+            Shield = 14,
+            Bow = 15,
+            Back = 16,
+            TwoHand = 17,
+            Tabard = 19,
+            Robe = 20,
+            MainHand = 21,
+            OffHand = 22,
+            HeldInOffHand = 23,
+            Ranged = 26
+        }
+
+        // Enum for slot indices
+        public enum SlotIndex
+        {
+            None = -1,
+            Head = 0,
+            RightShoulder = 1,
+            LeftShoulder = 2,
+            Back = 3,
+            Chest = 4,
+            Shirt = 5,
+            Tabard = 6,
+            Wrist = 7,
+            Hands = 8,
+            Waist = 9,
+            Legs = 10,
+            Feet = 11,
+            MainHand = 12,
+            OffHand = 13
+        }
+
+        // Enum for equipment Class
+        public enum ItemClass
+        {
+            Weapon = 2,
+            Armor = 4
+        }
+
+        // Enum for weapon types
+        public enum WeaponType
+        {
+            OneHandedAxe = 0,
+            TwoHandedAxe = 1,
+            Bow = 2,
+            Gun = 3,
+            OneHandedMace = 4,
+            TwoHandedMace = 5,
+            Polearm = 6,
+            OneHandedSword = 7,
+            TwoHandedSword = 8,
+            Warglaive = 9,
+            Staff = 10,
+            FistWeapon = 13,
+            Dagger = 15,
+            Crossbow = 18,
+            Wand = 19,
+            None = 100
+        }
+
+        // Enum for armor types
+        public enum ArmorType
+        {
+            Misc = 0,
+            Cloth = 1,
+            Leather = 2,
+            Mail = 3,
+            Plate = 4,
+            Cosmetic = 5,
+            Shield = 6,
+            None = 100
+        }
+
+        // Enum for component sections
+        public enum ComponentSection
+        {
+            ArmUpper = 0,
+            ArmLower = 1,
+            Hand = 2,
+            TorsoUpper = 3,
+            TorsoLower = 4,
+            LegUpper = 5,
+            LegLower = 6,
+            Foot = 7,
+            Accessory = 8
         }
 
         // Color for each item quality
@@ -120,72 +223,150 @@ namespace WoW
         }
 
         // Return slot name
-        public static string Slot(int slot)
+        public static string SlotName(ItemSlot slot)
         {
-            string result = slot switch
+            return slot switch
             {
-                1 => "head",
-                3 => "shoulder",
-                4 => "shirt",
-                5 => "chest",
-                6 => "waist",
-                7 => "legs",
-                8 => "feet",
-                9 => "wrist",
-                10 => "hands",
-                16 => "back",
-                19 => "tabard",
-                21 => "mainhand",
-                22 => "offhand",
-                _ => "",
+                ItemSlot.Head => "Head",
+                ItemSlot.Shoulder => "Shoulder",
+                ItemSlot.Shirt => "Shirt",
+                ItemSlot.Chest => "Chest",
+                ItemSlot.Waist => "Waist",
+                ItemSlot.Legs => "Legs",
+                ItemSlot.Feet => "Feet",
+                ItemSlot.Wrist => "Wrist",
+                ItemSlot.Hands => "Hands",
+                ItemSlot.OneHand => "One-Hand",
+                ItemSlot.Shield => "Off Hand",
+                ItemSlot.Bow => "Ranged",
+                ItemSlot.Back => "Back",
+                ItemSlot.TwoHand => "Two-Hand",
+                ItemSlot.Tabard => "Tabard",
+                ItemSlot.Robe => "Chest",
+                ItemSlot.MainHand => "Main Hand",
+                ItemSlot.OffHand => "Off Hand",
+                ItemSlot.HeldInOffHand => "Held in Off-Hand",
+                ItemSlot.Ranged => "Ranged",
+                _ => "Unknown",
             };
-            return result;
         }
 
-        // Return slot ID
-        public static int Slot(string slot)
+        // Return mapped slot indices
+        public static SlotIndex MapSlots(string slot)
         {
-            var result = slot.ToLower() switch
+            return slot switch
             {
-                "head" => 0,
-                "shoulder" => 1,
-                "back" => 2,
-                "chest" => 3,
-                "shirt" => 4,
-                "tabard" => 5,
-                "wrist" => 6,
-                "mainhand" => 7,
-                "hands" => 8,
-                "waist" => 9,
-                "legs" => 10,
-                "feet" => 11,
-                "offhand" => 12,
-                _ => -1,
+                "head" => SlotIndex.Head,
+                "rightshoulder" => SlotIndex.RightShoulder,
+                "leftshoulder" => SlotIndex.LeftShoulder,
+                "back" => SlotIndex.Back,
+                "chest" => SlotIndex.Chest,
+                "shirt" => SlotIndex.Shirt,
+                "tabard" => SlotIndex.Tabard,
+                "wrist" => SlotIndex.Wrist,
+                "hands" => SlotIndex.Hands,
+                "waist" => SlotIndex.Waist,
+                "legs" => SlotIndex.Legs,
+                "feet" => SlotIndex.Feet,
+                "mainhand" => SlotIndex.MainHand,
+                "offhand" => SlotIndex.OffHand,
+                _ => SlotIndex.None,
             };
-            return result;
         }
 
-        // Internal slot names
-        public static string SlotName(int slot)
+        // Return mapped slot names
+        public static string MapSlots(SlotIndex slot)
         {
-            string result = slot switch
+            return slot switch
             {
-                0 => "head",
-                1 => "shoulder",
-                2 => "back",
-                3 => "chest",
-                4 => "shirt",
-                5 => "tabard",
-                6 => "wrist",
-                7 => "mainhand",
-                8 => "hands",
-                9 => "waist",
-                10 => "legs",
-                11 => "feet",
-                12 => "offhand",
+                SlotIndex.Head => "head",
+                SlotIndex.RightShoulder => "rightshoulder",
+                SlotIndex.LeftShoulder => "leftshoulder",
+                SlotIndex.Back => "back",
+                SlotIndex.Chest => "chest",
+                SlotIndex.Shirt => "shirt",
+                SlotIndex.Tabard => "tabard",
+                SlotIndex.Wrist => "wrist",
+                SlotIndex.Hands => "hands",
+                SlotIndex.Waist => "waist",
+                SlotIndex.Legs => "legs",
+                SlotIndex.Feet => "feet",
+                SlotIndex.MainHand => "mainhand",
+                SlotIndex.OffHand => "offhand",
                 _ => "",
             };
-            return result;
+        }
+
+        // Return Blizzard internal slot IDs to slot indices
+        public static SlotIndex MapSlot(int slot)
+        {
+            return slot switch
+            {
+                0 => SlotIndex.Head,
+                2 => SlotIndex.RightShoulder,
+                3 => SlotIndex.Shirt,
+                4 => SlotIndex.Chest,
+                5 => SlotIndex.Waist,
+                6 => SlotIndex.Legs,
+                7 => SlotIndex.Feet,
+                8 => SlotIndex.Wrist,
+                9 => SlotIndex.Hands,
+                14 => SlotIndex.Back,
+                15 => SlotIndex.MainHand,
+                16 => SlotIndex.OffHand,
+                18 => SlotIndex.Tabard,
+                _ => SlotIndex.None
+            };
+        }
+
+        // Return weapon type name
+        public static string WeaponTypeName(WeaponType type)
+        {
+            return type switch
+            {
+                WeaponType.OneHandedAxe or WeaponType.TwoHandedAxe => "Axe",
+                WeaponType.OneHandedMace or WeaponType.TwoHandedMace => "Mace",
+                WeaponType.OneHandedSword or WeaponType.TwoHandedSword => "Sword",
+                WeaponType.Bow => "Bow",
+                WeaponType.Gun => "Gun",
+                WeaponType.Polearm => "Polearm",
+                WeaponType.Warglaive => "Warglaive",
+                WeaponType.Staff => "Staff",
+                WeaponType.FistWeapon => "Fist Weapon",
+                WeaponType.Dagger => "Dagger",
+                WeaponType.Crossbow => "Crossbow",
+                WeaponType.Wand => "Wand",
+                _ => "Unknown",
+            };
+        }
+
+        // Return armor type name
+        public static string ArmorTypeName(ArmorType type)
+        {
+            return type switch
+            {
+                ArmorType.Misc => "",
+                ArmorType.Cloth => "Cloth",
+                ArmorType.Leather => "Leather",
+                ArmorType.Mail => "Mail",
+                ArmorType.Plate => "Plate",
+                ArmorType.Cosmetic => "Cosmetic",
+                ArmorType.Shield => "Shield",
+                _ => "Unknown",
+            };
+        }
+
+        // Return appearance modifier name
+        public static string AppearanceModifierName(int modifier)
+        {
+            return modifier switch
+            {
+                1 => "Heroic",
+                3 => "Mythic",
+                4 => "Raid Finder",
+                5 => "Mythic",
+                _ => "",
+            };
         }
 
         // Translate race id to base race model id
@@ -237,25 +418,6 @@ namespace WoW
                     break;
                 case 37:
                     result = 7;
-                    break;
-            }
-            return result;
-        }
-
-        // Return text describing the item version
-        public static string ItemVersion(int version)
-        {
-            string result = "";
-            switch(version)
-            {
-                case 1:
-                    result = "(Heroic)";
-                    break;
-                case 2:
-                    result = "(Raid Finder)";
-                    break;
-                case 3:
-                    result = "(Mythic)";
                     break;
             }
             return result;
@@ -330,10 +492,10 @@ namespace WoW
             Transform[] bones = new Transform[file.Skeleton.Bones.Length];
             for (int i = 0; i < bones.Length; i++)
             {
-                bones[i] = new GameObject("Bone" + i).transform;
+                bones[i] = new GameObject($"Bone{i}").transform;
                 bones[i].position = new Vector3(-file.Skeleton.Bones[i].Pivot.X / 2, file.Skeleton.Bones[i].Pivot.Y / 2, file.Skeleton.Bones[i].Pivot.Z / 2);
             }
-            GameObject skeleton = new GameObject("Skeleton");
+            GameObject skeleton = new("Skeleton");
             for (int i = 0; i < bones.Length; i++)
             {
                 if (file.Skeleton.Bones[i].Parent == -1)
