@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using WoW;
 
 namespace Assets.WoW
@@ -23,16 +24,17 @@ namespace Assets.WoW
         public string Name { get; private set; }
         // Item flags
         public int Flags { get; private set; }
-        // Item description ID
-        public int DescriptionID { get; private set; }
+        // Description text
+        public string Description { get; private set; }
+        // Description Color
+        public Color32 Color { get; private set; }
         // Item quality
         public int Quality { get; private set; }
-        // Item description
-        public ItemDescription Description { get; set; }
         // Item appearances
         public Dictionary<int, ItemAppearance> Appearances { get; set; }
 
-        public Item(int id, int itemClass, int itemType, int itemSlot, int sheathe, int icon, string name, int flags, int description, int quality)
+        public Item(int id, int itemClass, int itemType, int itemSlot, int sheathe, int icon,
+            string name, int flags, string description, Color32 color, int quality)
         {
             ID = id;
             ItemClass = (WoWHelper.ItemClass)itemClass;
@@ -51,7 +53,8 @@ namespace Assets.WoW
             Icon = icon;
             Name = name;
             Flags = flags;
-            DescriptionID = description;
+            Description = description;
+            Color = color;
             Quality = quality;
         }
     }

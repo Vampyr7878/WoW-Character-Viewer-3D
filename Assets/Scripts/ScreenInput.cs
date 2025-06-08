@@ -197,8 +197,6 @@ public class ScreenInput : MonoBehaviour
         alliedRaceNames = new List<string> { "Tushui", "Huojin", "VoidElf", "Nightborne", "Lightforged", "Highmountain",
             "DarkIron", "Maghar", "KulTiran", "Zandalari", "Mechagnome", "Vulpera", "AzureEarthen", "RubyEarthen" };
         // Load initialize race, class and druid form dictionaries and load data into them
-        races = new Dictionary<int, string>();
-        classes = new Dictionary<int, string>();
         druidModels = new Dictionary<int, string>();
         customizationOptions = new List<GameObject>();
         customizationCategories = new List<Button>();
@@ -206,26 +204,8 @@ public class ScreenInput : MonoBehaviour
         dbPath = $"URI=file:{Application.streamingAssetsPath}/database.sqlite";
         connection = new SqliteConnection(dbPath);
         connection.Open();
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM Races;";
-            using SqliteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                races.Add(reader.GetInt32(0), reader.GetString(1));
-            }
-        }
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM Classes;";
-            using SqliteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                classes.Add(reader.GetInt32(0), reader.GetString(1));
-            }
-        }
+        races = DB.GetRaces(connection);
+        classes = DB.GetClasses(connection);
         connection.Close();
         items = new Dictionary<int, Item>();
         maxScrollItems = 100;
@@ -430,25 +410,7 @@ public class ScreenInput : MonoBehaviour
             Destroy(customizaionCategory.gameObject);
         }
         customizationCategories.Clear();
-        connection.Open();
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            List<CustomizationCategory> categories = new();
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT ChrCustomizati" +
-                $"" +
-                $"onCategory.ID, CategoryName_lang, CustomizeIcon, CustomizeIconSelected FROM " +
-                $"ChrCustomizationCategory JOIN ChrCustomizationOption ON ChrCustomizationCategoryID = ChrCustomizationCategory.ID WHERE " +
-                $"ChrModelID = {character.ModelID} AND Requirement <> 10 AND Requirement <> 12 " +
-                $"GROUP BY CategoryName_lang ORDER BY ChrCustomizationCategory.OrderIndex;";
-            using SqliteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                categories.Add(new(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetInt32(3)));
-            }
-            character.Categories = categories.ToArray();
-        }
-        connection.Close();
+        character.Categories = DB.GetCategories(connection, character.ModelID);
         GameObject uiObject;
         for (int i = 0; i < character.Categories.Length; i++)
         {
@@ -471,33 +433,7 @@ public class ScreenInput : MonoBehaviour
             Destroy(customizaionOption);
         }
         customizationOptions.Clear();
-        connection.Open();
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            List<CustomizationOption> options = new();
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT Name_lang, ID, ChrModelID, ChrCustomizationCategoryID, OptionType FROM ChrCustomizationOption WHERE " +
-                $"ChrModelID = {character.MainFormID} AND Requirement <> 10 AND Requirement <> 12 ORDER BY SecondaryOrderIndex;";
-            using (SqliteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    options.Add(new(reader.GetString(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3), reader.GetInt32(4)));
-                }
-            }
-            foreach (var form in character.CreatureForms)
-            {
-                command.CommandText = $"SELECT Name_lang, ID, ChrModelID, ChrCustomizationCategoryID, OptionType FROM ChrCustomizationOption WHERE " +
-                    $"ChrModelID = {form.ID} AND Requirement <> 10 AND Requirement <> 12 ORDER BY SecondaryOrderIndex;";
-                using SqliteDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    options.Add(new(reader.GetString(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3), reader.GetInt32(4)));
-                }
-            }
-            character.Options = options.ToArray();
-        }
-        connection.Close();
+        character.Options = DB.GetOptions(connection, character.MainFormID, character.CreatureForms);
         GameObject uiObject;
         for (int i = 0; i < character.Options.Length; i++)
         {
@@ -541,31 +477,10 @@ public class ScreenInput : MonoBehaviour
     {
         Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color1");
         character.Customization = new int[character.Options.Length];
-        connection.Open();
         for (int i = 0; i < character.Options.Length; i++)
         {
-            using (SqliteCommand command = connection.CreateCommand())
-            {
-                Dictionary<int, CustomizationChoice> choices = new();
-                int id;
-                command.CommandType = CommandType.Text;
-                command.CommandText = $"SELECT Name_lang, ChrCustomizationChoice.ID, ChrCustomizationReqID, SwatchColor_0, SwatchColor_1 FROM " +
-                    $"ChrCustomizationChoice JOIN ChrCustomizationReq ON ChrCustomizationReqID = ChrCustomizationReq.ID WHERE ChrCustomizationOptionID = " +
-                    $"{character.Options[i].ID} AND ReqType & 1 AND (ClassMask = 0 OR ClassMask & {1 << ((int)character.Class - 1)}) " +
-                    $"AND ChrCustomizationReqID <> 3128 AND ChrCustomizationReqID <> 407 ORDER BY UiOrderIndex;";
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        id = reader.GetInt32(1);
-                        ColorUtility.TryParseHtmlString($"#{reader.GetInt32(3).ToString("X8").Substring(2)}", out Color color1);
-                        ColorUtility.TryParseHtmlString($"#{reader.GetInt32(4).ToString("X8").Substring(2)}", out Color color2);
-                        choices.Add(id, new(reader.GetString(0), id, reader.GetInt32(2), color1, color2));
-                    }
-                }
-                character.Options[i].AllChoices = choices;
-                character.Options[i].Choices = character.Options[i].AllChoices;
-            }
+            character.Options[i].AllChoices = DB.GetChoices(connection, character.Options[i].ID, (int)character.Class);
+            character.Options[i].Choices = character.Options[i].AllChoices;
             if (character.Options[i].Type == WoWHelper.CustomizationType.Dropdown)
             {
                 Dropdown dropdown = customizationOptions[i].GetComponentInChildren<Dropdown>();
@@ -594,7 +509,6 @@ public class ScreenInput : MonoBehaviour
             }
             character.Customization[i] = character.Options[i].Choices.First().Key;
         }
-        connection.Close();
         for (int i = 0; i < character.Categories.Length; i++)
         {
             customizationCategories[i].gameObject.SetActive(false);
@@ -615,121 +529,21 @@ public class ScreenInput : MonoBehaviour
     // Load customization choices and fill the panel with them
     private void GetCustomizationElements()
     {
-        connection.Open();
         foreach (var option in character.Options)
         {
             foreach (var choice in option.Choices)
             {
-                using (SqliteCommand command = connection.CreateCommand())
-                {
-                    List<CustomizationGeoset> geosets = new();
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, GeosetType, GeosetID FROM ChrCustomizationElement JOIN " +
-                        $"ChrCustomizationGeoset ON ChrCustomizationGeosetID = ChrCustomizationGeoset.ID WHERE " +
-                        $"ChrCustomizationChoiceID = {choice.Value.ID} AND ChrCustomizationGeosetID > 0;";
-                    using SqliteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        geosets.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2)));
-                    }
-                    choice.Value.Geosets = geosets.ToArray();
-                }
-                using (SqliteCommand command = connection.CreateCommand())
-                {
-                    List<CustomizationGeoset> geosets = new();
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, GeosetType, GeosetID FROM ChrCustomizationElement JOIN " +
-                        $"ChrCustomizationSkinnedModel ON ChrCustomizationSkinnedModelID = ChrCustomizationSkinnedModel.ID WHERE " +
-                        $"ChrCustomizationChoiceID = {choice.Value.ID} AND ChrCustomizationSkinnedModelID > 0;";
-                    using SqliteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        geosets.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2)));
-                    }
-                    choice.Value.SkinnedGeosets = geosets.ToArray();
-                }
-                using (SqliteCommand command = connection.CreateCommand())
-                {
-                    List<CustomizationTexture> textures = new();
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, ChrModelTextureTargetID, FileDataID, UsageType FROM ChrCustomizationElement JOIN " +
-                        $"ChrCustomizationMaterial ON ChrCustomizationMAterialID = ChrCustomizationMAterial.ID JOIN TextureFileData ON " +
-                        $"ChrCustomizationMAterial.MaterialResourcesID = TextureFileData.MaterialResourcesID WHERE " +
-                        $"ChrCustomizationChoiceID = {choice.Value.ID} AND ChrCustomizationMAterialID > 0;";
-                    using SqliteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        textures.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3)));
-                    }
-                    choice.Value.Textures = textures.ToArray();
-                }
-                using (SqliteCommand command = connection.CreateCommand())
-                {
-                    List<CustomizationDisplayInfo> creatures = new();
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, CreatureDisplayInfo.ID, Path, CreatureDisplayInfo.ParticleColorID, " +
-                        $"TextureVariationFileDataID_0, TextureVariationFileDataID_1, TextureVariationFileDataID_2, TextureVariationFileDataID_3 FROM " +
-                        $"ChrCustomizationElement JOIN ChrCustomizationDisplayInfo ON ChrCustomizationDisplayInfoID = ChrCustomizationDisplayInfo.ID JOIN " +
-                        $"CreatureDisplayInfo ON CreatureDisplayInfoID = CreatureDisplayInfo.ID JOIN CreatureModels ON ModelID = CreatureModels.ID WHERE " +
-                        $"ChrCustomizationChoiceID = {choice.Value.ID} AND ChrCustomizationDisplayInfoID > 0;";
-                    using SqliteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        creatures.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.GetInt32(3),
-                            reader.GetInt32(4), reader.GetInt32(5), reader.GetInt32(6), reader.GetInt32(7)));
-                    }
-                    choice.Value.Creatures = creatures.ToArray();
-                }
+                choice.Value.Geosets = DB.GetGeosets(connection, choice.Value.ID);
+                choice.Value.SkinnedGeosets = DB.GetSkinnedGeosets(connection, choice.Value.ID);
+                choice.Value.Textures = DB.GetCustomizationTextures(connection, choice.Value.ID);
+                choice.Value.Creatures = DB.GetCustomizationDisplayInfos(connection, choice.Value.ID);
                 if (choice.Value.Creatures.Length > 0)
                 {
-                    using (SqliteCommand command = connection.CreateCommand())
-                    {
-                        List<CustomizationGeoset> geosets = new();
-                        int type;
-                        command.CommandType = CommandType.Text;
-                        command.CommandText = $"SELECT GeosetIndex, GeosetValue FROM CreatureDisplayInfoGeosetData WHERE " +
-                            $"CreatureDisplayInfoID = {choice.Value.Creatures[0].ID};";
-                        using SqliteDataReader reader = command.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            type = reader.GetInt32(0);
-                            geosets.Add(new(-1, type + 1, reader.GetInt32(1)));
-                        }
-                        choice.Value.Creatures[0].Geosets = geosets.ToArray();
-                    }
-                    choice.Value.Creatures[0].ParticleColors = GetParticleColors(choice.Value.Creatures[0].ParticleColor);
+                    choice.Value.Creatures[0].Geosets = DB.GetCreatureGeosets(connection, choice.Value.Creatures[0].ID);
+                    choice.Value.Creatures[0].ParticleColors = DB.GetParticleColors(connection, choice.Value.Creatures[0].ParticleColor);
                 }
             }
         }
-        connection.Close();
-    }
-
-    // Load particle colors from DB
-    private ParticleColor[] GetParticleColors(int id)
-    {
-        List<ParticleColor> colors = new();
-        using SqliteCommand command = connection.CreateCommand();
-        int start, mid, end;
-        command.CommandType = CommandType.Text;
-        command.CommandText = $"SELECT Start_0, MID_0, End_0, Start_1, MID_1, End_1, Start_2, MID_2, End_2 " +
-            $"FROM ParticleColor WHERE ID = {id};";
-        using SqliteDataReader reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            start = reader.GetInt32(0);
-            mid = reader.GetInt32(1);
-            end = reader.GetInt32(2);
-            colors.Add(new ParticleColor(start, mid, end));
-            start = reader.GetInt32(3);
-            mid = reader.GetInt32(4);
-            end = reader.GetInt32(5);
-            colors.Add(new ParticleColor(start, mid, end));
-            start = reader.GetInt32(6);
-            mid = reader.GetInt32(7);
-            end = reader.GetInt32(8);
-            colors.Add(new ParticleColor(start, mid, end));
-        }
-        return colors.ToArray();
     }
 
     // Load all the items matching the opened equipment slot
@@ -739,26 +553,15 @@ public class ScreenInput : MonoBehaviour
         connection.Open();
         string condition = slot switch
         {
-            WoWHelper.ItemSlot.Chest => $"Item.InventoryType IN ({(int)slot}, 20) AND ClassID = 4",
-            WoWHelper.ItemSlot.MainHand => $"Item.InventoryType IN (13, 15, 17, {(int)slot}, 26) AND" +
-                $" ClassID = 2 AND SubclassID IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 18, 19)",
-            WoWHelper.ItemSlot.OffHand => $"Item.InventoryType IN (13, 14, 17, {(int)slot}, 23) AND ((ClassID = 2 AND " +
+            WoWHelper.ItemSlot.Chest => $"InventoryType IN ({(int)slot}, 20) AND ClassID = 4",
+            WoWHelper.ItemSlot.MainHand => $"InventoryType IN (13, 15, 17, {(int)slot}, 26) AND " +
+                $"ClassID = 2 AND SubclassID IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 18, 19)",
+            WoWHelper.ItemSlot.OffHand => $"InventoryType IN (13, 14, 17, {(int)slot}, 23) AND ((ClassID = 2 AND " +
                 $"SubclassID IN (0, 1, 4, 5, 6, 7, 8, 9, 10, 13, 15)) OR (ClassID = 4 AND SubClassID IN (0, 6)))",
-            _ => $"Item.InventoryType = {(int)slot} AND ClassID = 4",
+            _ => $"InventoryType = {(int)slot} AND ClassID = 4",
         };
-        items = GetItems(condition);
-        foreach (var item in items)
-        {
-            GetDescription(item.Value);
-            GetAppearances(item.Value);
-            foreach (var appearance in item.Value.Appearances)
-            {
-                appearance.Value.ParticleColors = GetParticleColors(appearance.Value.ParticleColor);
-                GetHelmetGeosets(appearance.Value);
-                GetComponent(appearance.Value);
-                GetComponentTextures(appearance.Value);
-            }
-        }
+        items = DB.GetItems(connection, condition);
+        DB.GetAppearances(connection, items);
         connection.Close();
         Toggle none = panel.GetComponentInChildren<Toggle>();
         if (panel == leftPanel)
@@ -770,125 +573,6 @@ public class ScreenInput : MonoBehaviour
             LoadItems(rightScrollItems);
         }
         none.isOn = true;
-    }
-
-    // Get items from DB
-    private Dictionary<int, Item> GetItems(string condition)
-    {
-        using SqliteCommand command = connection.CreateCommand();
-        Dictionary<int, Item> items = new();
-        int id;
-        command.CommandType = CommandType.Text;
-        command.CommandText = $"SELECT Item.ID as ID, ClassID, SubclassID, Item.InventoryType, Item.SheatheType, IconFileDataID, Display_lang, Flags_0, " +
-            $"ItemNameDescriptionID, OverallQualityID FROM Item JOIN ItemSparse ON Item.ID = ItemSparse.ID WHERE {condition} ORDER BY ID;";
-        using SqliteDataReader reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            id = reader.GetInt32(0);
-            items.Add(id, new(id, reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(5),
-                reader.GetString(6), reader.GetInt32(7), reader.GetInt32(8), reader.GetInt32(9)));
-        }
-        return items;
-    }
-
-    // Get item description
-    private void GetDescription(Item item)
-    {
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandType = CommandType.Text;
-        command.CommandText = $"SELECT Description_lang, Color FROM ItemNameDescription WHERE ID = {item.DescriptionID};";
-        using SqliteDataReader reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            ColorUtility.TryParseHtmlString($"#{reader.GetInt32(1).ToString("X8").Substring(2)}", out Color color);
-            item.Description = new(reader.GetString(0), color);
-        }
-    }
-
-    // Get item appearance
-    private void GetAppearances(Item item)
-    {
-        using SqliteCommand command = connection.CreateCommand();
-        Dictionary<int, ItemAppearance> appearances = new();
-        int modifier;
-        int[] models, textures, geosets, skinnedGeosets, helmets;
-        command.CommandType = CommandType.Text;
-        command.CommandText = $"SELECT ItemAppearanceModifierID, ParticleColorID, ItemDisplayInfoID, ModelResourcesID_0, " +
-            $"ModelResourcesID_1, ModelMaterialResourcesID_0, ModelMaterialResourcesID_1, GeosetGroup_0, GeosetGroup_1, GeosetGroup_2, " +
-            $"GeosetGroup_3, GeosetGroup_4, GeosetGroup_5, AttachmentGeosetGroup_0, AttachmentGeosetGroup_1, AttachmentGeosetGroup_2, " +
-            $"AttachmentGeosetGroup_3, AttachmentGeosetGroup_4, AttachmentGeosetGroup_5, HelmetGeosetVis_0, HelmetGeosetVis_1, " +
-            $"DefaultIconFileDataID FROM ItemModifiedAppearance JOIN ItemAppearance ON ItemAppearanceID = ItemAppearance.ID " +
-            $"JOIN ItemDisplayInfo ON ItemDisplayInfoID = ItemDisplayInfo.ID WHERE ItemID = {item.ID};";
-        using SqliteDataReader reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            modifier = reader.GetInt32(0);
-            models = new[] { reader.GetInt32(3), reader.GetInt32(4) };
-            textures = new[] { reader.GetInt32(5), reader.GetInt32(6) };
-            geosets = new[] { reader.GetInt32(7), reader.GetInt32(8), reader.GetInt32(9),
-                        reader.GetInt32(10), reader.GetInt32(11), reader.GetInt32(12) };
-            skinnedGeosets = new[] { reader.GetInt32(13), reader.GetInt32(14), reader.GetInt32(15),
-                        reader.GetInt32(16), reader.GetInt32(17), reader.GetInt32(18) };
-            helmets = new[] { reader.GetInt32(19), reader.GetInt32(20) };
-            appearances.Add(modifier, new(modifier, reader.GetInt32(1), reader.GetInt32(2),
-                models, textures, geosets, skinnedGeosets, helmets, reader.GetInt32(21)));
-        }
-        item.Appearances = appearances;
-    }
-
-    // Get item appearance helmet geosets
-    private void GetHelmetGeosets(ItemAppearance appearance)
-    {
-        for (int i = 0; i < appearance.HelmetGeosets.Length; i++)
-        {
-            using SqliteCommand command = connection.CreateCommand();
-            List<HelmetGeoset> helmetGeosets = new();
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT RaceID, HideGeosetGroup FROM HelmetGeosetData " +
-                $"WHERE HelmetGeosetVisDataID = {appearance.HelmetGeosetsID[i]};";
-            using SqliteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                helmetGeosets.Add(new((WoWHelper.Race)reader.GetInt32(0), reader.GetInt32(1)));
-            }
-            appearance.HelmetGeosets[i] = helmetGeosets.ToArray();
-        }
-    }
-
-    // Get item appearance component
-    private void GetComponent(ItemAppearance appearance)
-    {
-        using SqliteCommand command = connection.CreateCommand();
-        List<ItemComponent> components = new();
-        command.CommandType = CommandType.Text;
-        command.CommandText = $"SELECT ComponentSection, MaterialResourcesID FROM ItemDisplayInfoMaterialRes " +
-            $"WHERE ItemDisplayInfoID = {appearance.DisplayInfoID};";
-        using SqliteDataReader reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            components.Add(new((WoWHelper.ComponentSection)reader.GetInt32(0), reader.GetInt32(1)));
-        }
-        appearance.Components = components.ToArray();
-    }
-
-    // Get item appearance component textures
-    private void GetComponentTextures(ItemAppearance appearance)
-    {
-        foreach (var component in appearance.Components)
-        {
-            using SqliteCommand command = connection.CreateCommand();
-            List<ComponentTexture> textures = new();
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT FileDataID, GenderIndex, ClassID, RaceID FROM TextureFileData JOIN " +
-                $"ComponentTextureFileData ON FileDataID = ID WHERE MaterialResourcesID = {component.Material};";
-            using SqliteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                textures.Add(new(reader.GetInt32(0), reader.GetInt32(1), (WoWHelper.Class)reader.GetInt32(2),
-                    (WoWHelper.Race)reader.GetInt32(3)));
-            }
-            component.Textures = textures.ToArray();
-        }
     }
 
     // Load items to fill the panel
@@ -929,7 +613,7 @@ public class ScreenInput : MonoBehaviour
         scrollItem.tooltip.gameObject.SetActive(true);
         string description;
         Color32 color;
-        if (item.DescriptionID == 0)
+        if (string.IsNullOrEmpty(item.Description))
         {
             description = appearance == null || appearance.Modifier == 0 ? (item.Flags & WoWHelper.Heroic) == 0 ? "" :
                 "Heroic" : WoWHelper.AppearanceModifierName(appearance.Modifier);
@@ -937,8 +621,8 @@ public class ScreenInput : MonoBehaviour
         }
         else
         {
-            description = item.Description.Text;
-            color = item.Description.Color;
+            description = item.Description;
+            color = item.Color;
         }
         scrollItem.SetTooltip(item.Name, WoWHelper.QualityColor(item.Quality), description, color,
             WoWHelper.SlotName(item.ItemSlot), item.ItemClass == WoWHelper.ItemClass.Weapon ?
@@ -1029,33 +713,7 @@ public class ScreenInput : MonoBehaviour
             Destroy(button.transform.parent.parent.gameObject);
         }
         formButtons.Clear();
-        connection.Open();
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            List<CreatureForm> forms = new();
-            if (character.Race == WoWHelper.Race.Worgen)
-            {
-                forms.Add(new CreatureForm(character.Gender ? 1 : 2, "Gilnean", character.Gender ? "race_humanmale" : "race_humanfemale", false));
-            }
-            else if (character.Race == WoWHelper.Race.Dracthyr)
-            {
-                forms.Add(new CreatureForm(character.Gender ? 127 : 128, "Visage", character.Gender ? "race_visagemale" : "race_visagefemale", false));
-            }
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT ID, Name, Icon FROM CreatureForms WHERE Class = {(int)character.Class} ORDER BY OrderIndex;";
-            using (SqliteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    int id = reader.GetInt32(0);
-                    string name = reader.GetString(1);
-                    string icon = reader.GetInt32(2).ToString();
-                    forms.Add(new CreatureForm(id, name, icon));
-                }
-            }
-            character.CreatureForms = forms.ToArray();
-        }
-        connection.Close();
+        character.CreatureForms = DB.GetCreatureForms(connection, character.Race, character.Gender, (int)character.Class);
         Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
         for (int i = 0; i < character.CreatureForms.Length; i++)
         {
@@ -1200,45 +858,19 @@ public class ScreenInput : MonoBehaviour
         {
             return;
         }
-        string model, extra, collection, armor, extraCollection;
+        string extraCollection;
         connection.Open();
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {(int)character.Race} AND Gender = {character.Race == WoWHelper.Race.Dracthyr || gender};";
-            using SqliteDataReader reader = command.ExecuteReader();
-            reader.Read();
-            character.ModelID = character.MainFormID = reader.GetInt32(0);
-            model = reader.GetString(4);
-            if (character.Race == WoWHelper.Race.Dracthyr)
-            {
-                extra = null;
-                armor = reader.GetString(5);
-            }
-            else
-            {
-                extra = reader.IsDBNull(5) ? null : reader.GetString(5);
-                armor = null;
-            }
-            character.RacePath = reader.GetString(6);
-            collection = reader.IsDBNull(7) ? null : reader.GetString(7);
-        }
+        character.ModelID = character.MainFormID = DB.GetModel(connection, character.Race, gender,
+            out string path, out string model, out string extra, out string armor, out string collection);
+        character.RacePath = path;
         if (character.Race == WoWHelper.Race.Dracthyr)
         {
-            using SqliteCommand command = connection.CreateCommand();
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = 75 AND Gender = {gender};";
-            using SqliteDataReader reader = command.ExecuteReader();
-            reader.Read();
-            extra = reader.GetString(4);
-            character.ExtraPath = reader.GetString(6);
-            extraCollection = reader.GetString(7);
+            character.ExtraPath = DB.GetModel(connection, gender, out extra, out extraCollection);
         }
         else
         {
             extraCollection = null;
         }
-        connection.Close();
         WoWHelper.Class c = character.Class;
         character.Class = WoWHelper.Class.Warrior;
         SetupFormPanel();
@@ -1246,6 +878,7 @@ public class ScreenInput : MonoBehaviour
         SetupCategories();
         GetCustomizationChoices();
         GetCustomizationElements();
+        connection.Close();
         LinkDropdowns();
         LinkToggles();
         LinkCategories();
@@ -1279,59 +912,25 @@ public class ScreenInput : MonoBehaviour
         {
             return;
         }
-        bool value;
-        string model, extra, collection, armor, extraCollection;
+        string extraCollection;
         connection.Open();
-        using (SqliteCommand command = connection.CreateCommand())
+        bool[] classes = DB.GetRaceClasses(connection, race, classButtons.Length);
+        for (int i = 0; i < classButtons.Length; i++)
         {
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT * FROM RaceClassCombos WHERE Race = {race};";
-            using SqliteDataReader reader = command.ExecuteReader();
-            reader.Read();
-            for (int i = 0; i < classButtons.Length; i++)
-            {
-                value = reader.GetBoolean(i + 1);
-                classButtons[i].interactable = value;
-            }
+            classButtons[i].interactable = classes[i];
         }
-        using (SqliteCommand command = connection.CreateCommand())
-        {
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = {race} AND Gender = {race == (int)WoWHelper.Race.Dracthyr || character.Gender};";
-            using SqliteDataReader reader = command.ExecuteReader();
-            reader.Read();
-            character.ModelID = character.MainFormID = reader.GetInt32(0);
-            model = reader.GetString(4);
-            if (race == (int)WoWHelper.Race.Dracthyr)
-            {
-                extra = null;
-                armor = reader.GetString(5);
-            }
-            else
-            {
-                extra = reader.IsDBNull(5) ? null : reader.GetString(5);
-                armor = null;
-            }
-            character.RacePath = reader.GetString(6);
-            collection = reader.IsDBNull(7) ? null : reader.GetString(7);
-        }
+        character.ModelID = character.MainFormID = DB.GetModel(connection, (WoWHelper.Race)race, character.Gender,
+            out string path, out string model, out string extra, out string armor, out string collection);
+        character.RacePath = path;
         if (race == (int)WoWHelper.Race.Dracthyr)
         {
-            using SqliteCommand command = connection.CreateCommand();
-            command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT * FROM RaceModels WHERE Race = 75 AND Gender = {character.Gender};";
-            using SqliteDataReader reader = command.ExecuteReader();
-            reader.Read();
-            extra = reader.GetString(4);
-            character.ExtraPath = reader.GetString(6);
-            extraCollection = reader.GetString(7);
+            character.ExtraPath = DB.GetModel(connection, character.Gender, out extra, out extraCollection);
         }
         else
         {
             character.ExtraPath = "";
             extraCollection = null;
         }
-        connection.Close();
         gearPanel.gameObject.SetActive(true);
         ClearItems();
         gearPanel.gameObject.SetActive(false);
@@ -1342,6 +941,7 @@ public class ScreenInput : MonoBehaviour
         SetupCategories();
         GetCustomizationChoices();
         GetCustomizationElements();
+        connection.Close();
         LinkDropdowns();
         LinkToggles();
         LinkCategories();
@@ -1393,11 +993,13 @@ public class ScreenInput : MonoBehaviour
         ChangeBorder(EventSystem.current.currentSelectedGameObject);
         character.Class = (WoWHelper.Class)id;
         int[] customization = character.Customization;
+        connection.Open();
         SetupFormPanel();
         SetupCustomizationPanel();
         SetupCategories();
         GetCustomizationChoices();
         GetCustomizationElements();
+        connection.Close();
         LinkDropdowns();
         LinkToggles();
         LinkCategories();
@@ -1597,6 +1199,7 @@ public class ScreenInput : MonoBehaviour
         rotate = false;
         translate = false;
         bool none = true;
+        int slot;
         GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
         ScrollItem scrollItem;
         for (int i = 0; i < maxScrollItems; i++)
@@ -1605,9 +1208,20 @@ public class ScreenInput : MonoBehaviour
             if (scrollItem.gameObject.activeSelf && scrollItem.toggle.isOn)
             {
                 none = false;
+                slot = (int)WoWHelper.MapSlots(slotButton.name);
                 slotButton.GetComponent<Image>().sprite = scrollItem.background.sprite;
-                character.Items[(int)WoWHelper.MapSlots(slotButton.name)] = new(scrollItem.Item.ID,
-                    scrollItem.Item.Appearance, items[scrollItem.Item.ID]);
+                character.Items[slot] = new(scrollItem.Item.ID, scrollItem.Item.Appearance, items[scrollItem.Item.ID]);
+                var appearance = character.Items[slot].Item.Appearances[character.Items[slot].Appearance];
+                if (appearance.DisplayInfoID != 0)
+                {
+                    connection.Open();
+                    DB.GetDisplayInfo(connection, appearance);
+                    appearance.DisplayInfo.ParticleColors = DB.GetParticleColors(connection, appearance.DisplayInfo.ParticleColor);
+                    DB.GetHelmetGeosets(connection, appearance.DisplayInfo);
+                    DB.GetComponents(connection, appearance);
+                    DB.GetComponentTextures(connection, appearance.DisplayInfo);
+                    connection.Close();
+                }
                 if (character.Items[(int)WoWHelper.SlotIndex.MainHand] != null &&
                     (character.Items[(int)WoWHelper.SlotIndex.MainHand].Item.ItemSlot == WoWHelper.ItemSlot.Bow))
                 {
@@ -1902,16 +1516,20 @@ public class ScreenInput : MonoBehaviour
         }
         Item item;
         string slot = WoWHelper.MapSlots(slotIndex), condition;
-        condition = $"Item.ID = {id}";
-        item = GetItems(condition).First().Value;
-        GetDescription(item);
-        GetAppearances(item);
+        condition = $"ID = {id}";
+        item = DB.GetItems(connection, condition).First().Value;
+        DB.GetAppearances(connection, item);
         foreach (var appearance in item.Appearances)
         {
-            appearance.Value.ParticleColors = GetParticleColors(appearance.Value.ParticleColor);
-            GetHelmetGeosets(appearance.Value);
-            GetComponent(appearance.Value);
-            GetComponentTextures(appearance.Value);
+            if (appearance.Value.DisplayInfoID != 0)
+            {
+                DB.GetDisplayInfo(connection, appearance.Value);
+                appearance.Value.DisplayInfo.ParticleColors = DB.GetParticleColors(connection,
+                    appearance.Value.DisplayInfo.ParticleColor);
+                DB.GetHelmetGeosets(connection, appearance.Value.DisplayInfo);
+                DB.GetComponents(connection, appearance.Value);
+                DB.GetComponentTextures(connection, appearance.Value.DisplayInfo);
+            }
         }
         character.Items[(int)slotIndex] = new(id, modifier, item);
         GameObject.Find(slot).GetComponent<Image>().sprite = IconFromBLP(item.Icon == 0 ?
