@@ -20,7 +20,6 @@ namespace WoW
         // Option choices
         public Dictionary<int, CustomizationChoice> AllChoices { get; set; }
 
-        // Constructor
         public CustomizationOption(string name, int id, int model, int category, int type)
         {
             Name = name;

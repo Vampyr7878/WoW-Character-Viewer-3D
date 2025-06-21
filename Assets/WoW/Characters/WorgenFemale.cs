@@ -98,15 +98,18 @@ namespace WoW.Characters
             switch (Character.Form)
             {
                 case 0:
-                    Character.ModelID = 44;
+                    Character.ModelID = Character.MainFormID;
+                    Character.CurrentRace = WoWHelper.Race.Worgen;
                     Character.ActivateMainMesh();
                     break;
                 case 1:
                     Character.ModelID = 2;
+                    Character.CurrentRace = WoWHelper.Race.Human;
                     Character.ActivateExtraMesh();
                     break;
                 default:
                     Character.ModelID = Character.CreatureForms[Character.Form - 1].ID;
+                    Character.CurrentRace = WoWHelper.Race.Worgen;
                     Character.ActivateCreature();
                     break;
             }
@@ -132,24 +135,27 @@ namespace WoW.Characters
         // Generate Worgen form skin texture from many layers
         private void WorgenTextures(Texture2D texture)
         {
-            DrawLayer(texture, "Face", "Fur Color", 512, 0, 512, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            DrawLayer(texture, "Face", "Fur Color", face);
             DrawBra(texture, "Fur Color");
             DrawUnderwear(texture, "Fur Color");
-            DrawLayer(texture, "Eyesight", "Eye Color", 512, 0, 512, 512);
+            DrawLayer(texture, "Eyesight", "Eye Color", face);
             DrawArmor(texture, true);
         }
 
         // Generate Human form skin texture from many layers
         private void HumanTextures(Texture2D texture)
         {
-            DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
-            OverlayLayer(texture, "Skin Color", 30, 0, 0, 1024, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            DrawLayer(texture, "Face", "Skin Color", face);
+            OverlayLayer(texture, "Skin Color", 30, full);
             DrawBra(texture);
             DrawUnderwear(texture);
-            DrawLayer(texture, "Makeup", 29, 512, 0, 512, 512);
-            DrawLayer(texture, "Eye Color", 36, 512, 0, 512, 512);
-            DrawLayer(texture, "Hair Style", "Hair Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Eyebrows", "Hair Color", 512, 0, 512, 512);
+            DrawLayer(texture, "Makeup", 29, face);
+            DrawLayer(texture, "Eye Color", 36, face);
+            DrawLayer(texture, "Hair Style", "Hair Color", face);
+            DrawLayer(texture, "Eyebrows", "Hair Color", face);
             DrawArmor(texture);
         }
 

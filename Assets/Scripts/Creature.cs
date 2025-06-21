@@ -60,8 +60,6 @@ public class Creature : ModelRenderer
     private string model;
     // Reference to the main camera
     private new Transform camera;
-    // List of geosets that are enabled for loading
-    private List<int> activeGeosets;
 
     private void Start()
     {
@@ -228,10 +226,7 @@ public class Creature : ModelRenderer
                     ParticleEffects();
                     for (int i = 0; i < Model.Skin.Textures.Length; i++)
                     {
-                        if (Model.Skin.Textures[i].Layer == 0)
-                        {
-                            SetMaterial(renderer, i);
-                        }
+                        SetMaterial(renderer, i);
                     }
                 }
                 catch (Exception e)
@@ -245,7 +240,7 @@ public class Creature : ModelRenderer
             {
                 if ((Model.Skeleton.Bones[i].Flags & 0x8) != 0)
                 {
-                    renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x - 90, camera.eulerAngles.y - 90, camera.eulerAngles.z);
+                    renderer.bones[i].transform.eulerAngles = new Vector3(camera.eulerAngles.x + 90, camera.eulerAngles.y + 90, camera.eulerAngles.z);
                 }
             }
             // Animate textures
@@ -337,6 +332,10 @@ public class Creature : ModelRenderer
     // Show only options available for selected race
     public void ChangeRacialOptions()
     {
+        if (!character.Loaded)
+        {
+            return;
+        }   
         if (character.Class == WoWHelper.Class.Druid)
         {
             switch (character.Race)
@@ -507,17 +506,17 @@ public class Creature : ModelRenderer
             {
                 Debug.LogError(Model.Skin.Textures[i].Shader);
             }
-            renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
-            renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
-            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
+            renderer.materials[i] = new Material(material.shader);
+            renderer.materials[i].shader = material.shader;
+            renderer.materials[i].CopyPropertiesFromMaterial(material);
             Debug.Log($"Shader: {Model.Skin.Textures[i].Shader}");
-            SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
+            SetTexture(renderer.materials[i], i);
         }
         else
         {
-            renderer.materials[Model.Skin.Textures[i].Id] = new Material(hiddenMaterial.shader);
-            renderer.materials[Model.Skin.Textures[i].Id].shader = hiddenMaterial.shader;
-            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(hiddenMaterial);
+            renderer.materials[i] = new Material(hiddenMaterial.shader);
+            renderer.materials[i].shader = hiddenMaterial.shader;
+            renderer.materials[i].CopyPropertiesFromMaterial(hiddenMaterial);
         }
     }
 
@@ -555,7 +554,7 @@ public class Creature : ModelRenderer
             {
                 ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particles[i].colorOverLifetime;
                 ParticleColor particleColor = particleColors.Length > 0 ? particleColors[Model.Particles[i].ColorIndex - 11] : null;
-                if (particleColor != null)
+                if (particleColor != null && particleColor.Start != Color.black)
                 {
                     Gradient gradient = new();
                     GradientColorKey[] colorKeys = new GradientColorKey[3];
@@ -563,9 +562,9 @@ public class Creature : ModelRenderer
                     colorKeys[1] = new GradientColorKey(particleColor.Mid, 0.5f);
                     colorKeys[2] = new GradientColorKey(particleColor.End, 1f);
                     GradientAlphaKey[] alphaKeys = new GradientAlphaKey[3];
-                    alphaKeys[0] = new GradientAlphaKey(particleColor.Start.a, 0f);
-                    alphaKeys[1] = new GradientAlphaKey(particleColor.Mid.a, 0.5f);
-                    alphaKeys[2] = new GradientAlphaKey(particleColor.End.a, 1f);
+                    alphaKeys[0] = new GradientAlphaKey(particleColor.Start.a / 255f, 0f);
+                    alphaKeys[1] = new GradientAlphaKey(particleColor.Mid.a / 255f, 0.5f);
+                    alphaKeys[2] = new GradientAlphaKey(particleColor.End.a / 255f, 1f);
                     gradient.SetKeys(colorKeys, alphaKeys);
                     colorOverLifetime.color = gradient;
                 }
@@ -581,7 +580,7 @@ public class Creature : ModelRenderer
             renderer.material.shader = material.shader;
             renderer.material.CopyPropertiesFromMaterial(material);
             Texture2D temp = textures[Model.Particles[i].Textures[0]];
-            Texture2D texture = new Texture2D(temp.width, temp.height, TextureFormat.ARGB32, false);
+            Texture2D texture = new(temp.width, temp.height, TextureFormat.ARGB32, false);
             texture.SetPixels32(temp.GetPixels32());
             texture.Apply();
             renderer.material.SetTexture("_MainTex", texture);

@@ -44,7 +44,8 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            DrawLayer(texture, "Face", "Skin Color", 1024, 0, 1024, 1024);
+            RectInt face = new(1024, 0, 1024, 1024);
+            DrawLayer(texture, "Face", "Skin Color", face);
             DrawArmor(texture);
         }
 

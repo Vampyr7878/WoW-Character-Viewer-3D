@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace WoW
+﻿namespace WoW
 {
     // Class to store customization choice data
     public class CustomizationDisplayInfo
@@ -26,7 +24,6 @@ namespace WoW
         // DisplayInfo Particle Colors
         public ParticleColor[] ParticleColors { get; set; }
 
-        // Constructor
         public CustomizationDisplayInfo(int related, int id, string model, int particle, int texture0, int texture1, int texture2, int texture3)
         {
             Related = related;

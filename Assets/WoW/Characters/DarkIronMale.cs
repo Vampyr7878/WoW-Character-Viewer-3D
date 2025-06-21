@@ -38,8 +38,10 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Tattoo", 19, 0, 0, 1024, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            DrawLayer(texture, "Face", "Skin Color", face);
+            DrawLayer(texture, "Tattoo", 19, full);
             DrawUnderwear(texture);
             DrawArmor(texture);
         }

@@ -18,7 +18,11 @@ public class Collection : ModelRenderer
     public Character character;
 
     // List of geosets that are enabled for loading
-    public List<int> ActiveGeosets { get; set; }
+    public List<int> ActiveGeosets
+    {
+        get { return activeGeosets; }
+        set { activeGeosets = value; }
+    }
     // Changable texture from database
     public int Texture { get; set; }
     // File id of the model
@@ -77,24 +81,24 @@ public class Collection : ModelRenderer
     // Set material with proper shader
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
-        if (ActiveGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
+        if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
             Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
             if (material == null)
             {
                 Debug.LogError(Model.Skin.Textures[i].Shader);
             }
-            renderer.materials[Model.Skin.Textures[i].Id] = new Material(material.shader);
-            renderer.materials[Model.Skin.Textures[i].Id].shader = material.shader;
-            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(material);
+            renderer.materials[i] = new Material(material.shader);
+            renderer.materials[i].shader = material.shader;
+            renderer.materials[i].CopyPropertiesFromMaterial(material);
             Debug.Log(Model.Skin.Textures[i].Shader);
-            SetTexture(renderer.materials[Model.Skin.Textures[i].Id], i);
+            SetTexture(renderer.materials[i], i);
         }
         else
         {
-            renderer.materials[Model.Skin.Textures[i].Id] = new Material(hiddenMaterial.shader);
-            renderer.materials[Model.Skin.Textures[i].Id].shader = hiddenMaterial.shader;
-            renderer.materials[Model.Skin.Textures[i].Id].CopyPropertiesFromMaterial(hiddenMaterial);
+            renderer.materials[i] = new Material(hiddenMaterial.shader);
+            renderer.materials[i].shader = hiddenMaterial.shader;
+            renderer.materials[i].CopyPropertiesFromMaterial(hiddenMaterial);
         }
     }
 
@@ -211,10 +215,7 @@ public class Collection : ModelRenderer
     {
         DestroyImmediate(mesh);
         Loaded = false;
-        if (loadBinaries != null)
-        {
-            loadBinaries.Abort();
-        }
+        loadBinaries?.Abort();
     }
 
     // Find matching bones in character model
@@ -272,7 +273,7 @@ public class Collection : ModelRenderer
         loadBinaries = new Thread(() => { Model = m2.LoadModel(data, skin, skel); done = true; });
         loadBinaries.Start();
         yield return null;
-        ActiveGeosets = new List<int>();
+        activeGeosets = new List<int>();
         while (loadBinaries.IsAlive)
         {
             yield return null;

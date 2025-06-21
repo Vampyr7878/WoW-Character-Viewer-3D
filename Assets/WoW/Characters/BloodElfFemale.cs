@@ -93,13 +93,15 @@ namespace WoW.Characters
             textures.Clear();
 #endif
             Emission = null;
-            DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Tattoo Color", "Tattoo", 0, 0, 512, 512);
-            DrawEmission("Tattoo Color", "Tattoo", 0, 0, 512, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            DrawLayer(texture, "Face", "Skin Color", face);
+            DrawLayer(texture, "Tattoo Color", "Tattoo", body);
+            DrawEmission("Tattoo Color", "Tattoo", body);
             DrawBra(texture);
             DrawUnderwear(texture);
-            DrawJewelry(texture, "Bracelets", 26, 0, 0, 512, 512);
-            DrawLayer(texture, "Hair Style", "Hair Color", 512, 0, 512, 512);
+            DrawJewelry(texture, "Bracelets", 26, body);
+            DrawLayer(texture, "Hair Style", "Hair Color", face);
             DrawArmor(texture);
         }
     }

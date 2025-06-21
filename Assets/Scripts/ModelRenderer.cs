@@ -53,6 +53,8 @@ public abstract class ModelRenderer : MonoBehaviour
     protected new SkinnedMeshRenderer renderer;
     // Animator object for this model
     protected Animator animator;
+    // List of geosets that are enabled for loading
+    protected List<int> activeGeosets;
 
     // Reference to the binary data
     public M2 Model { get; protected set; }
@@ -64,15 +66,15 @@ public abstract class ModelRenderer : MonoBehaviour
     // Animate current texture unit
     protected void AnimateTextures(SkinnedMeshRenderer renderer, int i)
     {
-        if (renderer.materials[Model.Skin.Textures[i].Id].shader != hiddenMaterial.shader)
+        if (renderer.materials[i].shader != hiddenMaterial.shader)
         {
             int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
             string texture = "_Texture1";
             if (index >= 0)
             {
-                Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
+                Vector2 offset = renderer.materials[i].GetTextureOffset(texture);
                 offset = AnimateTexture(index, offset);
-                renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+                renderer.materials[i].SetTextureOffset(texture, offset);
             }
             if (Model.Skin.Textures[i].TextureCount > 1)
             {
@@ -80,9 +82,9 @@ public abstract class ModelRenderer : MonoBehaviour
                 texture = "_Texture2";
                 if (index >= 0)
                 {
-                    Vector2 offset = renderer.materials[Model.Skin.Textures[i].Id].GetTextureOffset(texture);
+                    Vector2 offset = renderer.materials[i].GetTextureOffset(texture);
                     offset = AnimateTexture(index, offset);
-                    renderer.materials[Model.Skin.Textures[i].Id].SetTextureOffset(texture, offset);
+                    renderer.materials[i].SetTextureOffset(texture, offset);
                 }
             }
         }
@@ -129,22 +131,22 @@ public abstract class ModelRenderer : MonoBehaviour
     // Animate current texture unit
     protected void AnimateColors(SkinnedMeshRenderer renderer, int i)
     {
-        if (renderer.materials[Model.Skin.Textures[i].Id].shader != hiddenMaterial.shader)
+        if (renderer.materials[i].shader != hiddenMaterial.shader)
         {
             int index = Model.Skin.Textures[i].Color;
             if (index >= 0)
             {
                 if (Model.Colors[index].Color.Values[0].Length > 1)
                 {
-                    Color color = renderer.materials[Model.Skin.Textures[i].Id].GetColor("_Color");
+                    Color color = renderer.materials[i].GetColor("_Color");
                     color = AnimateColor(index, color);
-                    renderer.materials[Model.Skin.Textures[i].Id].SetColor("_Color", color);
+                    renderer.materials[i].SetColor("_Color", color);
                 }
                 if (Model.Colors[index].Transparency.Values[0].Length > 1)
                 {
-                    Color color = renderer.materials[Model.Skin.Textures[i].Id].GetColor("_Color");
+                    Color color = renderer.materials[i].GetColor("_Color");
                     color = AnimateTransparency(index, color);
-                    renderer.materials[Model.Skin.Textures[i].Id].SetColor("_Color", color);
+                    renderer.materials[i].SetColor("_Color", color);
                 }
             }
         }
@@ -324,22 +326,16 @@ public abstract class ModelRenderer : MonoBehaviour
         return blend;
     }
 
+    // Select material for particle
     public Material ParticleMaterial(int blend)
     {
-        string material;
-        switch (blend)
+        string material = blend switch
         {
-            case 2:
-                material = "particlefademultiplymaterial";
-                break;
-            case 4:
-            default:
-                material = "particleadditivemultiplymaterial";
-                break;
-            case 7:
-                material = "particleaddtivecolormaterial";
-                break;
-        }
+            2 => "particlefademultiplymaterial",
+            4 => "particleadditivemultiplymaterial",
+            //7 => "particleaddtivecolormaterial",
+            _ => "particletransparentcolormaterial",
+        };
         if (material == "")
         {
             return null;

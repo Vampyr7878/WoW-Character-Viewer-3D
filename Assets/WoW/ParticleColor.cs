@@ -10,7 +10,6 @@ public class ParticleColor
     // End color
     public Color32 End { get; set; }
 
-    // Constructor
     public ParticleColor(int start, int mid, int end)
     {
         Color color;

@@ -1,7 +1,6 @@
 ﻿using Mono.Data.Sqlite;
 using System.Collections.Generic;
 using System.Data;
-using UnityEditor.Build;
 using UnityEngine;
 using WoW;
 
@@ -115,13 +114,13 @@ namespace Assets.WoW
             using SqliteCommand command = connection.CreateCommand();
             List<CustomizationGeoset> geosets = new();
             command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, GeosetType, GeosetID FROM ChrCustomizationElement JOIN " +
+            command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, GeosetType, GeosetID, Modifier FROM ChrCustomizationElement JOIN " +
                 $"ChrCustomizationGeoset ON ChrCustomizationGeosetID = ChrCustomizationGeoset.ID WHERE " +
                 $"ChrCustomizationChoiceID = {choice} AND ChrCustomizationGeosetID > 0;";
             using SqliteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                geosets.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2)));
+                geosets.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3)));
             }
             return geosets.ToArray();
         }
@@ -132,13 +131,13 @@ namespace Assets.WoW
             using SqliteCommand command = connection.CreateCommand();
             List<CustomizationGeoset> geosets = new();
             command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, GeosetType, GeosetID FROM ChrCustomizationElement JOIN " +
+            command.CommandText = $"SELECT RelatedChrCustomizationChoiceID, GeosetType, GeosetID, Modifier FROM ChrCustomizationElement JOIN " +
                 $"ChrCustomizationSkinnedModel ON ChrCustomizationSkinnedModelID = ChrCustomizationSkinnedModel.ID WHERE " +
                 $"ChrCustomizationChoiceID = {choice} AND ChrCustomizationSkinnedModelID > 0;";
             using SqliteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                geosets.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2)));
+                geosets.Add(new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2), reader.GetInt32(3)));
             }
             return geosets.ToArray();
         }
@@ -291,27 +290,67 @@ namespace Assets.WoW
             item.Appearances = appearances;
         }
 
-        // Get item item display info from DB
+        // Get item display info from DB
         public static void GetDisplayInfo(SqliteConnection connection, ItemAppearance appearance)
         {
             using SqliteCommand command = connection.CreateCommand();
-            int[] models, textures, geosets, skinnedGeosets, helmets;
+            int[] models, materials, geosets, skinnedGeosets, helmets;
             command.CommandType = CommandType.Text;
-            command.CommandText = $"SELECT ParticleColorID, ModelResourcesID_0, ModelResourcesID_1, ModelMaterialResourcesID_0, " +
-                $"ModelMaterialResourcesID_1, GeosetGroup_0, GeosetGroup_1, GeosetGroup_2, GeosetGroup_3, GeosetGroup_4, " +
-                $"GeosetGroup_5, AttachmentGeosetGroup_0, AttachmentGeosetGroup_1, AttachmentGeosetGroup_2, " +
-                $"AttachmentGeosetGroup_3, AttachmentGeosetGroup_4, AttachmentGeosetGroup_5, HelmetGeosetVis_0, " +
-                $"HelmetGeosetVis_1 FROM ItemDisplayInfo WHERE ItemDisplayInfo.ID = {appearance.DisplayInfoID};";
+            command.CommandText = $"SELECT GeosetGroupOverride, ParticleColorID, Flags, ModelResourcesID_0, ModelResourcesID_1, " +
+                $"ModelMaterialResourcesID_0, ModelMaterialResourcesID_1, GeosetGroup_0, GeosetGroup_1, GeosetGroup_2, " +
+                $"GeosetGroup_3, GeosetGroup_4, GeosetGroup_5, AttachmentGeosetGroup_0, AttachmentGeosetGroup_1, " +
+                $"AttachmentGeosetGroup_2, AttachmentGeosetGroup_3, AttachmentGeosetGroup_4, AttachmentGeosetGroup_5, " +
+                $"HelmetGeosetVis_0, HelmetGeosetVis_1 FROM ItemDisplayInfo WHERE ItemDisplayInfo.ID = {appearance.DisplayInfoID};";
             using SqliteDataReader reader = command.ExecuteReader();
             reader.Read();
-                models = new[] { reader.GetInt32(1), reader.GetInt32(2) };
-            textures = new[] { reader.GetInt32(3), reader.GetInt32(4) };
-            geosets = new[] { reader.GetInt32(5), reader.GetInt32(6), reader.GetInt32(7),
-                        reader.GetInt32(8), reader.GetInt32(9), reader.GetInt32(10) };
-            skinnedGeosets = new[] { reader.GetInt32(11), reader.GetInt32(12), reader.GetInt32(13),
-                        reader.GetInt32(14), reader.GetInt32(15), reader.GetInt32(16) };
-            helmets = new[] { reader.GetInt32(17), reader.GetInt32(18) };
-            appearance.DisplayInfo = new(reader.GetInt32(0), models, textures, geosets, skinnedGeosets, helmets);
+            models = new[] { reader.GetInt32(3), reader.GetInt32(4) };
+            materials = new[] { reader.GetInt32(5), reader.GetInt32(6) };
+            geosets = new[] { reader.GetInt32(7), reader.GetInt32(8), reader.GetInt32(9),
+                        reader.GetInt32(10), reader.GetInt32(11), reader.GetInt32(12) };
+            skinnedGeosets = new[] { reader.GetInt32(13), reader.GetInt32(14), reader.GetInt32(15),
+                        reader.GetInt32(16), reader.GetInt32(17), reader.GetInt32(18) };
+            helmets = new[] { reader.GetInt32(19), reader.GetInt32(20) };
+            appearance.DisplayInfo = new(reader.GetInt32(0), reader.GetInt32(1), reader.GetInt32(2), models, materials, geosets, skinnedGeosets, helmets);
+        }
+
+        // Get item textures from DB
+        public static void GetItemModels(SqliteConnection connection, ItemDisplayInfo displayInfo)
+        {
+            for (int i = 0; i < displayInfo.Materials.Length; i++)
+            {
+                using SqliteCommand command = connection.CreateCommand();
+                List<ItemModel> models = new();
+                command.CommandType = CommandType.Text;
+                command.CommandText = $"SELECT FileDataID, GenderIndex, ClassID, RaceID, PositionIndex FROM ModelFileData LEFT JOIN ComponentModelFileData " +
+                    $"ON ModelFileData.FileDataID = ComponentModelFileData.ID WHERE ModelResourcesID = {displayInfo.ModelID[i]};";
+                using SqliteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    models.Add(new(reader.GetInt32(0), reader.IsDBNull(1) ? 2 : reader.GetInt32(1),
+                        reader.IsDBNull(2) ? WoWHelper.Class.All : (WoWHelper.Class)reader.GetInt32(2),
+                        reader.IsDBNull(3) ? WoWHelper.Race.All : (WoWHelper.Race)reader.GetInt32(3),
+                        reader.IsDBNull(4) ? -1 : reader.GetInt32(4)));
+                }
+                displayInfo.Models[i] = models.ToArray();
+            }
+        }
+
+        // Get item textures from DB
+        public static void GetItemTextures(SqliteConnection connection, ItemDisplayInfo displayInfo)
+        {
+            for(int i = 0; i < displayInfo.Materials.Length; i++)
+            {
+                using SqliteCommand command = connection.CreateCommand();
+                List<ItemTexture> textures = new();
+                command.CommandType = CommandType.Text;
+                command.CommandText = $"SELECT FileDataID, UsageType FROM TextureFileData WHERE MaterialResourcesID = {displayInfo.Materials[i]};";
+                using SqliteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    textures.Add(new(reader.GetInt32(0), reader.GetInt32(1)));
+                }
+                displayInfo.Textures[i] = textures.ToArray();
+            }
         }
 
         // Get item appearance helmet geosets from DB

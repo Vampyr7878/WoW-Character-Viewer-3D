@@ -12,7 +12,6 @@ public class CustomDropdown : Dropdown
     // counter to track down next index value
     private int index = 0;
 
-    // Constructor
     protected override GameObject CreateDropdownList(GameObject template)
     {
         index = 0;

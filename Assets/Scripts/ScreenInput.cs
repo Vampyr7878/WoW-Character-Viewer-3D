@@ -385,8 +385,8 @@ public class ScreenInput : MonoBehaviour
     {
         if (rotate && Input.GetMouseButton(0) && !FileBrowser.IsOpen)
         {
-            character.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
-            creature.transform.Rotate(0f, -Input.GetAxis("Mouse X") * 10f, 0f);
+            character.transform.Rotate(0f, Input.GetAxis("Mouse X") * 10f, 0f);
+            creature.transform.Rotate(0f, Input.GetAxis("Mouse X") * 10f, 0f);
         }
     }
 
@@ -581,6 +581,16 @@ public class ScreenInput : MonoBehaviour
         int i = 0;
         foreach(var item in items)
         {
+            if (i == maxScrollItems)
+            {
+                break;
+            }
+            if (item.Value.Appearances == null || item.Value.Appearances.Count == 0)
+            {
+                SetItem(scrollItems[i], item.Value, null);
+                i++;
+                continue;
+            }
             foreach (var appearance in item.Value.Appearances)
             {
                 SetItem(scrollItems[i], item.Value, appearance.Value);
@@ -589,15 +599,6 @@ public class ScreenInput : MonoBehaviour
                 {
                     break;
                 }
-            }
-            if (item.Value.Appearances.Count == 0)
-            {
-                SetItem(scrollItems[i], item.Value, null);
-                i++;
-            }
-            if (i == maxScrollItems)
-            {
-                break;
             }
         }
     }
@@ -931,9 +932,9 @@ public class ScreenInput : MonoBehaviour
             character.ExtraPath = "";
             extraCollection = null;
         }
-        gearPanel.gameObject.SetActive(true);
+        gearPanel.SetActive(true);
         ClearItems();
-        gearPanel.gameObject.SetActive(false);
+        gearPanel.SetActive(false);
         character.Race = (WoWHelper.Race)race;
         character.Class = WoWHelper.Class.Warrior;
         SetupFormPanel();
@@ -973,7 +974,9 @@ public class ScreenInput : MonoBehaviour
             ChangeBorder(EventSystem.current.currentSelectedGameObject);
         }
         character.ChangeForm(form);
+        connection.Open();
         SetupCategories();
+        connection.Close();
         LinkCategories();
         if (customizationCategories.Where(c => c.gameObject.activeSelf).Count() <= 1)
         {
@@ -1172,8 +1175,8 @@ public class ScreenInput : MonoBehaviour
     // Equipment button on the left toggles equipement panel on the left side
     public void LeftButton(int slot)
     {
-        rightPanel.gameObject.SetActive(false);
-        leftPanel.gameObject.SetActive(true);
+        rightPanel.SetActive(false);
+        leftPanel.SetActive(true);
         leftPanel.GetComponentInChildren<InputField>().text = "";
         this.slot = (WoWHelper.ItemSlot)slot;
         slotButton = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject;
@@ -1184,8 +1187,8 @@ public class ScreenInput : MonoBehaviour
     // Equipment button on the right toggles equipement panel on the righ side
     public void RightButton(int slot)
     {
-        leftPanel.gameObject.SetActive(false);
-        rightPanel.gameObject.SetActive(true);
+        leftPanel.SetActive(false);
+        rightPanel.SetActive(true);
         rightPanel.GetComponentInChildren<InputField>().text = "";
         this.slot = (WoWHelper.ItemSlot)slot;
         slotButton = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject;
@@ -1199,7 +1202,7 @@ public class ScreenInput : MonoBehaviour
         rotate = false;
         translate = false;
         bool none = true;
-        int slot;
+        int slot = (int)WoWHelper.MapSlots(slotButton.name);
         GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
         ScrollItem scrollItem;
         for (int i = 0; i < maxScrollItems; i++)
@@ -1208,18 +1211,24 @@ public class ScreenInput : MonoBehaviour
             if (scrollItem.gameObject.activeSelf && scrollItem.toggle.isOn)
             {
                 none = false;
-                slot = (int)WoWHelper.MapSlots(slotButton.name);
                 slotButton.GetComponent<Image>().sprite = scrollItem.background.sprite;
-                character.Items[slot] = new(scrollItem.Item.ID, scrollItem.Item.Appearance, items[scrollItem.Item.ID]);
-                var appearance = character.Items[slot].Item.Appearances[character.Items[slot].Appearance];
-                if (appearance.DisplayInfoID != 0)
+                int id = character.Items[slot] == null ? 0 : character.Items[slot].ID;
+                int appearance = character.Items[slot] == null ? 0 : character.Items[slot].Appearance;
+                character.Items[slot] = new(scrollItem.Item.ID, scrollItem.Item.Appearance, items[scrollItem.Item.ID])
+                {
+                    Changed = scrollItem.Item.ID != id || scrollItem.Item.Appearance != appearance
+                };
+                var itemAppearance = character.Items[slot].Item.Appearances[character.Items[slot].Appearance];
+                if (itemAppearance.DisplayInfoID != 0)
                 {
                     connection.Open();
-                    DB.GetDisplayInfo(connection, appearance);
-                    appearance.DisplayInfo.ParticleColors = DB.GetParticleColors(connection, appearance.DisplayInfo.ParticleColor);
-                    DB.GetHelmetGeosets(connection, appearance.DisplayInfo);
-                    DB.GetComponents(connection, appearance);
-                    DB.GetComponentTextures(connection, appearance.DisplayInfo);
+                    DB.GetDisplayInfo(connection, itemAppearance);
+                    itemAppearance.DisplayInfo.ParticleColors = DB.GetParticleColors(connection, itemAppearance.DisplayInfo.ParticleColor);
+                    DB.GetItemModels(connection, itemAppearance.DisplayInfo);
+                    DB.GetItemTextures(connection, itemAppearance.DisplayInfo);
+                    DB.GetHelmetGeosets(connection, itemAppearance.DisplayInfo);
+                    DB.GetComponents(connection, itemAppearance);
+                    DB.GetComponentTextures(connection, itemAppearance.DisplayInfo);
                     connection.Close();
                 }
                 if (character.Items[(int)WoWHelper.SlotIndex.MainHand] != null &&
@@ -1233,6 +1242,10 @@ public class ScreenInput : MonoBehaviour
         }
         if (none)
         {
+            if (slot == (int)WoWHelper.SlotIndex.LeftShoulder && character.Items[(int)WoWHelper.SlotIndex.RightShoulder] != null)
+            {
+                character.Items[(int)WoWHelper.SlotIndex.RightShoulder].Changed = true;
+            }
             character.Items[(int)WoWHelper.MapSlots(slotButton.name)] = null;
             slotButton.GetComponent<Image>().sprite = Resources.Load<Sprite>(@$"Icons\ui-paperdoll-slot-{slotButton.name}");
         }
@@ -1299,6 +1312,12 @@ public class ScreenInput : MonoBehaviour
             {
                 break;
             }
+            if (filtered[k].Value.Appearances == null || filtered[k].Value.Appearances.Count == 0)
+            {
+                SetItem(scrollItems[j], filtered[k].Value, null);
+                j++;
+                continue;
+            }
             foreach (var appearance in filtered[k].Value.Appearances)
             {
                 SetItem(scrollItems[j], filtered[k].Value, appearance.Value);
@@ -1307,11 +1326,6 @@ public class ScreenInput : MonoBehaviour
                 {
                     break;
                 }
-            }
-            if (filtered[k].Value.Appearances.Count == 0)
-            {
-                SetItem(scrollItems[j], filtered[k].Value, null);
-                j++;
             }
         }
         for (; j < maxScrollItems; j++)
@@ -1343,6 +1357,8 @@ public class ScreenInput : MonoBehaviour
             gearButton.gameObject.SetActive(customize);
             formPanel.SetActive(false);
             gearPanel.SetActive(gear);
+            rightPanel.SetActive(gear);
+            leftPanel.SetActive(gear);
             FormButton(0);
         }
         exitButton.GetComponentInChildren<Text>().text = customize ? "Back" : "Exit";
@@ -1378,13 +1394,13 @@ public class ScreenInput : MonoBehaviour
     public void Gear()
     {
         gear = !gear;
-        formPanel.gameObject.SetActive(!gear);
-        customizationPanel.gameObject.SetActive(!gear);
-        gearPanel.gameObject.SetActive(gear);
+        formPanel.SetActive(!gear);
+        customizationPanel.SetActive(!gear);
+        gearPanel.SetActive(gear);
         if (!gear)
         {
-            leftPanel.gameObject.SetActive(false);
-            rightPanel.gameObject.SetActive(false);
+            leftPanel.SetActive(false);
+            rightPanel.SetActive(false);
         }
     }
 
@@ -1437,10 +1453,10 @@ public class ScreenInput : MonoBehaviour
             }
             Button button = (faction == "Alliance" ? alliancePanel.transform.Find(races[race].ToLower()) :
                 hordePanel.transform.Find(races[race].ToLower())).GetComponentInChildren<Button>();
-            EventSystem.current.SetSelectedGameObject(button.gameObject);
-            RaceButton(race);
             EventSystem.current.SetSelectedGameObject(GameObject.Find(gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
             GenderButton(gender);
+            EventSystem.current.SetSelectedGameObject(button.gameObject);
+            RaceButton(race);
             EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[id].ToLower()).GetComponentInChildren<Button>().gameObject);
             ClassButton(id);
             List<JToken> list = jCharacter["customizations"].Children().ToList();
@@ -1464,7 +1480,7 @@ public class ScreenInput : MonoBehaviour
             }
             list = jCharacter["items"].Children().ToList();
             connection.Open();
-            gearPanel.gameObject.SetActive(true);
+            gearPanel.SetActive(true);
             WoWHelper.SlotIndex slot;
             ClearItems();
             foreach (JToken item in list)
@@ -1476,7 +1492,7 @@ public class ScreenInput : MonoBehaviour
                     EquipItem(item.Value<int>("secondary_id"), item.Value<int>("secondary_item_appearance_modifier_id"), WoWHelper.SlotIndex.LeftShoulder);
                 }
             }
-            gearPanel.gameObject.SetActive(false);
+            gearPanel.SetActive(false);
             connection.Close();
             character.Change = true;
         }
@@ -1526,12 +1542,17 @@ public class ScreenInput : MonoBehaviour
                 DB.GetDisplayInfo(connection, appearance.Value);
                 appearance.Value.DisplayInfo.ParticleColors = DB.GetParticleColors(connection,
                     appearance.Value.DisplayInfo.ParticleColor);
+                DB.GetItemModels(connection, appearance.Value.DisplayInfo);
+                DB.GetItemTextures(connection, appearance.Value.DisplayInfo);
                 DB.GetHelmetGeosets(connection, appearance.Value.DisplayInfo);
                 DB.GetComponents(connection, appearance.Value);
                 DB.GetComponentTextures(connection, appearance.Value.DisplayInfo);
             }
         }
-        character.Items[(int)slotIndex] = new(id, modifier, item);
+        character.Items[(int)slotIndex] = new(id, modifier, item)
+        {
+            Changed = true
+        };
         GameObject.Find(slot).GetComponent<Image>().sprite = IconFromBLP(item.Icon == 0 ?
             item.Appearances.Count == 0 ? 134400 : item.Appearances[modifier].Icon : item.Icon);
     }
@@ -1610,13 +1631,13 @@ public class ScreenInput : MonoBehaviour
                 }
             }
             connection.Open();
-            gearPanel.gameObject.SetActive(true);
+            gearPanel.SetActive(true);
             ClearItems();
             for (int i = 0; i < sCharacter.items.Length; i++)
             {
                 EquipItem(sCharacter.items[i].id, sCharacter.items[i].appearance, (WoWHelper.SlotIndex)i);
             }
-            gearPanel.gameObject.SetActive(false);
+            gearPanel.SetActive(false);
             connection.Close();
             character.Change = true;
         }

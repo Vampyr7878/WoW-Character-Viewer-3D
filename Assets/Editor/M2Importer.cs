@@ -1,5 +1,4 @@
 ﻿using M2Lib;
-using Newtonsoft.Json.Linq;
 using SkelLib;
 using System;
 using System.Collections.Generic;
@@ -8,24 +7,50 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.AssetImporters;
 using UnityEngine;
+using WoW;
 
-//Importer for m2 files
+// Importer for m2 files
 [ScriptedImporter(1, "m2")]
 public class M2Importer : ScriptedImporter
 {
+    // Set if it is a character model
+    public bool character;
+    // Shield attachment point
+    public GameObject shield;
+    // Right hand attachment point
+    public GameObject handRight;
+    // Left hand attachment point
+    public GameObject handLeft;
+    // Right Shoulder attachment point
+    public GameObject shoulderRight;
+    // Left Shoulder attachment point
+    public GameObject shoulderLeft;
+    // Helm attachment point
+    public GameObject helm;
+    // Quiver attachment point
+    public GameObject quiver;
+    // Buckle attachment point
+    public GameObject buckle;
+    // Book attachment point
+    public GameObject book;
+    // Backpack attachment point
+    public GameObject backpack;
+
     public override void OnImportAsset(AssetImportContext ctx)
     {
-        //Load file contents
+        // Load file contents
         M2 file = new();
         file.LoadFile(ctx.assetPath);
-        //Prepare blank asset
+        // Prepare blank asset
         GameObject model = new();
         model.AddComponent<Animator>();
         model.AddComponent<SkinnedMeshRenderer>();
         SkinnedMeshRenderer renderer = model.GetComponent<SkinnedMeshRenderer>();
-        Mesh mesh = new Mesh();
-        mesh.name = $"{file.Name}_mesh";
-        //Fill vertex data
+        Mesh mesh = new()
+        {
+            name = $"{file.Name}_mesh"
+        };
+        // Fill vertex data
         Vector3[] vertices = new Vector3[file.Vertices.Length];
         Vector3[] normals = new Vector3[file.Vertices.Length];
         BoneWeight[] weights = new BoneWeight[file.Vertices.Length];
@@ -55,18 +80,18 @@ public class M2Importer : ScriptedImporter
         mesh.boneWeights = weights;
         mesh.uv = uv;
         mesh.uv2 = uv2;
-        //Fill Submesh data
-        mesh.subMeshCount = file.Skin.Submeshes.Length;
+        // Fill Submesh data
+        mesh.subMeshCount = file.Skin.Textures.Length;
         for (int i = 0; i < mesh.subMeshCount; i++)
         {
-            int[] triangles = new int[file.Skin.Submeshes[i].Count];
+            int[] triangles = new int[file.Skin.Submeshes[file.Skin.Textures[i].Id].Count];
             for (int j = 0; j < triangles.Length; j++)
             {
-                triangles[j] = file.Skin.Indices[file.Skin.Submeshes[i].Start + j];
+                triangles[j] = file.Skin.Indices[file.Skin.Submeshes[file.Skin.Textures[i].Id].Start + j];
             }
             mesh.SetTriangles(triangles, i);
         }
-        //Generate bones
+        // Generate bones
         Transform[] bones = new Transform[file.Skeleton.Bones.Length];
         for (int i = 0; i < bones.Length; i++)
         {
@@ -85,7 +110,6 @@ public class M2Importer : ScriptedImporter
                 bones[i].parent = bones[file.Skeleton.Bones[i].Parent];
             }
         }
-        //Add Attachment points
         Matrix4x4[] bind = new Matrix4x4[bones.Length];
         for (int i = 0; i < bones.Length; i++)
         {
@@ -97,7 +121,31 @@ public class M2Importer : ScriptedImporter
         renderer.bones = bones;
         renderer.rootBone = bones[0];
         mesh.bindposes = bind;
-        //Add Animation Seqences
+        // Add Attachment points
+        if (character)
+        {
+            AddAttachmentPoint(shield, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.Shield]].Bone]);
+            AddAttachmentPoint(handRight, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.HandRight]].Bone]);
+            AddAttachmentPoint(handLeft, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.HandLeft]].Bone]);
+            AddAttachmentPoint(shoulderRight, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.ShoulderRight]].Bone]);
+            AddAttachmentPoint(shoulderLeft, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.ShoulderLeft]].Bone]);
+            AddAttachmentPoint(helm, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.Helm]].Bone]);
+            AddAttachmentPoint(quiver, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.Quiver]].Bone]);
+            AddAttachmentPoint(buckle, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.Buckle]].Bone]);
+            AddAttachmentPoint(book, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.Book]].Bone]);
+            AddAttachmentPoint(backpack, bones[file.Skeleton.Attachments[file.Skeleton.
+                AttachmentLookup[(int)WoWHelper.AttachmentPoint.Backpack]].Bone]);
+        }
+        // Add Animation Seqences
         string[] bonePaths = new string[file.Skeleton.Bones.Length];
         for (int i = 0; i < bonePaths.Length; i++)
         {
@@ -116,7 +164,7 @@ public class M2Importer : ScriptedImporter
                 GetSeqence(0, file.Skeleton, bonePaths, bones),
             };
         }
-        //Load *.bytes files so data can be easly accessible at runtime
+        // Load *.bytes files so data can be easly accessible at runtime
         string path = Path.GetDirectoryName(ctx.assetPath);
         TextAsset data = AssetDatabase.LoadAssetAtPath<TextAsset>(path + "\\data.bytes");
         TextAsset skin = AssetDatabase.LoadAssetAtPath<TextAsset>(path + "\\skin.bytes");
@@ -128,7 +176,7 @@ public class M2Importer : ScriptedImporter
         {
             m2.skel = skel;
         }
-        //Populate the asset
+        // Populate the asset
         skeleton.transform.localEulerAngles = new Vector3(-90, 0, 0);
         ctx.AddObjectToAsset(file.Name, model);
         ctx.AddObjectToAsset(mesh.name, mesh);
@@ -152,7 +200,7 @@ public class M2Importer : ScriptedImporter
         }
     }
 
-    //Recursively get full path to the bone
+    // Recursively get full path to the bone
     private string GetBonePath(short bone, Bone[] bones)
     {
         if (bone == -1)
@@ -168,8 +216,15 @@ public class M2Importer : ScriptedImporter
             return $"{GetBonePath(bones[bone].Parent, bones)}Bone{bone}/";
         }
     }
+    
+    // 
+    private void AddAttachmentPoint(GameObject point, Transform bone)
+    {
+        GameObject attachment = Instantiate(point, bone);
+        attachment.name = attachment.name.Replace("(Clone)", "");
+    }
 
-    //Create animation seqence clip
+    // Create animation seqence clip
     private AnimationClip GetSeqence(short sequence, Skel skeleton, string[] bonePaths, Transform[] bones)
     {
         AnimationClip clip = new()
@@ -247,7 +302,7 @@ public class M2Importer : ScriptedImporter
         return clip;
     }
 
-    //Create global animation loop, mostly used to scale attachment points
+    // Create global animation loop, mostly used to scale attachment points
     private AnimationClip GetLoop(int loop, Skel skeleton, string[] bonePaths, Transform[] bones)
     {
         AnimationClip clip = new()
@@ -324,7 +379,7 @@ public class M2Importer : ScriptedImporter
         return clip;
     }
 
-    //Create curve for translation keys
+    // Create curve for translation keys
     private AnimationCurve TranslationCurve(short interpolation, int[] timestamps, float[] values, float position)
     {
         AnimationCurve curve = null;
@@ -345,7 +400,7 @@ public class M2Importer : ScriptedImporter
         return curve;
     }
 
-    //Create curve for rotation keys
+    // Create curve for rotation keys
     private AnimationCurve RotationCurve(short interpolation, int[] timestamps, float[] values)
     {
         AnimationCurve curve = null;
@@ -366,7 +421,7 @@ public class M2Importer : ScriptedImporter
         return curve;
     }
 
-    //Create curve for scale keys
+    // Create curve for scale keys
     private AnimationCurve ScaleCurve(short interpolation, int[] timestamps, float[] values)
     {
         AnimationCurve curve = null;
@@ -387,7 +442,7 @@ public class M2Importer : ScriptedImporter
         return curve;
     }
 
-    //Add translation keyframes
+    // Add translation keyframes
     private List<Keyframe> AddTranslationKeyframes(int[] timestamps, float[] values, float position, int step = 1)
     {
         List<Keyframe> keys = new();
@@ -406,7 +461,7 @@ public class M2Importer : ScriptedImporter
         return keys;
     }
 
-    //Add rotation keyframes
+    // Add rotation keyframes
     private List<Keyframe> AddRotationKeyframes(int[] timestamps, float[] values, int step = 1)
     {
         List<Keyframe> keys = new();
@@ -425,7 +480,7 @@ public class M2Importer : ScriptedImporter
         return keys;
     }
 
-    //Add scale keyframes
+    // Add scale keyframes
     private List<Keyframe> AddScaleKeyframes(int[] timestamps, float[] values, int step = 1)
     {
         List<Keyframe> keys = new();
@@ -444,7 +499,7 @@ public class M2Importer : ScriptedImporter
         return keys;
     }
 
-    //Set proper interpolation mode for given curve
+    // Set proper interpolation mode for given curve
     private void SetInterpolation(AnimationCurve curve, short interpolation)
     {
         for (int j = 0; j < curve.length; j++)

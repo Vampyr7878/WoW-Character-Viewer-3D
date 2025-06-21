@@ -53,9 +53,11 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Paint Color", "Face Paint", 512, 0, 512, 512);
-            DrawLayer(texture, "Paint Color", "Body Paint", 0, 0, 512, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            DrawLayer(texture, "Face", "Skin Color", face);
+            DrawLayer(texture, "Paint Color", "Face Paint", face);
+            DrawLayer(texture, "Paint Color", "Body Paint", body);
             DrawUnderwear(texture);
             DrawArmor(texture, true);
         }

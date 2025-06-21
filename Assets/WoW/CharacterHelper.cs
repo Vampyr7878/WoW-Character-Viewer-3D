@@ -1,7 +1,9 @@
-﻿using M2Lib;
+﻿using Assets.WoW;
+using M2Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace WoW
@@ -26,8 +28,6 @@ namespace WoW
         public Texture2D Emission { get; protected set; }
         // Reference to a main class that handles character models
         public Character Character { get; protected set; }
-        // Hide hair when wearing helmet
-        public bool HideHair { get; set; }
 
         // Draw Texture on top of another
         public void DrawTexture(Texture2D texture, Texture2D layer, int x, int y)
@@ -162,7 +162,7 @@ namespace WoW
         }
 
         // Draw texture layer with given name and target
-        protected void DrawLayer(Texture2D texture, string name, int target, int x, int y, int width, int height)
+        protected void DrawLayer(Texture2D texture, string name, int target, RectInt rect)
         {
             int index;
             CustomizationTexture layer;
@@ -171,13 +171,13 @@ namespace WoW
             if (layer != null)
             {
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                DrawTexture(texture, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                DrawTexture(texture, layerTexture, rect.x, rect.y);
             }
         }
 
         // Draw texture layer with given names
-        protected void DrawLayer(Texture2D texture, string name, string name2, int x, int y, int width, int height)
+        protected void DrawLayer(Texture2D texture, string name, string name2, RectInt rect)
         {
             int index, index2;
             CustomizationTexture layer;
@@ -188,13 +188,13 @@ namespace WoW
             if (layer != null)
             {
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                DrawTexture(texture, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                DrawTexture(texture, layerTexture, rect.x, rect.y);
             }
         }
 
         // Draw texture layer with given names and target
-        protected void DrawLayer(Texture2D texture, string name, string name2, int target, int x, int y, int width, int height)
+        protected void DrawLayer(Texture2D texture, string name, string name2, int target, RectInt rect)
         {
             int index, index2;
             CustomizationTexture layer;
@@ -205,13 +205,13 @@ namespace WoW
             if (layer != null)
             {
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                DrawTexture(texture, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                DrawTexture(texture, layerTexture, rect.x, rect.y);
             }
         }
 
         // Draw texture layer twice with given name and target
-        protected void DoubleLayer(Texture2D texture, string name, int target, int x, int y, int width, int height)
+        protected void DoubleLayer(Texture2D texture, string name, int target, RectInt rect)
         {
             int index;
             CustomizationTexture layer;
@@ -220,13 +220,13 @@ namespace WoW
             if (layer != null)
             {
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                DoubleTexture(texture, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                DoubleTexture(texture, layerTexture, rect.x, rect.y);
             }
         }
 
         // Overlay texture layer with given name and target
-        protected void OverlayLayer(Texture2D texture, string name, int target, int x, int y, int width, int height)
+        protected void OverlayLayer(Texture2D texture, string name, int target, RectInt rect)
         {
             int index;
             CustomizationTexture layer;
@@ -235,13 +235,13 @@ namespace WoW
             if (layer != null)
             {
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                OverlayTexture(texture, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                OverlayTexture(texture, layerTexture, rect.x, rect.y);
             }
         }
 
         // Multiply texture layer with given name and target
-        protected void MultiplyLayer(Texture2D texture, string name, int target, int x, int y, int width, int height)
+        protected void MultiplyLayer(Texture2D texture, string name, int target, RectInt rect)
         {
             int index;
             CustomizationTexture layer;
@@ -250,8 +250,8 @@ namespace WoW
             if (layer != null)
             {
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                MultiplyTexture(texture, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                MultiplyTexture(texture, layerTexture, rect.x, rect.y);
             }
         }
 
@@ -269,7 +269,7 @@ namespace WoW
         }
 
         // Draw layer on emission texture with given name and target
-        protected void DrawEmission(string name, int target, int x, int y, int width, int height)
+        protected void DrawEmission(string name, int target, RectInt rect)
         {
             int index;
             CustomizationTexture layer;
@@ -279,29 +279,13 @@ namespace WoW
             {
                 InitEmissionTexture();
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                DrawTexture(Emission, layerTexture, x, y);
-            }
-        }
-
-        // Draw layer on emission texture twcie with given name and target
-        protected void DoubleEmission(string name, int target, int x, int y, int width, int height)
-        {
-            int index;
-            CustomizationTexture layer;
-            index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
-            layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == target && t.Usage == 2);
-            if (layer != null)
-            {
-                InitEmissionTexture();
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                DoubleTexture(Emission, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                DrawTexture(Emission, layerTexture, rect.x, rect.y);
             }
         }
 
         // Draw layer on emission texture with given names
-        protected void DrawEmission(string name, string name2, int x, int y, int width, int height)
+        protected void DrawEmission(string name, string name2, RectInt rect)
         {
             int index, index2;
             CustomizationTexture layer;
@@ -313,13 +297,29 @@ namespace WoW
             {
                 InitEmissionTexture();
                 Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
-                layerTexture = ScaleTexture(layerTexture, width, height);
-                DrawTexture(Emission, layerTexture, x, y);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                DrawTexture(Emission, layerTexture, rect.x, rect.y);
+            }
+        }
+
+        // Draw layer on emission texture twcie with given name and target
+        protected void DoubleEmission(string name, int target, RectInt rect)
+        {
+            int index;
+            CustomizationTexture layer;
+            index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
+            layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == target && t.Usage == 2);
+            if (layer != null)
+            {
+                InitEmissionTexture();
+                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
+                DoubleTexture(Emission, layerTexture, rect.x, rect.y);
             }
         }
 
         // Draw jewelry layer and use it to mask the emission
-        protected void DrawJewelry(Texture2D texture, string name, int target, int x, int y, int width, int height)
+        protected void DrawJewelry(Texture2D texture, string name, int target, RectInt rect)
         {
             int index;
             CustomizationTexture layer;
@@ -328,14 +328,14 @@ namespace WoW
             if (layer != null)
             {
                 Texture2D jewelry = Character.TextureFromBLP(layer.ID);
-                jewelry = ScaleTexture(jewelry, width, height);
-                DrawTexture(texture, jewelry, x, y);
+                jewelry = ScaleTexture(jewelry, rect.width, rect.height);
+                DrawTexture(texture, jewelry, rect.x, rect.y);
                 if (Emission != null)
                 {
                     Texture2D temp = new(jewelry.width, jewelry.height, TextureFormat.ARGB32, false);
                     BlackTexture(jewelry, temp);
                     temp.Apply();
-                    DrawTexture(Emission, temp, x, y);
+                    DrawTexture(Emission, temp, rect.x, rect.y);
                 }
             }
         }
@@ -346,42 +346,22 @@ namespace WoW
             int index;
             CustomizationTexture layer;
             index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
-            // if (Character.Items[3] == null && Character.Items[4] == null && Character.Items[5] == null)
-            // {
-            layer = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 14);
-            Texture2D bra = Character.TextureFromBLP(layer.ID);
-            bra = ScaleTexture(bra, 256, 128);
-            DrawTexture(texture, bra, 256, 384);
-            if (Emission != null)
+            if (Character.Items[(int)WoWHelper.SlotIndex.Chest] == null && Character.Items[(int)WoWHelper.SlotIndex.Shirt]
+                == null && Character.Items[(int)WoWHelper.SlotIndex.Tabard] == null)
             {
-                Texture2D temp = new(bra.width, bra.height, TextureFormat.ARGB32, false);
-                BlackTexture(bra, temp);
-                temp.Apply();
-                DrawTexture(Emission, temp, 256, 384);
+                layer = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 14);
+                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.TorsoUpper);
+                Texture2D bra = Character.TextureFromBLP(layer.ID);
+                bra = ScaleTexture(bra, rect.width, rect.height);
+                DrawTexture(texture, bra, rect.x, rect.y);
+                if (Emission != null)
+                {
+                    Texture2D temp = new(bra.width, bra.height, TextureFormat.ARGB32, false);
+                    BlackTexture(bra, temp);
+                    temp.Apply();
+                    DrawTexture(Emission, temp, rect.x, rect.y);
+                }
             }
-            // }
-        }
-
-        // Draw underwear layer and use it to mask the emission
-        protected void DrawUnderwear(Texture2D texture, string name = "Skin Color")
-        {
-            int index;
-            CustomizationTexture layer;
-            index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
-            // if (!(Character.Items[3] != null && Character.Items[3].UpperLeg !> 0) && Character.Items[10] == null)
-            // {
-            layer = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 13);
-            Texture2D underwear = Character.TextureFromBLP(layer.ID);
-            underwear = ScaleTexture(underwear, 256, 128);
-            DrawTexture(texture, underwear, 256, 192);
-            if (Emission != null)
-            {
-                Texture2D temp = new(underwear.width, underwear.height, TextureFormat.ARGB32, false);
-                BlackTexture(underwear, temp);
-                temp.Apply();
-                DrawTexture(Emission, temp, 256, 192);
-            }
-            // }
         }
 
         // Draw bra layer and use it to mask the emission
@@ -391,25 +371,51 @@ namespace WoW
             CustomizationTexture layer;
             index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
-            // if (Character.Items[3] == null && Character.Items[4] == null && Character.Items[5] == null)
-            // {
-            layer = Character.Options[index].Choices[Character.Customization[index]].Textures.
-                FirstOrDefault(t => t.Target == 14 && t.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
-            if (layer == null)
+            if (Character.Items[(int)WoWHelper.SlotIndex.Chest] == null && Character.Items[(int)WoWHelper.SlotIndex.Shirt]
+                == null && Character.Items[(int)WoWHelper.SlotIndex.Tabard] == null)
             {
-                return;
+                layer = Character.Options[index].Choices[Character.Customization[index]].Textures.
+                    FirstOrDefault(t => t.Target == 14 && t.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
+                if (layer == null)
+                {
+                    return;
+                }
+                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.TorsoUpper);
+                Texture2D bra = Character.TextureFromBLP(layer.ID);
+                bra = ScaleTexture(bra, rect.width, rect.height);
+                DrawTexture(texture, bra, rect.x, rect.y);
+                if (Emission != null)
+                {
+                    Texture2D temp = new(bra.width, bra.height, TextureFormat.ARGB32, false);
+                    BlackTexture(bra, temp);
+                    temp.Apply();
+                    DrawTexture(Emission, temp, rect.x, rect.y);
+                }
             }
-            Texture2D bra = Character.TextureFromBLP(layer.ID);
-            bra = ScaleTexture(bra, 256, 128);
-            DrawTexture(texture, bra, 256, 384);
-            if (Emission != null)
+        }
+
+        // Draw underwear layer and use it to mask the emission
+        protected void DrawUnderwear(Texture2D texture, string name = "Skin Color")
+        {
+            int index;
+            CustomizationTexture layer;
+            index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
+            if (!(Character.Items[(int)WoWHelper.SlotIndex.Chest] != null && Character.Items[(int)WoWHelper.SlotIndex.Chest].Item.ItemSlot
+                == WoWHelper.ItemSlot.Robe) && Character.Items[(int)WoWHelper.SlotIndex.Legs] == null)
             {
-                Texture2D temp = new(bra.width, bra.height, TextureFormat.ARGB32, false);
-                BlackTexture(bra, temp);
-                temp.Apply();
-                DrawTexture(Emission, temp, 256, 384);
+                layer = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 13);
+                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.LegUpper);
+                Texture2D underwear = Character.TextureFromBLP(layer.ID);
+                underwear = ScaleTexture(underwear, rect.width, rect.height);
+                DrawTexture(texture, underwear, rect.x, rect.y);
+                if (Emission != null)
+                {
+                    Texture2D temp = new(underwear.width, underwear.height, TextureFormat.ARGB32, false);
+                    BlackTexture(underwear, temp);
+                    temp.Apply();
+                    DrawTexture(Emission, temp, rect.x, rect.y);
+                }
             }
-            // }
         }
 
         // Draw underwear layer and use it to mask the emission
@@ -419,105 +425,205 @@ namespace WoW
             CustomizationTexture layer;
             index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
-            // if (!(Character.Items[3] != null && Character.Items[3].UpperLeg !> 0) && Character.Items[10] == null)
-            // {
-            layer = Character.Options[index].Choices[Character.Customization[index]].Textures.
-                First(t => t.Target == 13 && t.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
-            Texture2D underwear = Character.TextureFromBLP(layer.ID);
-            underwear = ScaleTexture(underwear, 256, 128);
-            DrawTexture(texture, underwear, 256, 192);
-            if (Emission != null)
+            if (!(Character.Items[(int)WoWHelper.SlotIndex.Chest] != null && Character.Items[(int)WoWHelper.SlotIndex.Chest].Item.ItemSlot
+                == WoWHelper.ItemSlot.Robe) && Character.Items[(int)WoWHelper.SlotIndex.Legs] == null)
             {
-                Texture2D temp = new(underwear.width, underwear.height, TextureFormat.ARGB32, false);
-                BlackTexture(underwear, temp);
-                temp.Apply();
-                DrawTexture(Emission, temp, 256, 192);
+                layer = Character.Options[index].Choices[Character.Customization[index]].Textures.
+                    First(t => t.Target == 13 && t.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
+                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.LegUpper);
+                Texture2D underwear = Character.TextureFromBLP(layer.ID);
+                underwear = ScaleTexture(underwear, rect.width, rect.height);
+                DrawTexture(texture, underwear, rect.x, rect.y);
+                if (Emission != null)
+                {
+                    Texture2D temp = new(underwear.width, underwear.height, TextureFormat.ARGB32, false);
+                    BlackTexture(underwear, temp);
+                    temp.Apply();
+                    DrawTexture(Emission, temp, rect.x, rect.y);
+                }
             }
-            // }
         }
 
         // Draw armor textures
-        protected void DrawArmor(Texture2D texture, bool shotFeet = false)
+        protected void DrawArmor(Texture2D texture, bool showFeet = false)
         {
+            bool shirtSleeves = CheckSleeves((int)WoWHelper.SlotIndex.Chest);
+            bool gloveSleeves = CheckSleeves((int)WoWHelper.SlotIndex.Hands);
+            bool isKilt = IsKilt((int)WoWHelper.SlotIndex.Legs);
             if (Emission != null)
             {
-                // Character.BlackChest(Emission);
-                // Character.BlackShirt(Emission);
-                // Character.BlackTabard(Emission);
-                // Character.BlackWrist(Emission);
-                // Character.BlackHands(Emission);
-                // Character.BlackWaist(Emission);
-                // Character.BlackLegs(Emission);
-                // Character.BlackFeet(Emission);
+                BlackArmor(WoWHelper.SlotIndex.Chest, Emission);
+                BlackArmor(WoWHelper.SlotIndex.Shirt, Emission);
+                BlackArmor(WoWHelper.SlotIndex.Tabard, Emission);
+                BlackArmor(WoWHelper.SlotIndex.Wrist, Emission);
+                BlackArmor(WoWHelper.SlotIndex.Hands, Emission);
+                BlackArmor(WoWHelper.SlotIndex.Waist, Emission);
+                BlackArmor(WoWHelper.SlotIndex.Legs, Emission);
+                BlackArmor(WoWHelper.SlotIndex.Feet, Emission, showFeet);
                 Emission.Apply();
             }
-            // Character.TextureShirt(texture);
-            // if (!(Character.Items[4] != null && Character.Items[4].Geoset1 != 0))
-            // {
-            //     Character.TextureWrist(texture);
-            // }
-            // Character.TextureLegs(texture);
-            // Character.TextureFeet(texture, showFeet);
-            // Character.TextureChest(texture);
-            // if (!(Character.Items[3] != null && Character.Items[3].Geoset1 != 0))
-            // {
-            //     Character.TextureWrist(texture);
-            // }
-            // Character.TextureHands(texture);
-            // if (!(Character.Items[8] != null && Character.Items[8].Geoset1 != 0))
-            // {
-            //     Character.TextureChest(texture);
-            // }
-            // Character.TextureTabard(texture);
-            // Character.TextureWaist(texture);
+            TextureArmor(WoWHelper.SlotIndex.Shirt ,texture);
+            if (!isKilt)
+            {
+                TextureArmor(WoWHelper.SlotIndex.Legs, texture);
+            }
+            TextureArmor(WoWHelper.SlotIndex.Feet, texture, showFeet);
+            if(isKilt)
+            {
+                TextureArmor(WoWHelper.SlotIndex.Legs, texture);
+            }
+            if (shirtSleeves)
+            {
+                TextureArmor(WoWHelper.SlotIndex.Wrist, texture);
+            }
+            if (!gloveSleeves)
+            {
+                TextureArmor(WoWHelper.SlotIndex.Hands, texture);
+            }
+            TextureArmor(WoWHelper.SlotIndex.Chest, texture);
+            if (!shirtSleeves)
+            {
+                TextureArmor(WoWHelper.SlotIndex.Wrist, texture);
+            }
+            if (gloveSleeves)
+            {
+                TextureArmor(WoWHelper.SlotIndex.Hands, texture);
+            }
+            TextureArmor(WoWHelper.SlotIndex.Tabard, texture);
+            TextureArmor(WoWHelper.SlotIndex.Waist, texture);
+        }
+
+        // Draw texture layer for armor slot
+        private void TextureArmor(WoWHelper.SlotIndex slot, Texture2D texture, bool showFeet = false)
+        {
+            ItemInstance item = Character.Items[(int)slot];
+            if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
+            {
+                return;
+            }
+            int? file = null;
+            foreach (var component in item.Item.Appearances[item.Appearance].DisplayInfo.Components)
+            {
+                if (showFeet && component.ComponentSection == WoWHelper.ComponentSection.Foot)
+                {
+                    continue;
+                }
+                file = component.Textures.FirstOrDefault(t => (int)t.Race == Character.ModelID
+                    && (t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3))?.ID;
+                file ??= component.Textures.FirstOrDefault(t => t.Class == Character.Class
+                    && (t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3))?.ID;
+                file ??= component.Textures.FirstOrDefault(t => t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3)?.ID;
+                if (file != null)
+                {
+                    RectInt rect = WoWHelper.ComponentRect(component.ComponentSection);
+                    Texture2D layer = Character.TextureFromBLP(file.Value);
+                    layer = ScaleTexture(layer, rect.width, rect.height);
+                    DrawTexture(texture, layer, rect.x, rect.y);
+                }
+            }
+        }
+
+        // Check type of sleeves to decide order of texture layers
+        private bool CheckSleeves(int slot)
+        {
+            ItemInstance item = Character.Items[slot];
+            return item != null && item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0] != 0;
+        }
+
+        // Check if character wears a kilt
+        private bool IsKilt(int slot)
+        {
+            ItemInstance item = Character.Items[slot];
+            return item != null && item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[2] != 0;
+        }
+
+        private void BlackArmor(WoWHelper.SlotIndex slot, Texture2D texture, bool showFeet = false)
+        {
+            ItemInstance item = Character.Items[(int)slot];
+            if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
+            {
+                return;
+            }
+            int? file = null;
+            foreach (var component in item.Item.Appearances[item.Appearance].DisplayInfo.Components)
+            {
+                if (showFeet && component.ComponentSection == WoWHelper.ComponentSection.Foot)
+                {
+                    continue;
+                }
+                file = component.Textures.FirstOrDefault(t => (int)t.Race == Character.ModelID
+                    && (t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3))?.ID;
+                file ??= component.Textures.FirstOrDefault(t => t.Class == Character.Class
+                    && (t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3))?.ID;
+                file ??= component.Textures.FirstOrDefault(t => t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3)?.ID;
+                if (file != null)
+                {
+                    RectInt rect = WoWHelper.ComponentRect(component.ComponentSection);
+                    Texture2D layer = Character.TextureFromBLP(file.Value);
+                    layer = ScaleTexture(layer, rect.width, rect.height);
+                    BlackTexture(layer, layer);
+                    layer.Apply();
+                    DrawTexture(texture, layer, rect.x, rect.y);
+                }
+            }
+        }
+
+        // Add geoset to rendered list
+        private void AddGeoset(List<int> activeGeosets, int type, int geoset, int modifier)
+        {
+            ItemInstance item = Character.Items[(int)WoWHelper.SlotIndex.Head];
+            activeGeosets.RemoveAll(x => x > Math.Clamp(type * 100 - 1, 0, 9999) && x < (type + 1) * 100);
+            if (item != null && item.Item.Appearances[item.Appearance].DisplayInfo?.HelmetGeosets[Character.Gender ? 0 : 1]
+                .FirstOrDefault(h => h.Race == Character.Race && h.Geoset == type) != null)
+            {
+                activeGeosets.Add(modifier == -1 ? type * 100 + (type == 0 ? 1 : 0) : type * 100 + modifier);
+            }
+            else
+            {
+                activeGeosets.Add(type * 100 + geoset);
+            }
         }
 
         // Make sure head geoset is visible
         protected void ChangeFace(List<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 3199 && x < 3300);
-            activeGeosets.Add(3202);
+            AddGeoset(activeGeosets, 32, 2, 1);
         }
 
         // Make sure eyes geosets are visible
         protected void ChangeEyes(List<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 3299 && x < 3400);
-            activeGeosets.Add(3301);
+            AddGeoset(activeGeosets, 33, 1, -1);
         }
 
         // Make sure ears geosets are visible
         protected void ChangeEars(List<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 699 && x < 800);
-            activeGeosets.Add(702);
+            AddGeoset(activeGeosets, 7, 2, 1);
         }
 
         // Make sure hand geosets are visible
         protected void ChangeHands(List<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 2299 && x < 2400);
-            activeGeosets.Add(2301);
+            AddGeoset(activeGeosets, 23, 1, -1);
         }
 
         // Make sure underwear geoset is visible
         protected void ChangeUnderwear(List<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
-            activeGeosets.Add(1401);
+            AddGeoset(activeGeosets, 14, 1, -1);
         }
 
         // Make sure underwear geoset is visible for demon hunter
         protected void ChangeDHUnderwear(List<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
             if (Character.Class == WoWHelper.Class.DemonHunter)
             {
-                activeGeosets.Add(1401);
+                AddGeoset(activeGeosets, 14, 1, -1);
             }
             else
             {
-                activeGeosets.Add(1400);
+                AddGeoset(activeGeosets, 14, 0, -1);
             }
         }
 
@@ -532,8 +638,7 @@ namespace WoW
         // Make sure wings geoset is visible
         protected void ChangeWings(List<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 4599 && x < 4700);
-            activeGeosets.Add(4601);
+            AddGeoset(activeGeosets, 46, 1, -1);
         }
 
         // Activate and deactivate dropdown options based on dependencies
@@ -624,8 +729,7 @@ namespace WoW
             var geosets = Character.Options[index].Choices[Character.Customization[index]].Geosets.Where(g => g.Related == 0);
             foreach (var geoset in geosets)
             {
-                activeGeosets.RemoveAll(x => x > Math.Clamp(geoset.Type * 100 - 1, 0, 9999) && x < ((geoset.Type + 1) * 100));
-                activeGeosets.Add(geoset.Type * 100 + geoset.ID);
+                AddGeoset(activeGeosets, geoset.Type, geoset.ID, geoset.Modifier);
             }
         }
 
@@ -638,8 +742,7 @@ namespace WoW
                 Where(g => g.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
             foreach (var geoset in geosets)
             {
-                activeGeosets.RemoveAll(x => x > Math.Clamp(geoset.Type * 100 - 1, 0, 9999) && x < ((geoset.Type + 1) * 100));
-                activeGeosets.Add(geoset.Type * 100 + geoset.ID);
+                AddGeoset(activeGeosets, geoset.Type, geoset.ID, geoset.Modifier);
             }
         }
 
@@ -650,7 +753,7 @@ namespace WoW
             var geosets = Character.Options[index].Choices[Character.Customization[index]].SkinnedGeosets.Where(g => g.Related == 0);
             foreach (var geoset in geosets)
             {
-                activeGeosets.Add(geoset.Type * 100 + geoset.ID);
+                AddGeoset(activeGeosets, geoset.Type, geoset.ID, geoset.Modifier);
             }
         }
 
@@ -663,7 +766,7 @@ namespace WoW
                 Where(g => g.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
             foreach (var geoset in geosets)
             {
-                activeGeosets.Add(geoset.Type * 100 + geoset.ID);
+                AddGeoset(activeGeosets, geoset.Type, geoset.ID, geoset.Modifier);
             }
         }
 
@@ -783,9 +886,11 @@ namespace WoW
                     file = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 1).ID;
                     layered = WoWHelper.LayeredTexture.Skin;
                     break;
-                //            case 2:
-                //                file = Character.Items[2] != null ? Character.Items[2].LeftTexture2 : -1;
-                //                break;
+                case 2:
+                    ItemInstance item = Character.Items[(int)WoWHelper.SlotIndex.Back];
+                    file = item != null && item.Item.Appearances[item.Appearance].DisplayInfo.Materials[0] > 0
+                        ? item.Item.Appearances[item.Appearance].DisplayInfo.Textures[0][0].ID : -1;
+                    break;
                 case 6:
                     index = GetHairColorIndex();
                     index2 = GetHairColor2Index();
@@ -824,14 +929,6 @@ namespace WoW
                     index = GetJewelryColorIndex();
                     file = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == 38)?.ID;
                     break;
-                // case 25:
-                //     index = GetSkinColorIndex();
-                //     file = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 1).ID;
-                //     break;
-                // case 26:
-                //     index = GetSkinColorIndex();
-                //     file = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 1).ID;
-                //     break;
             }
             return file == null ? -1 : file.Value;
         }

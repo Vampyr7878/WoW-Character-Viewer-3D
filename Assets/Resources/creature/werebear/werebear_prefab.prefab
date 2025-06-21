@@ -60,9 +60,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1112244709739862350, guid: eaca546f4d032e241b659df89ef20b49, type: 3}
+      propertyPath: m_AABB.m_Center.z
+      value: 1.9048972
+      objectReference: {fileID: 0}
+    - target: {fileID: -1112244709739862350, guid: eaca546f4d032e241b659df89ef20b49, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 2.27112
+      objectReference: {fileID: 0}
+    - target: {fileID: -1112244709739862350, guid: eaca546f4d032e241b659df89ef20b49, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 3.138311
+      objectReference: {fileID: 0}
     - target: {fileID: 1277681088791285492, guid: eaca546f4d032e241b659df89ef20b49, type: 3}
       propertyPath: m_Name
-      value: werebear
+      value: werebear_prefab
       objectReference: {fileID: 0}
     - target: {fileID: 3511099882184628845, guid: eaca546f4d032e241b659df89ef20b49, type: 3}
       propertyPath: m_Controller

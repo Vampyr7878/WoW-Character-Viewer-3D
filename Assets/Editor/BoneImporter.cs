@@ -1,31 +1,28 @@
 ﻿using M2Lib;
 using SkelLib;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 
-//Importer for bone files
+// Importer for bone files
 [ScriptedImporter(1, "bone")]
 public class BoneImporter : ScriptedImporter
 {
     public override void OnImportAsset(AssetImportContext ctx)
     {
-        //Load file contents
+        // Load file contents
         BoneLib.Bone file = new();
         file.LoadFile(ctx.assetPath);
-        //Load skel file for reference
+        // Load skel file for reference
         M2 model = new();
         model.LoadFile($"{ctx.assetPath[..^8]}.m2");
         Skel skeleton = model.Skeleton;
-        //Create empty animation clip
+        // Create empty animation clip
         AnimationClip clip = new();
         Matrix4x4 matrix;
         Vector4[] columns = new Vector4[4];
-        //Generate temporary bones
+        // Generate temporary bones
         Transform[] bones = new Transform[skeleton.Bones.Length];
         for (int i = 0; i < bones.Length; i++)
         {
@@ -44,7 +41,7 @@ public class BoneImporter : ScriptedImporter
                 bones[i].parent = bones[skeleton.Bones[i].Parent];
             }
         }
-        //Fill animation data for each bone
+        // Fill animation data for each bone
         List<short> blacklist = new();
         for (int i = 0; i < file.Bones.Length; i++)
         {
@@ -74,12 +71,12 @@ public class BoneImporter : ScriptedImporter
             Vector3 scale = matrix.lossyScale;
             AddCurve(clip, scale, "localScale", path);
         }
-        //Clear temporary bones and add animation clip to the asset
+        // Clear temporary bones and add animation clip to the asset
         DestroyImmediate(rig);
         ctx.AddObjectToAsset(Path.GetFileNameWithoutExtension(ctx.assetPath.Replace("/", "\\")), clip);
     }
 
-    //Recursively get full path to the bone
+    // Recursively get full path to the bone
     private string GetBonePath(short bone, Bone[] bones)
     {
         if (bones[bone].Parent == -1)
@@ -92,6 +89,7 @@ public class BoneImporter : ScriptedImporter
         }
     }
 
+    // Add animation curve
     private void AddCurve(AnimationClip clip, Vector3 value, string name, string path)
     {
         AnimationCurve curve = AnimationCurve.Linear(0f, value.x, 0.1f, value.x);

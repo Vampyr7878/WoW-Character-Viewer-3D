@@ -9,10 +9,9 @@ namespace WoW
         public int Target { get; private set; }
         // Texture ID
         public int ID { get; private set; }
-        // Texture Emission
+        // Texture Usage Type
         public int Usage { get; private set; }
 
-        // Constructor
         public CustomizationTexture(int related, int target, int id, int usage)
         {
             Related = related;

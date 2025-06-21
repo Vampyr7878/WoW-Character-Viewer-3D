@@ -19,8 +19,6 @@ public class ItemTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerEnter(PointerEventData eventData)
     {
         tooltip.gameObject.SetActive(true);
-        //tooltip.GetComponent<ContentSizeFitter>().SetLayoutVertical();
-        //tooltip.GetComponent<ContentSizeFitter>().SetLayoutHorizontal();
         float width = name.preferredWidth;
         width = width < minWidth ? minWidth : width;
         description.rectTransform.sizeDelta = new Vector2(width, description.rectTransform.sizeDelta.y);

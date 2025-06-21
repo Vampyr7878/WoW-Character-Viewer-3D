@@ -41,8 +41,10 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            DrawLayer(texture, "Face", "Fur Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Pattern", "Fur Color", 0, 0, 1024, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            DrawLayer(texture, "Face", "Fur Color", face);
+            DrawLayer(texture, "Pattern", "Fur Color", full);
             DrawUnderwear(texture, "Fur Color");
             DrawBra(texture, "Fur Color");
             DrawArmor(texture, true);

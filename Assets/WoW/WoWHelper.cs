@@ -55,6 +55,7 @@ namespace WoW
             BloodElf = 10,
             Draenei = 11,
             Worgen = 22,
+            Gilnean = 23,
             Pandaren = 24,
             Nightborne = 27,
             Highmountain = 28,
@@ -194,7 +195,25 @@ namespace WoW
             LegUpper = 5,
             LegLower = 6,
             Foot = 7,
-            Accessory = 8
+            Accessory = 8,
+            Face = 100,
+            Body = 200,
+            Full = 300
+        }
+
+        // Enum for equipment attachment points
+        public enum AttachmentPoint
+        {
+            Shield = 0,
+            HandRight = 1,
+            HandLeft = 2,
+            ShoulderRight = 5,
+            ShoulderLeft = 6,
+            Helm = 11,
+            Quiver = 26,
+            Buckle = 53,
+            Book = 53,
+            Backpack = 57
         }
 
         // Color for each item quality
@@ -211,7 +230,7 @@ namespace WoW
                 // Epic
                 4 => new Color32(163, 53, 238, 255),
                 // Legendary
-                5 => new Color32(122, 128, 0, 255),
+                5 => new Color32(255, 128, 0, 255),
                 // Artifact
                 6 => new Color32(230, 204, 128, 255),
                 // Heirloom
@@ -369,60 +388,86 @@ namespace WoW
             };
         }
 
-        // Translate race id to base race model id
-        public static int RaceModel(int race)
+        // Return rectangle for component section
+        public static RectInt ComponentRect(ComponentSection section)
         {
-            int result = 0;
-            switch (race)
+            return section switch
             {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 22:
-                case 24:
-                case 32:
-                case 35:
+                ComponentSection.ArmUpper => new RectInt(0, 384, 256, 128),
+                ComponentSection.ArmLower => new RectInt(0, 256, 256, 128),
+                ComponentSection.Hand => new RectInt(0, 192, 256, 64),
+                ComponentSection.TorsoUpper => new RectInt(256, 384, 256, 128),
+                ComponentSection.TorsoLower => new RectInt(256, 320, 256, 64),
+                ComponentSection.LegUpper => new RectInt(256, 192, 256, 128),
+                ComponentSection.LegLower => new RectInt(256, 64, 256, 128),
+                ComponentSection.Foot => new RectInt(256, 0, 256, 64),
+                ComponentSection.Accessory => new RectInt(768, 0, 256, 128),
+                ComponentSection.Face => new RectInt(512, 0, 512, 512),
+                ComponentSection.Body => new RectInt(0, 0, 512, 512),
+                ComponentSection.Full => new RectInt(768, 0, 256, 128),
+                _ => new RectInt(0, 0, 256, 128),
+            };
+        }
+
+        // Translate race id to base race model id
+        public static Race RaceModel(WoWHelper.Race race, bool gender)
+        {
+            Race result = 0; switch (race)
+            {
+                case Race.Human:
+                case Race.Orc:
+                case Race.Dwarf:
+                case Race.NightElf:
+                case Race.Undead:
+                case Race.Tauren:
+                case Race.Gnome:
+                case Race.Troll:
+                case Race.Goblin:
+                case Race.BloodElf:
+                case Race.Draenei:
+                case Race.Worgen:
+                case Race.Pandaren:
+                case Race.KulTiran:
+                case Race.Vulpera:
+                case Race.Dracthyr:
                     result = race;
                     break;
-                case 23:
-                    result = 1;
+                case Race.Gilnean:
+                    result = Race.Human;
                     break;
-                case 27:
-                    result = 4;
+                case Race.Nightborne:
+                    result = Race.NightElf;
                     break;
-                case 28:
-                    result = 6;
+                case Race.Highmountain:
+                    result = Race.Tauren;
                     break;
-                case 29:
-                    result = 10;
+                case Race.VoidElf:
+                    result = Race.BloodElf;
                     break;
-                case 30:
-                    result = 11;
+                case Race.Lightforged:
+                    result = Race.Draenei;
                     break;
-                case 31:
-                    result = 8;
+                case Race.Zandalari:
+                    result = gender ? Race.Zandalari : Race.Troll;
                     break;
-                case 34:
-                    result = 3;
+                case Race.DarkIron:
+                case Race.Earthen:
+                    result = Race.Dwarf;
                     break;
-                case 36:
-                    result = 2;
+                case Race.Maghar:
+                    result = Race.Orc;
                     break;
-                case 37:
-                    result = 7;
+                case Race.Mechagnome:
+                    result = Race.Gnome;
+                    break;
+                case Race.Visage:
+                    result = gender ? Race.BloodElf : Race.Human;
                     break;
             }
             return result;
         }
 
+        // Get region two letter symbol
         public static string WoWRegion(int value)
         {
             string region = value switch
@@ -455,9 +500,9 @@ namespace WoW
             Vector2[] uv2 = new Vector2[file.Vertices.Length];
             for (int i = 0; i < file.Vertices.Length; i++)
             {
-                vertices[i] = new Vector3(-file.Vertices[i].Position.X / 2, file.Vertices[i].Position.Y / 2, file.Vertices[i].Position.Z / 2);
-                normals[i] = new Vector3(-file.Vertices[i].Normal.X, file.Vertices[i].Normal.Y, file.Vertices[i].Normal.Z);
-                BoneWeight weight = new BoneWeight
+                vertices[i] = new Vector3(file.Vertices[i].Position.X, file.Vertices[i].Position.Y, file.Vertices[i].Position.Z);
+                normals[i] = new Vector3(file.Vertices[i].Normal.X, file.Vertices[i].Normal.Y, file.Vertices[i].Normal.Z);
+                BoneWeight weight = new()
                 {
                     boneIndex0 = file.Vertices[i].Bones[0],
                     boneIndex1 = file.Vertices[i].Bones[1],
@@ -478,13 +523,13 @@ namespace WoW
             mesh.uv = uv;
             mesh.uv2 = uv2;
             // Fill Submesh data
-            mesh.subMeshCount = file.Skin.Submeshes.Length;
+            mesh.subMeshCount = file.Skin.Textures.Length;
             for (int i = 0; i < mesh.subMeshCount; i++)
             {
-                int[] triangles = new int[file.Skin.Submeshes[i].Count];
+                int[] triangles = new int[file.Skin.Submeshes[file.Skin.Textures[i].Id].Count];
                 for (int j = 0; j < triangles.Length; j++)
                 {
-                    triangles[j] = file.Skin.Indices[file.Skin.Submeshes[i].Start + j];
+                    triangles[j] = file.Skin.Indices[file.Skin.Submeshes[file.Skin.Textures[i].Id].Start + j];
                 }
                 mesh.SetTriangles(triangles, i);
             }
@@ -493,7 +538,7 @@ namespace WoW
             for (int i = 0; i < bones.Length; i++)
             {
                 bones[i] = new GameObject($"Bone{i}").transform;
-                bones[i].position = new Vector3(-file.Skeleton.Bones[i].Pivot.X / 2, file.Skeleton.Bones[i].Pivot.Y / 2, file.Skeleton.Bones[i].Pivot.Z / 2);
+                bones[i].position = new Vector3(file.Skeleton.Bones[i].Pivot.X, file.Skeleton.Bones[i].Pivot.Y, file.Skeleton.Bones[i].Pivot.Z);
             }
             GameObject skeleton = new("Skeleton");
             for (int i = 0; i < bones.Length; i++)
@@ -531,7 +576,7 @@ namespace WoW
                     shape = ParticleSystemShapeType.Rectangle;
                     break;
                 case 2:
-                    shape = ParticleSystemShapeType.Circle;
+                    shape = ParticleSystemShapeType.Sphere;
                     break;
                 case 3:
                     shape = ParticleSystemShapeType.Circle;
@@ -556,16 +601,15 @@ namespace WoW
             // Setup emission rate in emission module
             ParticleSystem.EmissionModule emission = system.emission;
             variation = particle.EmissionVariation * particle.EmissionRate;
-            emission.rateOverTime = new ParticleSystem.MinMaxCurve((particle.EmissionRate - variation) / 2f, (particle.EmissionRate + variation) / 2f);
-            emission.rateOverDistance = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
+            emission.rateOverTime = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
             // Setup shape and scale in shape module
             ParticleSystem.ShapeModule shape = system.shape;
             shape.shapeType = ParticleShape(particle.Type);
-            shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionWidth, particle.EmissionLength);
+            shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionLength, particle.EmissionWidth);
             // Setup color and alpha gradients in color over lifetime module
             ParticleSystem.ColorOverLifetimeModule color = system.colorOverLifetime;
             color.enabled = true;
-            Gradient gradient = new Gradient();
+            Gradient gradient = new();
             GradientColorKey[] colorKeys = new GradientColorKey[particle.Colors.Values.Length];
             for (int i = 0; i < colorKeys.Length; i++)
             {
@@ -594,10 +638,10 @@ namespace WoW
             // Setup size in size over lifetime module
             ParticleSystem.SizeOverLifetimeModule size = system.sizeOverLifetime;
             size.enabled = true;
-            AnimationCurve curve = new AnimationCurve();
+            AnimationCurve curve = new();
             for (int i = 0; i < particle.Scale.Values.Length; i++)
             {
-                curve.AddKey(particle.Scale.Timestamps[i], particle.Scale.Values[i].X);
+                curve.AddKey(particle.Scale.Timestamps[i], particle.Scale.Values[i].X - particle.Scale.Values[i].X * particle.ScaleVariation.X);
             }
             size.size = new ParticleSystem.MinMaxCurve(1f, curve);
             // Setup texture sheet in texture sheet animation module
@@ -605,6 +649,12 @@ namespace WoW
             textureSheet.enabled = true;
             textureSheet.numTilesX = particle.TileColumns;
             textureSheet.numTilesY = particle.TileRows;
+            curve = new();
+            for (int i = 0; i < particle.TextureUV.Timestamps.Length; i++)
+            {
+                curve.AddKey(particle.TextureUV.Timestamps[i], particle.TextureUV.Values[i] / (float)(particle.TileColumns * particle.TileRows - 1));
+            }
+            textureSheet.frameOverTime = new ParticleSystem.MinMaxCurve(1f, curve);
             return element;
         }
     }

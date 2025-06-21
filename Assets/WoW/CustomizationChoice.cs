@@ -25,7 +25,6 @@ namespace WoW
         // Choice creature
         public CustomizationDisplayInfo[] Creatures { get; set; }
 
-        // Constructor
         public CustomizationChoice(string name, int id, int requirement, Color32 color1, Color32 color2)
         {
             Name = name;

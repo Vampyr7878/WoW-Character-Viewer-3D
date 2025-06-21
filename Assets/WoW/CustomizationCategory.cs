@@ -12,7 +12,6 @@ namespace WoW
         // Category icon when selected
         public int Selected { get; private set; }
 
-        // Constructor
         public CustomizationCategory(int id, string name, int icon, int selected)
         {
             ID = id;

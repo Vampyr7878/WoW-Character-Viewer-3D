@@ -44,16 +44,19 @@ namespace WoW.Characters
             textures.Clear();
 #endif
             Emission = null;
-            DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
-            DoubleLayer(texture, "Face Tattoo", 19, 512, 0, 512, 512);
-            DoubleEmission("Face Tattoo", 19, 512, 0, 512, 512);
-            DoubleLayer(texture, "Body Tattoo", 16, 0, 0, 512, 512);
-            DoubleEmission("Body Tattoo", 16, 0, 0, 512, 512);
-            DoubleLayer(texture, "Luminous Hands", 22, 0, 0, 1024, 512);
-            DoubleEmission("Luminous Hands", 22, 0, 0, 1024, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            DrawLayer(texture, "Face", "Skin Color", face);
+            DoubleLayer(texture, "Face Tattoo", 19, face);
+            DoubleEmission("Face Tattoo", 19, face);
+            DoubleLayer(texture, "Body Tattoo", 16, body);
+            DoubleEmission("Body Tattoo", 16, body);
+            DoubleLayer(texture, "Luminous Hands", 22, full);
+            DoubleEmission("Luminous Hands", 22, full);
             DrawBra(texture);
             DrawUnderwear(texture);
-            DrawLayer(texture, "Eyesight", "Eye Color", 512, 0, 512, 512);
+            DrawLayer(texture, "Eyesight", "Eye Color", face);
             DrawArmor(texture);
         }
     }

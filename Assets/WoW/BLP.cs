@@ -96,7 +96,7 @@ namespace Assets.WoW
             }
         }
 
-        // / Load pixel data for BLP compression
+        // Load pixel data for BLP compression
         void ReadBLP(BinaryReader reader)
         {
             byte index, a, value;
@@ -153,7 +153,7 @@ namespace Assets.WoW
             }
         }
 
-        // / Load pixel data for DXT1 compression.
+        // Load pixel data for DXT1 compression.
         void ReadDXT1(BinaryReader reader)
         {
             ushort color0;
@@ -197,10 +197,7 @@ namespace Assets.WoW
             }
         }
 
-        // / <summary>
-        // / Load pixel data for DXT3 compression.
-        // / </summary>
-        // / <param name="reader">The <see cref="System.IO.BinaryReader"/> object that currently has access to the file.</param>
+        // Load pixel data for DXT3 compression.
         void ReadDXT3(BinaryReader reader)
         {
             ushort color0;

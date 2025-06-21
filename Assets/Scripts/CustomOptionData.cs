@@ -18,7 +18,6 @@ public class CustomOptionData : UnityEngine.UI.Dropdown.OptionData
     // Property to store second color
     public Color32 Color2 { get; set; }
 
-    // Constructor
     public CustomOptionData(string text, Color32 color1, Color32 color2, Sprite image, int index, int id) : base(text, image)
     {
         Interactable = true;

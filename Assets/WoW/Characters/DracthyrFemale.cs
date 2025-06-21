@@ -210,11 +210,18 @@ namespace WoW.Characters
             {
                 case 0:
                     Character.ModelID = Character.MainFormID;
+                    Character.CurrentRace = WoWHelper.Race.Dracthyr;
                     Character.ActivateMainMesh();
                     break;
                 case 1:
                     Character.ModelID = 128;
+                    Character.CurrentRace = WoWHelper.Race.Visage;
                     Character.ActivateExtraMesh();
+                    break;
+                default:
+                    Character.ModelID = Character.CreatureForms[Character.Form - 1].ID;
+                    Character.CurrentRace = WoWHelper.Race.Dracthyr;
+                    Character.ActivateCreature();
                     break;
             }
         }
@@ -239,22 +246,27 @@ namespace WoW.Characters
         // Generate Dracthyr form skin texture from many layers
         private void DracthyrTextures(Texture2D texture)
         {
-            DrawLayer(texture, "Face", "Primary Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Markings Color", "Face Markings", 5, 0, 0, 1024, 512);
-            DrawLayer(texture, "Markings Color", "Face Pattern", 6, 0, 0, 1024, 512);
-            DrawLayer(texture, "Horn Color", 11, 0, 0, 512, 512);
-            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 16, 0, 0, 1024, 512);
-            DrawLayer(texture, "Markings Color", "Body Markings", 19, 0, 0, 1024, 512);
-            DrawLayer(texture, "Markings Color", "Body Pattern", 22, 0, 0, 1024, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            DrawLayer(texture, "Face", "Primary Color", face);
+            DrawLayer(texture, "Markings Color", "Face Markings", 5, full);
+            DrawLayer(texture, "Markings Color", "Face Pattern", 6, full);
+            DrawLayer(texture, "Horn Color", 11, body);
+            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 16, full);
+            DrawLayer(texture, "Markings Color", "Body Markings", 19, full);
+            DrawLayer(texture, "Markings Color", "Body Pattern", 22, full);
         }
 
         // Generate Visabe form skin texture from many layers
         private void VisageTextures(Texture2D texture)
         {
-            DrawLayer(texture, "Face", "Skin Color", 512, 0, 512, 512);
-            DrawLayer(texture, "Scale Color", "Body Scales", 2, 0, 0, 512, 512);
-            DrawLayer(texture, "Scale Color", "Scale Markings", 5, 512, 0, 512, 512);
-            DrawLayer(texture, "Eyebrows", "Hair Color", 7, 512, 0, 512, 512);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            DrawLayer(texture, "Face", "Skin Color", face);
+            DrawLayer(texture, "Scale Color", "Body Scales", 2, body);
+            DrawLayer(texture, "Scale Color", "Scale Markings", 5, face);
+            DrawLayer(texture, "Eyebrows", "Hair Color", 7, face);
             DrawBra(texture, "Underclothes Top", "Underclothes Color");
             DrawUnderwear(texture, "Underclothes Bottom", "Underclothes Color");
             DrawArmor(texture);
@@ -263,23 +275,26 @@ namespace WoW.Characters
         // Draw Layers on extra skin texture
         protected override void LayeredExtra1(Texture2D texture)
         {
-            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 17, 0, 0, 512, 512);
-            DrawLayer(texture, "Markings Color", "Face Pattern", 23, 0, 0, 512, 512);
+            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 17, body);
+            DrawLayer(texture, "Markings Color", "Face Pattern", 23, body);
         }
 
         // Draw Layers on extra skin texture
         protected override void LayeredExtra2(Texture2D texture)
         {
-            DrawLayer(texture, "Horn Color", 12, 0, 0, 1024, 512);
-            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 18, 0, 0, 1024, 512);
-            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 21, 0, 0, 1024, 512);
-            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 24, 0, 0, 1024, 512);
+            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            DrawLayer(texture, "Horn Color", 12, full);
+            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 18, full);
+            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 21, full);
+            DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 24, full);
         }
 
         // Draw Layers on hair texture
         protected override void LayeredHair(Texture2D texture)
         {
-            DrawLayer(texture, "Hair Highlights", 12, 0, 0, texture.width, texture.height);
+            RectInt rect = new(0, 0, texture.width, texture.height);
+            DrawLayer(texture, "Hair Highlights", 12, rect);
         }
 
         // Get id of Skin Color option
