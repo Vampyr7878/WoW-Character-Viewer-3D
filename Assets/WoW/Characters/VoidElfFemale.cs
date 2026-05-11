@@ -51,7 +51,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
             ChangeEyes(activeGeosets);
@@ -65,18 +65,18 @@ namespace WoW.Characters
         }
 
         // Change goesets in according to eye color and make sure left over geosets are removed
-        private new void ChangeEyeColor(List<int> activeGeosets)
+        private new void ChangeEyeColor(HashSet<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
-            activeGeosets.RemoveAll(x => x > 5099 && x < 5200);
+            activeGeosets.RemoveWhere(x => x > 1699 && x < 1800);
+            activeGeosets.RemoveWhere(x => x > 5099 && x < 5200);
             ActivateRelatedGeosetOptions(activeGeosets, "Skin Color", "Eye Color", skinColorEyes);
             ChangeGeosetOption(activeGeosets, "Eye Color");
         }
         
         // Change hair tentacles
-        private void ChangeTentacles(List<int> activeGeosets)
+        private void ChangeTentacles(HashSet<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 2399 && x < 2500);
+            activeGeosets.RemoveWhere(x => x > 2399 && x < 2500);
             ChangeGeosetOption(activeGeosets, "Tentacles", "Hair Style");
         }
 
@@ -86,7 +86,7 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
             DrawLayer(texture, "Face", "Skin Color", face);
             DrawBra(texture);
             DrawUnderwear(texture);

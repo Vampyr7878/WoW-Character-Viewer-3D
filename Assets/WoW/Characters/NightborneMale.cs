@@ -21,7 +21,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             ChangeEyes(activeGeosets);
             ChangeEars(activeGeosets);
@@ -44,9 +44,9 @@ namespace WoW.Characters
             textures.Clear();
 #endif
             Emission = null;
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
-            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
-            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            var full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
             DrawLayer(texture, "Face", "Skin Color", face);
             DoubleLayer(texture, "Face Tattoo", 19, face);
             DoubleEmission("Face Tattoo", 19, face);

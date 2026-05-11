@@ -66,7 +66,7 @@ public class Creature : ModelRenderer
         // Initiazlie
         modelsPath = @"creature\";
         camera = Camera.main.transform;
-        activeGeosets = new List<int>();
+        activeGeosets = new();
         impStyleColors = new()
             {
                 { 4084, new int[] { 32186, 32183, 32184, 32185 } },
@@ -501,12 +501,12 @@ public class Creature : ModelRenderer
     {
         if (activeGeosets.Count == 0 || activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id) && !IsDeathModel(i))
         {
-            Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            var material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
             if (material == null)
             {
                 Debug.LogError(Model.Skin.Textures[i].Shader);
             }
-            renderer.materials[i] = new Material(material.shader);
+            renderer.materials[i] = new(material.shader);
             renderer.materials[i].shader = material.shader;
             renderer.materials[i].CopyPropertiesFromMaterial(material);
             Debug.Log($"Shader: {Model.Skin.Textures[i].Shader}");
@@ -514,7 +514,7 @@ public class Creature : ModelRenderer
         }
         else
         {
-            renderer.materials[i] = new Material(hiddenMaterial.shader);
+            renderer.materials[i] = new(hiddenMaterial.shader);
             renderer.materials[i].shader = hiddenMaterial.shader;
             renderer.materials[i].CopyPropertiesFromMaterial(hiddenMaterial);
         }
@@ -545,23 +545,23 @@ public class Creature : ModelRenderer
     // Setup particle effects for rendering
     private void ParticleEffects()
     {
-        ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
+        var particles = GetComponentsInChildren<ParticleSystem>();
         particles = particles.OrderBy(x => x.name).ToArray();
         for (int i = 0; i < particles.Length; i++)
         {
             particles[i].transform.localEulerAngles = new Vector3(0f, 0f, 0f);
             if (Model.Particles[i].ColorIndex != 0)
             {
-                ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particles[i].colorOverLifetime;
-                ParticleColor particleColor = particleColors.Length > 0 ? particleColors[Model.Particles[i].ColorIndex - 11] : null;
+                var colorOverLifetime = particles[i].colorOverLifetime;
+                var particleColor = particleColors.Length > 0 ? particleColors[Model.Particles[i].ColorIndex - 11] : null;
                 if (particleColor != null && particleColor.Start != Color.black)
                 {
                     Gradient gradient = new();
-                    GradientColorKey[] colorKeys = new GradientColorKey[3];
+                    var colorKeys = new GradientColorKey[3];
                     colorKeys[0] = new GradientColorKey(particleColor.Start, 0f);
                     colorKeys[1] = new GradientColorKey(particleColor.Mid, 0.5f);
                     colorKeys[2] = new GradientColorKey(particleColor.End, 1f);
-                    GradientAlphaKey[] alphaKeys = new GradientAlphaKey[3];
+                    var alphaKeys = new GradientAlphaKey[3];
                     alphaKeys[0] = new GradientAlphaKey(particleColor.Start.a / 255f, 0f);
                     alphaKeys[1] = new GradientAlphaKey(particleColor.Mid.a / 255f, 0.5f);
                     alphaKeys[2] = new GradientAlphaKey(particleColor.End.a / 255f, 1f);
@@ -569,17 +569,17 @@ public class Creature : ModelRenderer
                     colorOverLifetime.color = gradient;
                 }
             }
-            ParticleSystem.LimitVelocityOverLifetimeModule limitVelocityOverLifetime = particles[i].limitVelocityOverLifetime;
+            var limitVelocityOverLifetime = particles[i].limitVelocityOverLifetime;
             limitVelocityOverLifetime.enabled = true;
             limitVelocityOverLifetime.drag = Model.Particles[i].Drag;
             limitVelocityOverLifetime.multiplyDragByParticleSize = false;
             limitVelocityOverLifetime.multiplyDragByParticleVelocity = true;
             particles[i].transform.localScale = transform.lossyScale;
-            ParticleSystemRenderer renderer = particles[i].GetComponent<ParticleSystemRenderer>();
-            Material material = ParticleMaterial(Model.Particles[i].Blend);
+            var renderer = particles[i].GetComponent<ParticleSystemRenderer>();
+            var material = ParticleMaterial(Model.Particles[i].Blend);
             renderer.material.shader = material.shader;
             renderer.material.CopyPropertiesFromMaterial(material);
-            Texture2D temp = textures[Model.Particles[i].Textures[0]];
+            var temp = textures[Model.Particles[i].Textures[0]];
             Texture2D texture = new(temp.width, temp.height, TextureFormat.ARGB32, false);
             texture.SetPixels32(temp.GetPixels32());
             texture.Apply();
@@ -605,12 +605,12 @@ public class Creature : ModelRenderer
         material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend < 2 ? 0.5f : 0f);
-        Color color = Color.white;
+        var color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
             color = colors[Model.Skin.Textures[i].Color];
         }
-        CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
+        var cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
         material.SetInt("_Cull", (int)cull);
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
@@ -734,11 +734,10 @@ public class Creature : ModelRenderer
             modelsPath = @"creature\";
         }
         bool done = false;
-        converter = new System.Drawing.ImageConverter();
-        GameObject prefab = Resources.Load<GameObject>($"{modelsPath}{modelfile}_prefab");
+        var prefab = Resources.Load<GameObject>($"{modelsPath}{modelfile}_prefab");
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
-        M2Model m2 = GetComponentInChildren<M2Model>();
+        var m2 = GetComponentInChildren<M2Model>();
         byte[] data = m2.data.bytes;
         byte[] skin = m2.skin.bytes;
         byte[] skel = m2.skel == null ? null : m2.skel.bytes;
@@ -753,7 +752,7 @@ public class Creature : ModelRenderer
         {
             LoadColors();
             textures = new Texture2D[Model.Textures.Length];
-            Transform[] bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
+            var bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
             yield return null;
             if (Model.Particles.Length > 0)
             {

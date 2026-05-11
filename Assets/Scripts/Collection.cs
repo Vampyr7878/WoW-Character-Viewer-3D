@@ -18,7 +18,7 @@ public class Collection : ModelRenderer
     public Character character;
 
     // List of geosets that are enabled for loading
-    public List<int> ActiveGeosets
+    public HashSet<int> ActiveGeosets
     {
         get { return activeGeosets; }
         set { activeGeosets = value; }
@@ -26,7 +26,7 @@ public class Collection : ModelRenderer
     // Changable texture from database
     public int Texture { get; set; }
     // File id of the model
-    public int File { get; private set; }
+    public int File { get; set; }
 
     private void Start()
     {
@@ -83,7 +83,7 @@ public class Collection : ModelRenderer
     {
         if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            var material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
             if (material == null)
             {
                 Debug.LogError(Model.Skin.Textures[i].Shader);
@@ -115,12 +115,12 @@ public class Collection : ModelRenderer
         material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.5f : 0f);
-        Color color = Color.white;
+        var color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
             color = colors[Model.Skin.Textures[i].Color];
         }
-        CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
+        var cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
         material.SetInt("_Cull", (int)cull);
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
@@ -194,7 +194,7 @@ public class Collection : ModelRenderer
             }
             else
             {
-                Texture2D texture = TextureFromBLP(file);
+                var texture = TextureFromBLP(file);
                 textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                 textures[i].SetPixels32(texture.GetPixels32());
                 textures[i].wrapModeU = (Model.Textures[i].Flags & 1) != 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
@@ -222,8 +222,8 @@ public class Collection : ModelRenderer
     private void MatchBones(GameObject modelRenderer, Bone[] parentBones)
     {
         renderer = mesh.GetComponentInChildren<SkinnedMeshRenderer>();
-        SkinnedMeshRenderer renderer2 = modelRenderer.GetComponentInChildren<SkinnedMeshRenderer>();
-        Dictionary<int, int> boneMap = new Dictionary<int, int>();
+        var renderer2 = modelRenderer.GetComponentInChildren<SkinnedMeshRenderer>();
+        Dictionary<int, int> boneMap = new();
         for (int i = 0, j = 0; i < Model.Skeleton.Bones.Length; i++, j++)
         {
             if (Model.Skeleton.Bones[i].Name == parentBones[j].Name)
@@ -235,8 +235,8 @@ public class Collection : ModelRenderer
                 i--;
             }
         }
-        Transform[] bones = new Transform[boneMap.Count];
-        Matrix4x4[] bind = new Matrix4x4[boneMap.Count];
+        var bones = new Transform[boneMap.Count];
+        var bind = new Matrix4x4[boneMap.Count];
         for (int i = 0; i < bones.Length; i++)
         {
             bones[i] = renderer2.bones[boneMap[i]];
@@ -256,24 +256,23 @@ public class Collection : ModelRenderer
     {
         UnloadModel();
         bool done = false;
-        converter = new System.Drawing.ImageConverter();
 #if UNITY_EDITOR
         this.listFile = listFile;
         this.dataPath = dataPath;
 #else
         this.casc = casc;
 #endif
-        GameObject prefab = Resources.Load<GameObject>(collectionfile);
+        var prefab = Resources.Load<GameObject>(collectionfile);
         mesh = Instantiate(prefab, gameObject.transform);
         yield return null;
-        M2Model m2 = GetComponentInChildren<M2Model>();
+        var m2 = GetComponentInChildren<M2Model>();
         byte[] data = m2.data.bytes;
         byte[] skin = m2.skin.bytes;
         byte[] skel = m2.skel == null ? null : m2.skel.bytes;
         loadBinaries = new Thread(() => { Model = m2.LoadModel(data, skin, skel); done = true; });
         loadBinaries.Start();
         yield return null;
-        activeGeosets = new List<int>();
+        activeGeosets = new();
         while (loadBinaries.IsAlive)
         {
             yield return null;
@@ -316,50 +315,27 @@ public class Collection : ModelRenderer
     // Load the model from CASC
 #if UNITY_EDITOR
     public IEnumerator LoadModel(int file, int texture, GameObject parent, Bone[] parentBones, Dictionary<int, string> listFile, string dataPath)
+#else
+    public IEnumerator LoadModel(int file, int texture, GameObject parent, Bone[] parentBones, CASCHandler casc)
+#endif
     {
         File = file;
         if (file != 0)
         {
             Texture = texture;
+#if UNITY_EDITOR
             this.listFile = listFile;
             this.dataPath = dataPath;
-            converter = new System.Drawing.ImageConverter();
-            byte[] bytes;
-            yield return null;
-            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listFile[file]}", FileMode.Open)))
-            {
-                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
-            }
-            yield return null;
-            Model = new M2();
-            Model.LoadFile(bytes);
-            yield return null;
-            if (Model.SkelFileID != 0)
-            {
-                using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listFile[Model.SkelFileID]}", FileMode.Open)))
-                {
-                    bytes = reader.ReadBytes((int)reader.BaseStream.Length);
-                }
-            }
-            yield return null;
-            Model.Skeleton.LoadFile(bytes, Model.SkelFileID);
-            yield return null;
-            using (BinaryReader reader = new BinaryReader(System.IO.File.Open($@"{dataPath}\{listFile[Model.SkinFileID]}", FileMode.Open)))
-            {
-                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
-            }
 #else
-    public IEnumerator LoadModel(int file, int texture, GameObject parent, Bone[] parentBones, CASCHandler casc)
-        {
-        File = file;
-        if (file != 0)
-        {
-            Texture = texture;
             this.casc = casc;
-            converter = new System.Drawing.ImageConverter();
+#endif
             byte[] bytes;
             yield return null;
-            using (BinaryReader reader = new BinaryReader(casc.OpenFile(file)))
+#if UNITY_EDITOR
+            using (BinaryReader reader = new(System.IO.File.Open($@"{dataPath}\{listFile[file]}", FileMode.Open)))
+#else
+            using (BinaryReader reader = new(casc.OpenFile(file)))
+#endif
             {
                 bytes = reader.ReadBytes((int)reader.BaseStream.Length);
             }
@@ -369,20 +345,24 @@ public class Collection : ModelRenderer
             yield return null;
             if (Model.SkelFileID != 0)
             {
-                using (BinaryReader reader = new BinaryReader(casc.OpenFile(Model.SkelFileID)))
-                {
-                    bytes = reader.ReadBytes((int)reader.BaseStream.Length);
-                }
+#if UNITY_EDITOR
+                using BinaryReader reader = new(System.IO.File.Open($@"{dataPath}\{listFile[Model.SkelFileID]}", FileMode.Open));
+#else
+                using BinaryReader reader = new(casc.OpenFile(Model.SkelFileID))
+#endif
+                bytes = reader.ReadBytes((int)reader.BaseStream.Length);
             }
             yield return null;
             Model.Skeleton.LoadFile(bytes, Model.SkelFileID);
             yield return null;
-            using (BinaryReader reader = new BinaryReader(casc.OpenFile(Model.SkinFileID)))
+#if UNITY_EDITOR
+            using (BinaryReader reader = new(System.IO.File.Open($@"{dataPath}\{listFile[Model.SkinFileID]}", FileMode.Open)))
+#else
+            using (BinaryReader reader = new(casc.OpenFile(Model.SkinFileID)))
+#endif
             {
                 bytes = reader.ReadBytes((int)reader.BaseStream.Length);
             }
-#endif
-            yield return null;
             Model.Skin.LoadFile(bytes);
             yield return null;
             LoadColors();
@@ -395,10 +375,10 @@ public class Collection : ModelRenderer
             mesh.transform.localScale = Vector3.one;
             renderer = GetComponentInChildren<SkinnedMeshRenderer>();
             yield return null;
-            Transform[] bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
+            var bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
             if (Model.Particles.Length > 0)
             {
-                GameObject[] particles = new GameObject[Model.Particles.Length];
+                var particles = new GameObject[Model.Particles.Length];
                 for (int i = 0; i < particles.Length; i++)
                 {
                     particles[i] = WoWHelper.ParticleEffect(Model.Particles[i]);
@@ -434,7 +414,7 @@ public class Collection : ModelRenderer
                 yield return null;
             }
             Loaded = true;
-            Change = false;
+            Change = true;
         }
     }
 }

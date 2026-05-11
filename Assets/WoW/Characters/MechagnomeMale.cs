@@ -30,7 +30,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             Character.racial.ActiveGeosets.Clear();
             ChangeFace(activeGeosets);
@@ -45,9 +45,9 @@ namespace WoW.Characters
         }
 
         // Chamge head modification
-        private void ChangeModification(List<int> activeGeosets)
+        private void ChangeModification(HashSet<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 699 && x < 800);
+            activeGeosets.RemoveWhere(x => x > 699 && x < 800);
             ChangeGeosetOption(activeGeosets, "Modification");
             ChangeSkinnedGeosetOption(Character.racial.ActiveGeosets, "Modification");
         }
@@ -58,7 +58,7 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
             DrawLayer(texture, "Face", "Skin Color", face);
             DrawUnderwear(texture);
             DrawLayer(texture, "Hair Color", 8, face);

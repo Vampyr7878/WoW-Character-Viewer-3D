@@ -487,17 +487,17 @@ namespace WoW
         {
             GameObject model = new(file.Name);
             model.AddComponent<SkinnedMeshRenderer>();
-            SkinnedMeshRenderer renderer = model.GetComponent<SkinnedMeshRenderer>();
+            var renderer = model.GetComponent<SkinnedMeshRenderer>();
             Mesh mesh = new()
             {
                 name = file.Name + "_mesh"
             };
             // Fill vertex data
-            Vector3[] vertices = new Vector3[file.Vertices.Length];
-            Vector3[] normals = new Vector3[file.Vertices.Length];
-            BoneWeight[] weights = new BoneWeight[file.Vertices.Length];
-            Vector2[] uv = new Vector2[file.Vertices.Length];
-            Vector2[] uv2 = new Vector2[file.Vertices.Length];
+            var vertices = new Vector3[file.Vertices.Length];
+            var normals = new Vector3[file.Vertices.Length];
+            var weights = new BoneWeight[file.Vertices.Length];
+            var uv = new Vector2[file.Vertices.Length];
+            var uv2 = new Vector2[file.Vertices.Length];
             for (int i = 0; i < file.Vertices.Length; i++)
             {
                 vertices[i] = new Vector3(file.Vertices[i].Position.X, file.Vertices[i].Position.Y, file.Vertices[i].Position.Z);
@@ -534,7 +534,7 @@ namespace WoW
                 mesh.SetTriangles(triangles, i);
             }
             // Generate bones
-            Transform[] bones = new Transform[file.Skeleton.Bones.Length];
+            var bones = new Transform[file.Skeleton.Bones.Length];
             for (int i = 0; i < bones.Length; i++)
             {
                 bones[i] = new GameObject($"Bone{i}").transform;
@@ -552,7 +552,7 @@ namespace WoW
                     bones[i].parent = bones[file.Skeleton.Bones[i].Parent];
                 }
             }
-            Matrix4x4[] bind = new Matrix4x4[bones.Length];
+            var bind = new Matrix4x4[bones.Length];
             for (int i = 0; i < bones.Length; i++)
             {
                 bind[i] = bones[i].worldToLocalMatrix * model.transform.localToWorldMatrix;
@@ -569,7 +569,7 @@ namespace WoW
         // Particle shape
         private static ParticleSystemShapeType ParticleShape(byte value)
         {
-            ParticleSystemShapeType shape = ParticleSystemShapeType.Cone;
+            var shape = ParticleSystemShapeType.Cone;
             switch (value)
             {
                 case 1:
@@ -591,26 +591,26 @@ namespace WoW
             // Create gameobject
             GameObject element = new();
             element.AddComponent<ParticleSystem>();
-            ParticleSystem system = element.GetComponent<ParticleSystem>();
+            var system = element.GetComponent<ParticleSystem>();
             // Setup lifetime and speed in main module
-            ParticleSystem.MainModule main = system.main;
+            var main = system.main;
             float variation = particle.LifespanVariation * particle.Lifespan;
             main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2f, (particle.Lifespan + variation) / 2f);
             variation = particle.SpeedVariation * particle.Speed;
             main.startSpeed = new ParticleSystem.MinMaxCurve((particle.Speed - variation) / 2f, (particle.Speed + variation) / 2f);
             // Setup emission rate in emission module
-            ParticleSystem.EmissionModule emission = system.emission;
+            var emission = system.emission;
             variation = particle.EmissionVariation * particle.EmissionRate;
             emission.rateOverTime = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
             // Setup shape and scale in shape module
-            ParticleSystem.ShapeModule shape = system.shape;
+            var shape = system.shape;
             shape.shapeType = ParticleShape(particle.Type);
             shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionLength, particle.EmissionWidth);
             // Setup color and alpha gradients in color over lifetime module
-            ParticleSystem.ColorOverLifetimeModule color = system.colorOverLifetime;
+            var color = system.colorOverLifetime;
             color.enabled = true;
             Gradient gradient = new();
-            GradientColorKey[] colorKeys = new GradientColorKey[particle.Colors.Values.Length];
+            var colorKeys = new GradientColorKey[particle.Colors.Values.Length];
             for (int i = 0; i < colorKeys.Length; i++)
             {
                 colorKeys[i] = new GradientColorKey(new Color(particle.Colors.Values[i].X / 255f, particle.Colors.Values[i].Y / 255f,
@@ -636,7 +636,7 @@ namespace WoW
             gradient.SetKeys(colorKeys, alphaKeys);
             color.color = gradient;
             // Setup size in size over lifetime module
-            ParticleSystem.SizeOverLifetimeModule size = system.sizeOverLifetime;
+            var size = system.sizeOverLifetime;
             size.enabled = true;
             AnimationCurve curve = new();
             for (int i = 0; i < particle.Scale.Values.Length; i++)
@@ -645,7 +645,7 @@ namespace WoW
             }
             size.size = new ParticleSystem.MinMaxCurve(1f, curve);
             // Setup texture sheet in texture sheet animation module
-            ParticleSystem.TextureSheetAnimationModule textureSheet = system.textureSheetAnimation;
+            var textureSheet = system.textureSheetAnimation;
             textureSheet.enabled = true;
             textureSheet.numTilesX = particle.TileColumns;
             textureSheet.numTilesY = particle.TileRows;

@@ -19,7 +19,7 @@ public class ItemObject : ModelRenderer
     // Swappable item texture type 4 
     public int Texture4 { get; private set; }
     // File id of the model
-    public int File { get; private set; }
+    public int File { get; set; }
     // Index of extra geoset to be enabled
     public int Geoset { get; set; }
     // Particle colors from database
@@ -98,7 +98,7 @@ public class ItemObject : ModelRenderer
     {
         if (activeGeosets.Count == 0 || activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            var material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
             if (material == null)
             {
                 Debug.LogError(Model.Skin.Textures[i].Shader);
@@ -121,28 +121,28 @@ public class ItemObject : ModelRenderer
     // Setup particle effects for rendering
     private void ParticleEffects()
     {
-        ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
+        var particles = GetComponentsInChildren<ParticleSystem>();
         particles = particles.OrderBy(x => int.Parse(x.name.Replace("Particle", ""))).ToArray();
         for (int i = 0; i < particles.Length; i++)
         {
-            ParticleSystem.MainModule main = particles[i].main;
+            var main = particles[i].main;
             main.startRotation3D = true;
             main.startRotationZ = -Mathf.PI / 2 * Model.Particles[i].TileRotation;
-            ParticleSystem.EmissionModule emission = particles[i].emission;
+            var emission = particles[i].emission;
             if (Model.Particles[i].ColorIndex != 0)
             {
-                ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particles[i].colorOverLifetime;
+                var colorOverLifetime = particles[i].colorOverLifetime;
                 if (ParticleColors.Length > 0)
                 {
-                    ParticleColor particleColors = ParticleColors[Model.Particles[i].ColorIndex - 11];
+                    var particleColors = ParticleColors[Model.Particles[i].ColorIndex - 11];
                     if (particleColors.Start != Color.black)
                     {
                         Gradient gradient = new();
-                        GradientColorKey[] colorKeys = new GradientColorKey[3];
+                        var colorKeys = new GradientColorKey[3];
                         colorKeys[0] = new GradientColorKey(particleColors.Start, 0f);
                         colorKeys[1] = new GradientColorKey(particleColors.Mid, 0.5f);
                         colorKeys[2] = new GradientColorKey(particleColors.End, 1f);
-                        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[3];
+                        var alphaKeys = new GradientAlphaKey[3];
                         alphaKeys[0] = new GradientAlphaKey(particleColors.Start.a / 255f, 0f);
                         alphaKeys[1] = new GradientAlphaKey(particleColors.Mid.a / 255f, 0.5f);
                         alphaKeys[2] = new GradientAlphaKey(particleColors.End.a / 255f, 1f);
@@ -151,13 +151,13 @@ public class ItemObject : ModelRenderer
                     }
                 }
             }
-            ParticleSystem.LimitVelocityOverLifetimeModule limitVelocityOverLifetime = particles[i].limitVelocityOverLifetime;
+            var limitVelocityOverLifetime = particles[i].limitVelocityOverLifetime;
             limitVelocityOverLifetime.enabled = true;
             limitVelocityOverLifetime.drag = Model.Particles[i].Drag;
             limitVelocityOverLifetime.multiplyDragByParticleSize = false;
             limitVelocityOverLifetime.multiplyDragByParticleVelocity = true;
-            ParticleSystemRenderer renderer = particles[i].GetComponent<ParticleSystemRenderer>();
-            Material material = ParticleMaterial(Model.Particles[i].Blend);
+            var renderer = particles[i].GetComponent<ParticleSystemRenderer>();
+            var material = ParticleMaterial(Model.Particles[i].Blend);
             particles[i].transform.localScale = transform.localScale;
             bool right = name.Contains("right");
             if (Model.Particles[i].Flags == 8652344)
@@ -174,7 +174,7 @@ public class ItemObject : ModelRenderer
             }
             renderer.material.shader = material.shader;
             renderer.material.CopyPropertiesFromMaterial(material);
-            Texture2D temp = textures[Model.Particles[i].Textures[0]];
+            var temp = textures[Model.Particles[i].Textures[0]];
             Texture2D texture = new(temp.width, temp.height, TextureFormat.ARGB32, false);
             texture.SetPixels32(temp.GetPixels32());
             texture.alphaIsTransparency = true;
@@ -201,12 +201,12 @@ public class ItemObject : ModelRenderer
         material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
         material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 || Model.Materials[Model.Skin.Textures[i].Material].Blend == 7 ? 0.5f : 0f);
-        Color color = Color.white;
+        var color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
              color = colors[Model.Skin.Textures[i].Color];
         }
-        CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
+        var cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
         if (File == 850143)
         {
             cull = CullMode.Off;
@@ -256,7 +256,7 @@ public class ItemObject : ModelRenderer
             }
             else
             {
-                Texture2D texture = TextureFromBLP(file);
+                var texture = TextureFromBLP(file);
                 if (texture == null)
                 {
                     Debug.LogError(file);
@@ -280,9 +280,9 @@ public class ItemObject : ModelRenderer
 
     // Load the model
 #if UNITY_EDITOR
-    public IEnumerator LoadModel(int file, ItemTexture[] textures, Dictionary<int, string> listFile, string dataPath)
+    public IEnumerator LoadModel(int file, ItemTexture[] textures, Dictionary<int, string> listFile, string dataPath, List<int> geosets)
 #else
-    public IEnumerator LoadModel(int file, ItemTexture[] textures, CASCHandler casc)
+    public IEnumerator LoadModel(int file, ItemTexture[] textures, CASCHandler casc, List<int> geosets)
 #endif
     {
         File = file;
@@ -295,7 +295,6 @@ public class ItemObject : ModelRenderer
 #else
         this.casc = casc;
 #endif
-        converter = new System.Drawing.ImageConverter();
         byte[] bytes;
         yield return null;
 #if UNITY_EDITOR
@@ -326,10 +325,14 @@ public class ItemObject : ModelRenderer
         yield return null;
         Model.Skin.LoadFile(bytes);
         yield return null;
-        activeGeosets = Model.Skin.Submeshes.Select(s => (int)s.Id).Distinct().ToList();
-        if (Geoset > 0)
+        activeGeosets = new() { 0 };
+        for (int i = 0; i < Model.Skin.Submeshes.Length; i++)
         {
-            activeGeosets.Remove(Model.Skin.Submeshes[Model.Skin.Textures[Geoset].Id].Id);
+            if (Model.Skin.Submeshes[i].Id != 0)
+            {
+                int s = (Model.Skin.Submeshes[i].Id / 100) * 100 + (i == Model.Skin.Submeshes.Length - 1 ? 1 + Geoset: 1);
+                activeGeosets.Add(s);
+            }
         }
         LoadColors();
         yield return null;
@@ -341,10 +344,10 @@ public class ItemObject : ModelRenderer
         mesh.transform.localScale = Vector3.one;
         renderer = GetComponentInChildren<SkinnedMeshRenderer>();
         yield return null;
-        Transform[] bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
+        var bones = GetComponentInChildren<SkinnedMeshRenderer>().bones;
         if (Model.Particles.Length > 0)
         {
-            GameObject[] particles = new GameObject[Model.Particles.Length];
+            var particles = new GameObject[Model.Particles.Length];
             for (int i = 0; i < particles.Length; i++)
             {
                 particles[i] = WoWHelper.ParticleEffect(Model.Particles[i]);
@@ -381,29 +384,29 @@ public class ItemObject : ModelRenderer
         }
         for (int i = 0; i < bones.Length; i++)
         {
-            if ((Model.Skeleton.Bones[i].Flags & 0x400) != 0 && Model.Skeleton.Bones[i].Parent >= 0)
-            {
-                bones[i].gameObject.AddComponent<Rigidbody>();
-                bones[i].gameObject.AddComponent<HingeJoint>().axis = new Vector3(0.5f, 0.5f, 0f);
-                HingeJoint joint = bones[i].GetComponent<HingeJoint>();
-                joint.autoConfigureConnectedAnchor = false;
-                Rigidbody parent = bones[Model.Skeleton.Bones[i].Parent].GetComponent<Rigidbody>();
-                if (parent == null)
-                {
-                    bones[Model.Skeleton.Bones[i].Parent].gameObject.AddComponent<Rigidbody>().isKinematic = true;
-                    parent = bones[Model.Skeleton.Bones[i].Parent].GetComponent<Rigidbody>();
-                }
-                joint.connectedBody = parent;
-                joint.connectedAnchor = bones[i].localPosition;
-                if (bones[i].childCount == 0)
-                {
-                    GameObject weight = new("Weight");
-                    weight.transform.parent = bones[i];
-                    weight.transform.localPosition = bones[i].transform.localPosition;
-                    weight.transform.localScale = Vector3.one;
-                }
-                joint.anchor = bones[i].InverseTransformPoint(bones[i].GetComponentInChildren<Transform>().position);
-            }
+            //if ((Model.Skeleton.Bones[i].Flags & 0x400) != 0 && Model.Skeleton.Bones[i].Parent >= 0)
+            //{
+            //    bones[i].gameObject.AddComponent<Rigidbody>();
+            //    bones[i].gameObject.AddComponent<HingeJoint>().axis = new Vector3(0.5f, 0.5f, 0f);
+            //    var joint = bones[i].GetComponent<HingeJoint>();
+            //    joint.autoConfigureConnectedAnchor = false;
+            //    var parent = bones[Model.Skeleton.Bones[i].Parent].GetComponent<Rigidbody>();
+            //    if (parent == null)
+            //    {
+            //        bones[Model.Skeleton.Bones[i].Parent].gameObject.AddComponent<Rigidbody>().isKinematic = true;
+            //        parent = bones[Model.Skeleton.Bones[i].Parent].GetComponent<Rigidbody>();
+            //    }
+            //    joint.connectedBody = parent;
+            //    joint.connectedAnchor = bones[i].localPosition;
+            //    if (bones[i].childCount == 0)
+            //    {
+            //        GameObject weight = new("Weight");
+            //        weight.transform.parent = bones[i];
+            //        weight.transform.localPosition = bones[i].transform.localPosition;
+            //        weight.transform.localScale = Vector3.one;
+            //    }
+            //    joint.anchor = bones[i].InverseTransformPoint(bones[i].GetComponentInChildren<Transform>().position);
+            //}
         }
         Loaded = true;
         Change = true;

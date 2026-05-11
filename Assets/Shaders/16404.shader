@@ -22,7 +22,7 @@ Shader "Custom/16404"
 		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 		LOD 200
 		ZWrite[_DepthTest]
-		Blend SrcAlpha One,[_SrcAlphaBlend][_DstAlphaBlend]
+		Blend[_SrcColorBlend][_DstColorBlend],[_SrcAlphaBlend][_DstAlphaBlend]
 		Cull[_Cull]
 
 		CGPROGRAM
@@ -51,6 +51,7 @@ Shader "Custom/16404"
 				OUT.Alpha = alpha.a;
 				OUT.Metallic = 0;
 				OUT.Smoothness = 0;
+				OUT.Emission = color;
 			}
 		ENDCG
 	}

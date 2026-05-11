@@ -28,7 +28,7 @@ namespace Assets.WoW
         // Get model matching proper conditions
         public int GetModel(int index, bool gender, WoWHelper.Race r, WoWHelper.Class c, int position)
         {
-            WoWHelper.Race fallback = WoWHelper.RaceModel(r, gender);
+            var fallback = WoWHelper.RaceModel(r, gender);
             var model = Item.Appearances[Appearance].DisplayInfo.Models[index].FirstOrDefault
                 (m => m.Class == c && m.Race == r && m.Gender == (gender ? 0 : 1) && m.Position == position);
             model ??= Item.Appearances[Appearance].DisplayInfo.Models[index].FirstOrDefault

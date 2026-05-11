@@ -19,7 +19,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             Character.racial.ActiveGeosets.Clear();
             ChangeFace(activeGeosets);
@@ -44,7 +44,7 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            RectInt face = new(1024, 0, 1024, 1024);
+            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
             DrawLayer(texture, "Face", "Skin Color", face);
             DrawArmor(texture);
         }

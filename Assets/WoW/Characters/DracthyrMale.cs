@@ -115,7 +115,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             HideOtherFormsOptions();
             switch (Character.Form)
@@ -130,7 +130,7 @@ namespace WoW.Characters
         }
 
         // Change Dracthyr form geosets according to chosen character customization
-        private void DracthyrGeosets(List<int> activeGeosets)
+        private void DracthyrGeosets(HashSet<int> activeGeosets)
         {
             Character.racial.ActiveGeosets.Clear();
             Character.armor.ActiveGeosets.Clear();
@@ -180,7 +180,7 @@ namespace WoW.Characters
         }
 
         // Change Visage form geosets according to chosen character customization
-        private void VisageGeosets(List<int> activeGeosets)
+        private void VisageGeosets(HashSet<int> activeGeosets)
         {
             Character.extraRacial.ActiveGeosets.Clear();
             ChangeFace(activeGeosets);
@@ -246,9 +246,9 @@ namespace WoW.Characters
         // Generate Dracthyr form skin texture from many layers
         private void DracthyrTextures(Texture2D texture)
         {
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
-            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
-            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            var full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
             DrawLayer(texture, "Face", "Primary Color", face);
             DrawLayer(texture, "Markings Color", "Face Markings", 5, full);
             DrawLayer(texture, "Markings Color", "Face Pattern", 6, full);
@@ -261,8 +261,8 @@ namespace WoW.Characters
         // Generate Visabe form skin texture from many layers
         private void VisageTextures(Texture2D texture)
         {
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
-            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
             DrawLayer(texture, "Face", "Skin Color", face);
             DrawLayer(texture, "Scale Color", "Body Scales", 2, body);
             DrawLayer(texture, "Scale Color", "Scale Markings", 5, face);
@@ -275,7 +275,7 @@ namespace WoW.Characters
         // Draw Layers on extra skin texture
         protected override void LayeredExtra1(Texture2D texture)
         {
-            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            var body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
             DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 17, body);
             DrawLayer(texture, "Markings Color", "Face Pattern", 23, body);
         }
@@ -283,7 +283,7 @@ namespace WoW.Characters
         // Draw Layers on extra skin texture
         protected override void LayeredExtra2(Texture2D texture)
         {
-            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            var full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
             DrawLayer(texture, "Horn Color", 12, full);
             DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 18, full);
             DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 21, full);

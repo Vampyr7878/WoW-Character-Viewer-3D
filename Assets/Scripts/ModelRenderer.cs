@@ -27,8 +27,6 @@ public abstract class ModelRenderer : MonoBehaviour
     // Referenece to the opened CASC storage
     protected CASCHandler casc;
 #endif
-    // Image converter for loading textures
-    protected System.Drawing.ImageConverter converter;
     // Reference to the instantiated prefab
     protected GameObject mesh;
     // Colors used by the model
@@ -54,7 +52,7 @@ public abstract class ModelRenderer : MonoBehaviour
     // Animator object for this model
     protected Animator animator;
     // List of geosets that are enabled for loading
-    protected List<int> activeGeosets;
+    protected HashSet<int> activeGeosets;
 
     // Reference to the binary data
     public M2 Model { get; protected set; }
@@ -72,7 +70,7 @@ public abstract class ModelRenderer : MonoBehaviour
             string texture = "_Texture1";
             if (index >= 0)
             {
-                Vector2 offset = renderer.materials[i].GetTextureOffset(texture);
+                var offset = renderer.materials[i].GetTextureOffset(texture);
                 offset = AnimateTexture(index, offset);
                 renderer.materials[i].SetTextureOffset(texture, offset);
             }
@@ -82,7 +80,7 @@ public abstract class ModelRenderer : MonoBehaviour
                 texture = "_Texture2";
                 if (index >= 0)
                 {
-                    Vector2 offset = renderer.materials[i].GetTextureOffset(texture);
+                    var offset = renderer.materials[i].GetTextureOffset(texture);
                     offset = AnimateTexture(index, offset);
                     renderer.materials[i].SetTextureOffset(texture, offset);
                 }
@@ -95,7 +93,7 @@ public abstract class ModelRenderer : MonoBehaviour
     {
         if (index < Model.TextureAnimations.Length)
         {
-            TextureAnimation animation = Model.TextureAnimations[index];
+            var animation = Model.TextureAnimations[index];
             if (animation.Translation.Timestamps.Length > 0 && animation.Translation.Timestamps[0].Length > 1)
             {
                 if (textureTime[index] >= animation.Translation.Timestamps[0][textureFrame[index]] / 1000f)
@@ -138,13 +136,13 @@ public abstract class ModelRenderer : MonoBehaviour
             {
                 if (Model.Colors[index].Color.Values[0].Length > 1)
                 {
-                    Color color = renderer.materials[i].GetColor("_Color");
+                    var color = renderer.materials[i].GetColor("_Color");
                     color = AnimateColor(index, color);
                     renderer.materials[i].SetColor("_Color", color);
                 }
                 if (Model.Colors[index].Transparency.Values[0].Length > 1)
                 {
-                    Color color = renderer.materials[i].GetColor("_Color");
+                    var color = renderer.materials[i].GetColor("_Color");
                     color = AnimateTransparency(index, color);
                     renderer.materials[i].SetColor("_Color", color);
                 }
@@ -157,7 +155,7 @@ public abstract class ModelRenderer : MonoBehaviour
     {
         if (index < Model.TextureAnimations.Length)
         {
-            Track<Vector3D> animation = Model.Colors[index].Color;
+            var animation = Model.Colors[index].Color;
             if (animation.Timestamps.Length > 0 && animation.Timestamps[0].Length > 1)
             {
                 if (colorTime[index] >= animation.Timestamps[0][colorFrame[index]] / 1000f)
@@ -193,7 +191,7 @@ public abstract class ModelRenderer : MonoBehaviour
     {
         if (index < Model.TextureAnimations.Length)
         {
-            Track<float> animation = Model.Colors[index].Transparency;
+            var animation = Model.Colors[index].Transparency;
             if (animation.Timestamps.Length > 0 && animation.Timestamps[0].Length > 1)
             {
                 if (transparencyTime[index] >= animation.Timestamps[0][transparencyFrame[index]] / 1000f)
@@ -223,7 +221,7 @@ public abstract class ModelRenderer : MonoBehaviour
     // Get proper source color blend option for alpha blending
     protected BlendMode SrcColorBlend(short value)
     {
-        BlendMode blend = BlendMode.One;
+        var blend = BlendMode.One;
         switch (value)
         {
             case 0:
@@ -251,7 +249,7 @@ public abstract class ModelRenderer : MonoBehaviour
     // Get proper destination color blend option for alpha blending
     protected BlendMode DstColorBlend(short value)
     {
-        BlendMode blend = BlendMode.Zero;
+        var blend = BlendMode.Zero;
         switch (value)
         {
             case 0:
@@ -277,7 +275,7 @@ public abstract class ModelRenderer : MonoBehaviour
     // Get proper source alpha blend option for alpha blending
     protected BlendMode SrcAlphaBlend(short value)
     {
-        BlendMode blend = BlendMode.One;
+        var blend = BlendMode.One;
         switch (value)
         {
             case 0:
@@ -303,7 +301,7 @@ public abstract class ModelRenderer : MonoBehaviour
     // Get proper destination alpha blend option for alpha blending
     protected BlendMode DstAlphaBlend(short value)
     {
-        BlendMode blend = BlendMode.Zero;
+        var blend = BlendMode.Zero;
         switch (value)
         {
             case 0:
@@ -333,7 +331,7 @@ public abstract class ModelRenderer : MonoBehaviour
         {
             2 => "particlefademultiplymaterial",
             4 => "particleadditivemultiplymaterial",
-            //7 => "particleaddtivecolormaterial",
+            7 => "particleadditivemultiplymaterial",
             _ => "particletransparentcolormaterial",
         };
         if (material == "")
@@ -362,7 +360,7 @@ public abstract class ModelRenderer : MonoBehaviour
 #else
         BLP blp = new(casc.OpenFile(file));
 #endif
-        Texture2D texture = blp.GetImage();
+        var texture = blp.GetImage();
         return texture;
     }
 

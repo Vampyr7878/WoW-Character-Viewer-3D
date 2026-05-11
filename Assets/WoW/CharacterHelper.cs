@@ -3,7 +3,6 @@ using M2Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace WoW
@@ -170,7 +169,7 @@ namespace WoW
             layer = Character.Options[index].Choices[Character.Customization[index]].Textures.LastOrDefault(t => t.Target == target && t.Usage == 0);
             if (layer != null)
             {
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 DrawTexture(texture, layerTexture, rect.x, rect.y);
             }
@@ -187,7 +186,7 @@ namespace WoW
                 FirstOrDefault(t => t.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
             if (layer != null)
             {
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 DrawTexture(texture, layerTexture, rect.x, rect.y);
             }
@@ -204,7 +203,7 @@ namespace WoW
                 FirstOrDefault(t => t.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID && t.Target == target);
             if (layer != null)
             {
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 DrawTexture(texture, layerTexture, rect.x, rect.y);
             }
@@ -219,7 +218,7 @@ namespace WoW
             layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == target && t.Usage == 0);
             if (layer != null)
             {
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 DoubleTexture(texture, layerTexture, rect.x, rect.y);
             }
@@ -234,7 +233,7 @@ namespace WoW
             layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == target && t.Usage == 0);
             if (layer != null)
             {
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 OverlayTexture(texture, layerTexture, rect.x, rect.y);
             }
@@ -249,7 +248,7 @@ namespace WoW
             layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == target && t.Usage == 0);
             if (layer != null)
             {
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 MultiplyTexture(texture, layerTexture, rect.x, rect.y);
             }
@@ -262,7 +261,7 @@ namespace WoW
             {
                 return;
             }
-            Texture2D temp = Resources.Load<Texture2D>("Materials/Emission");
+            var temp = Resources.Load<Texture2D>("Materials/Emission");
             Emission = new Texture2D(temp.width, temp.height, TextureFormat.ARGB32, false);
             Emission.SetPixels32(temp.GetPixels32());
             Emission.Apply();
@@ -278,7 +277,7 @@ namespace WoW
             if (layer != null)
             {
                 InitEmissionTexture();
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 DrawTexture(Emission, layerTexture, rect.x, rect.y);
             }
@@ -296,7 +295,7 @@ namespace WoW
             if (layer != null)
             {
                 InitEmissionTexture();
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 DrawTexture(Emission, layerTexture, rect.x, rect.y);
             }
@@ -312,7 +311,7 @@ namespace WoW
             if (layer != null)
             {
                 InitEmissionTexture();
-                Texture2D layerTexture = Character.TextureFromBLP(layer.ID);
+                var layerTexture = Character.TextureFromBLP(layer.ID);
                 layerTexture = ScaleTexture(layerTexture, rect.width, rect.height);
                 DoubleTexture(Emission, layerTexture, rect.x, rect.y);
             }
@@ -327,7 +326,7 @@ namespace WoW
             layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == target);
             if (layer != null)
             {
-                Texture2D jewelry = Character.TextureFromBLP(layer.ID);
+                var jewelry = Character.TextureFromBLP(layer.ID);
                 jewelry = ScaleTexture(jewelry, rect.width, rect.height);
                 DrawTexture(texture, jewelry, rect.x, rect.y);
                 if (Emission != null)
@@ -350,8 +349,8 @@ namespace WoW
                 == null && Character.Items[(int)WoWHelper.SlotIndex.Tabard] == null)
             {
                 layer = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 14);
-                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.TorsoUpper);
-                Texture2D bra = Character.TextureFromBLP(layer.ID);
+                var rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.TorsoUpper);
+                var bra = Character.TextureFromBLP(layer.ID);
                 bra = ScaleTexture(bra, rect.width, rect.height);
                 DrawTexture(texture, bra, rect.x, rect.y);
                 if (Emission != null)
@@ -380,8 +379,8 @@ namespace WoW
                 {
                     return;
                 }
-                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.TorsoUpper);
-                Texture2D bra = Character.TextureFromBLP(layer.ID);
+                var rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.TorsoUpper);
+                var bra = Character.TextureFromBLP(layer.ID);
                 bra = ScaleTexture(bra, rect.width, rect.height);
                 DrawTexture(texture, bra, rect.x, rect.y);
                 if (Emission != null)
@@ -404,8 +403,8 @@ namespace WoW
                 == WoWHelper.ItemSlot.Robe) && Character.Items[(int)WoWHelper.SlotIndex.Legs] == null)
             {
                 layer = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 13);
-                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.LegUpper);
-                Texture2D underwear = Character.TextureFromBLP(layer.ID);
+                var rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.LegUpper);
+                var underwear = Character.TextureFromBLP(layer.ID);
                 underwear = ScaleTexture(underwear, rect.width, rect.height);
                 DrawTexture(texture, underwear, rect.x, rect.y);
                 if (Emission != null)
@@ -430,8 +429,8 @@ namespace WoW
             {
                 layer = Character.Options[index].Choices[Character.Customization[index]].Textures.
                     First(t => t.Target == 13 && t.Related == Character.Options[index2].Choices[Character.Customization[index2]].ID);
-                RectInt rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.LegUpper);
-                Texture2D underwear = Character.TextureFromBLP(layer.ID);
+                var rect = WoWHelper.ComponentRect(WoWHelper.ComponentSection.LegUpper);
+                var underwear = Character.TextureFromBLP(layer.ID);
                 underwear = ScaleTexture(underwear, rect.width, rect.height);
                 DrawTexture(texture, underwear, rect.x, rect.y);
                 if (Emission != null)
@@ -484,6 +483,7 @@ namespace WoW
             if (!shirtSleeves)
             {
                 TextureArmor(WoWHelper.SlotIndex.Wrist, texture);
+                TextureArmor(WoWHelper.SlotIndex.Hands, texture);
             }
             if (gloveSleeves)
             {
@@ -496,7 +496,7 @@ namespace WoW
         // Draw texture layer for armor slot
         private void TextureArmor(WoWHelper.SlotIndex slot, Texture2D texture, bool showFeet = false)
         {
-            ItemInstance item = Character.Items[(int)slot];
+            var item = Character.Items[(int)slot];
             if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
             {
                 return;
@@ -515,8 +515,8 @@ namespace WoW
                 file ??= component.Textures.FirstOrDefault(t => t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3)?.ID;
                 if (file != null)
                 {
-                    RectInt rect = WoWHelper.ComponentRect(component.ComponentSection);
-                    Texture2D layer = Character.TextureFromBLP(file.Value);
+                    var rect = WoWHelper.ComponentRect(component.ComponentSection);
+                    var layer = Character.TextureFromBLP(file.Value);
                     layer = ScaleTexture(layer, rect.width, rect.height);
                     DrawTexture(texture, layer, rect.x, rect.y);
                 }
@@ -526,20 +526,20 @@ namespace WoW
         // Check type of sleeves to decide order of texture layers
         private bool CheckSleeves(int slot)
         {
-            ItemInstance item = Character.Items[slot];
+            var item = Character.Items[slot];
             return item != null && item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0] != 0;
         }
 
         // Check if character wears a kilt
         private bool IsKilt(int slot)
         {
-            ItemInstance item = Character.Items[slot];
+            var item = Character.Items[slot];
             return item != null && item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[2] != 0;
         }
 
         private void BlackArmor(WoWHelper.SlotIndex slot, Texture2D texture, bool showFeet = false)
         {
-            ItemInstance item = Character.Items[(int)slot];
+            var item = Character.Items[(int)slot];
             if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
             {
                 return;
@@ -558,8 +558,8 @@ namespace WoW
                 file ??= component.Textures.FirstOrDefault(t => t.Gender == (Character.Gender ? 0 : 1) || t.Gender == 3)?.ID;
                 if (file != null)
                 {
-                    RectInt rect = WoWHelper.ComponentRect(component.ComponentSection);
-                    Texture2D layer = Character.TextureFromBLP(file.Value);
+                    var rect = WoWHelper.ComponentRect(component.ComponentSection);
+                    var layer = Character.TextureFromBLP(file.Value);
                     layer = ScaleTexture(layer, rect.width, rect.height);
                     BlackTexture(layer, layer);
                     layer.Apply();
@@ -569,10 +569,10 @@ namespace WoW
         }
 
         // Add geoset to rendered list
-        private void AddGeoset(List<int> activeGeosets, int type, int geoset, int modifier)
+        private void AddGeoset(HashSet<int> activeGeosets, int type, int geoset, int modifier)
         {
-            ItemInstance item = Character.Items[(int)WoWHelper.SlotIndex.Head];
-            activeGeosets.RemoveAll(x => x > Math.Clamp(type * 100 - 1, 0, 9999) && x < (type + 1) * 100);
+            var item = Character.Items[(int)WoWHelper.SlotIndex.Head];
+            activeGeosets.RemoveWhere(x => x > Math.Clamp(type * 100 - 1, 0, 9999) && x < (type + 1) * 100);
             if (item != null && item.Item.Appearances[item.Appearance].DisplayInfo?.HelmetGeosets[Character.Gender ? 0 : 1]
                 .FirstOrDefault(h => h.Race == Character.Race && h.Geoset == type) != null)
             {
@@ -585,37 +585,37 @@ namespace WoW
         }
 
         // Make sure head geoset is visible
-        protected void ChangeFace(List<int> activeGeosets)
+        protected void ChangeFace(HashSet<int> activeGeosets)
         {
             AddGeoset(activeGeosets, 32, 2, 1);
         }
 
         // Make sure eyes geosets are visible
-        protected void ChangeEyes(List<int> activeGeosets)
+        protected void ChangeEyes(HashSet<int> activeGeosets)
         {
             AddGeoset(activeGeosets, 33, 1, -1);
         }
 
         // Make sure ears geosets are visible
-        protected void ChangeEars(List<int> activeGeosets)
+        protected void ChangeEars(HashSet<int> activeGeosets)
         {
             AddGeoset(activeGeosets, 7, 2, 1);
         }
 
         // Make sure hand geosets are visible
-        protected void ChangeHands(List<int> activeGeosets)
+        protected void ChangeHands(HashSet<int> activeGeosets)
         {
             AddGeoset(activeGeosets, 23, 1, -1);
         }
 
         // Make sure underwear geoset is visible
-        protected void ChangeUnderwear(List<int> activeGeosets)
+        protected void ChangeUnderwear(HashSet<int> activeGeosets)
         {
             AddGeoset(activeGeosets, 14, 1, -1);
         }
 
         // Make sure underwear geoset is visible for demon hunter
-        protected void ChangeDHUnderwear(List<int> activeGeosets)
+        protected void ChangeDHUnderwear(HashSet<int> activeGeosets)
         {
             if (Character.Class == WoWHelper.Class.DemonHunter)
             {
@@ -628,15 +628,15 @@ namespace WoW
         }
 
         // Change goesets in according to eye color and make sure left over geosets are removed
-        protected void ChangeEyeColor(List<int> activeGeosets)
+        protected void ChangeEyeColor(HashSet<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
-            activeGeosets.RemoveAll(x => x > 5099 && x < 5200);
+            activeGeosets.RemoveWhere(x => x > 1699 && x < 1800);
+            activeGeosets.RemoveWhere(x => x > 5099 && x < 5200);
             ChangeGeosetOption(activeGeosets, "Eye Color");
         }
 
         // Make sure wings geoset is visible
-        protected void ChangeWings(List<int> activeGeosets)
+        protected void ChangeWings(HashSet<int> activeGeosets)
         {
             AddGeoset(activeGeosets, 46, 1, -1);
         }
@@ -685,7 +685,7 @@ namespace WoW
         }
 
         // Activate and deactivate dropdown options based on requirements
-        protected void ActivateRelatedGeosetOptions(List<int> activeGeosets, string name, string name2, Dictionary<int, int[]> reqRelations)
+        protected void ActivateRelatedGeosetOptions(HashSet<int> activeGeosets, string name, string name2, Dictionary<int, int[]> reqRelations)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
@@ -701,7 +701,7 @@ namespace WoW
         }
 
         // Make sure dropdown only contains options that match given requirements
-        protected void ChangeRelatedGeosetOptions(List<int> activeGeosets, string name, string name2, Dictionary<int, int[]> reqRelations)
+        protected void ChangeRelatedGeosetOptions(HashSet<int> activeGeosets, string name, string name2, Dictionary<int, int[]> reqRelations)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
@@ -723,7 +723,7 @@ namespace WoW
         }
 
         // Change visible geosets for given option
-        public void ChangeGeosetOption(List<int> activeGeosets, string name)
+        public void ChangeGeosetOption(HashSet<int> activeGeosets, string name)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             var geosets = Character.Options[index].Choices[Character.Customization[index]].Geosets.Where(g => g.Related == 0);
@@ -734,7 +734,7 @@ namespace WoW
         }
 
         // Change visible geosets for given option
-        protected void ChangeGeosetOption(List<int> activeGeosets, string name, string name2)
+        protected void ChangeGeosetOption(HashSet<int> activeGeosets, string name, string name2)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
@@ -747,7 +747,7 @@ namespace WoW
         }
 
         // Change visible geosets for given option on skinned model
-        protected void ChangeSkinnedGeosetOption(List<int> activeGeosets, string name)
+        protected void ChangeSkinnedGeosetOption(HashSet<int> activeGeosets, string name)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             var geosets = Character.Options[index].Choices[Character.Customization[index]].SkinnedGeosets.Where(g => g.Related == 0);
@@ -758,7 +758,7 @@ namespace WoW
         }
 
         // Change visible geosets for given option on skinned model
-        protected void ChangeSkinnedGeosetOption(List<int> activeGeosets, string name, string name2)
+        protected void ChangeSkinnedGeosetOption(HashSet<int> activeGeosets, string name, string name2)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
@@ -771,7 +771,7 @@ namespace WoW
         }
 
         // Make sure dropdown only contains options that match given requirements
-        protected void ChangeRelatedSkinnedGeosetOption(List<int> activeGeosets, string name, string name2, Dictionary<int, int[]> reqRelations)
+        protected void ChangeRelatedSkinnedGeosetOption(HashSet<int> activeGeosets, string name, string name2, Dictionary<int, int[]> reqRelations)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
@@ -829,7 +829,7 @@ namespace WoW
                 }
                 else
                 {
-                    Texture2D texture = Character.TextureFromBLP(file);
+                    var texture = Character.TextureFromBLP(file);
                     textures[i] = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
                     textures[i].SetPixels32(texture.GetPixels32());
                     textures[i].wrapModeU = (Model.Textures[i].Flags & 1) != 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
@@ -838,6 +838,7 @@ namespace WoW
                     switch (layered)
                     {
                         case WoWHelper.LayeredTexture.Skin:
+                            textures[i] = ScaleTexture(textures[i], 1024, 512);
                             LayeredTexture(textures[i]);
                             break;
                         case WoWHelper.LayeredTexture.Eye:
@@ -861,10 +862,10 @@ namespace WoW
         protected void EyeTexture(Texture2D texture)
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Eyesight" && o.Model == Character.ModelID);
-            CustomizationTexture layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == 44);
+            var layer = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == 44);
             if (layer != null)
             {
-                Texture2D eyesight = Character.TextureFromBLP(layer.ID);
+                var eyesight = Character.TextureFromBLP(layer.ID);
                 DrawTexture(texture, eyesight, 0, 0);
             }
         }
@@ -887,8 +888,8 @@ namespace WoW
                     layered = WoWHelper.LayeredTexture.Skin;
                     break;
                 case 2:
-                    ItemInstance item = Character.Items[(int)WoWHelper.SlotIndex.Back];
-                    file = item != null && item.Item.Appearances[item.Appearance].DisplayInfo.Materials[0] > 0
+                    var item = Character.Items[(int)WoWHelper.SlotIndex.Back];
+                    file = item != null && item.Item.Appearances[item.Appearance].DisplayInfo.Textures[0].Length > 0
                         ? item.Item.Appearances[item.Appearance].DisplayInfo.Textures[0][0].ID : -1;
                     break;
                 case 6:
@@ -1012,7 +1013,7 @@ namespace WoW
         }
 
         // Change geosets according to chosen character customization
-        public abstract void ChangeGeosets(List<int> activeGeosets);
+        public abstract void ChangeGeosets(HashSet<int> activeGeosets);
 
         // Generate skin texture from many layers
         public abstract void LayeredTexture(Texture2D texture);

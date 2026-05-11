@@ -256,7 +256,7 @@ public class ScreenInput : MonoBehaviour
         // Select next ui element with Tab key
         if (Input.GetKeyUp(KeyCode.Tab))
         {
-            Selectable next = EventSystem.current.currentSelectedGameObject.GetComponent<Selectable>().FindSelectableOnDown();
+            var next = EventSystem.current.currentSelectedGameObject.GetComponent<Selectable>().FindSelectableOnDown();
             if (next != null)
             {
                 EventSystem.current.SetSelectedGameObject(next.gameObject);
@@ -289,17 +289,17 @@ public class ScreenInput : MonoBehaviour
     {
         try
         {
-            using HttpClient client = new();
+            using HttpClient client = new HttpClient();
             using HttpRequestMessage request = new(new HttpMethod("POST"), "https://us.battle.net/oauth/token");
-            TextAsset api = Resources.Load<TextAsset>("API");
+            var api = Resources.Load<TextAsset>("API");
             string auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(api.text));
             request.Headers.TryAddWithoutValidation("Authorization", $"Basic {auth}");
             request.Content = new StringContent("grant_type=client_credentials", Encoding.UTF8, "application/x-www-form-urlencoded");
-            HttpResponseMessage response = client.SendAsync(request).Result;
+            var response = client.SendAsync(request).Result;
             string resp = response.Content.ReadAsStringAsync().Result;
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                JObject access = JObject.Parse(resp);
+                var access = JObject.Parse(resp);
                 return access.Value<string>("access_token");
             }
             else
@@ -373,7 +373,7 @@ public class ScreenInput : MonoBehaviour
         if (translate && Input.GetMouseButton(1) && !FileBrowser.IsOpen)
         {
             mainCamera.transform.Translate(-Input.GetAxis("Mouse X") / 4f, -Input.GetAxis("Mouse Y") / 4, 0f);
-            Vector3 value = mainCamera.transform.position;
+            var value = mainCamera.transform.position;
             value.x = Mathf.Clamp(value.x, -1.5f, 1.5f);
             value.y = Mathf.Clamp(value.y, -0.5f, 1.5f);
             mainCamera.transform.position = value;
@@ -396,7 +396,7 @@ public class ScreenInput : MonoBehaviour
         if (zoom && !FileBrowser.IsOpen)
         {
             mainCamera.transform.Translate(0f, 0f, Input.GetAxis("Mouse ScrollWheel"));
-            Vector3 value = mainCamera.transform.position;
+            var value = mainCamera.transform.position;
             value.z = Mathf.Clamp(value.z, -3f, -0.25f);
             mainCamera.transform.position = value;
         }
@@ -415,10 +415,10 @@ public class ScreenInput : MonoBehaviour
         for (int i = 0; i < character.Categories.Length; i++)
         {
             uiObject = Instantiate(customizationCategory, customizationPanel.GetComponentInChildren<HorizontalLayoutGroup>().transform);
-            Button button = uiObject.GetComponent<Button>();
+            var button = uiObject.GetComponent<Button>();
             int customizationValue = i;
             button.onClick.AddListener(delegate { Category(customizationValue); });
-            EventTrigger trigger = uiObject.GetComponent<EventTrigger>();
+            var trigger = uiObject.GetComponent<EventTrigger>();
             trigger.triggers[0].callback.AddListener(delegate { PointerEnter(); });
             trigger.triggers[1].callback.AddListener(delegate { PointerExit(); });
             customizationCategories.Add(button);
@@ -440,7 +440,7 @@ public class ScreenInput : MonoBehaviour
             if (character.Options[i].Type == WoWHelper.CustomizationType.Dropdown)
             {
                 uiObject = Instantiate(customizationDropdown, customizationPanel.GetComponentInChildren<VerticalLayoutGroup>().transform);
-                Button[] buttons = uiObject.GetComponentsInChildren<Button>();
+                var buttons = uiObject.GetComponentsInChildren<Button>();
                 int customizationValue = i;
                 foreach (var button in buttons)
                 {
@@ -453,18 +453,18 @@ public class ScreenInput : MonoBehaviour
                         button.onClick.AddListener(delegate { NextButton(customizationValue); });
                     }
                 }
-                Dropdown dropdown = uiObject.GetComponentInChildren<Dropdown>();
+                var dropdown = uiObject.GetComponentInChildren<Dropdown>();
                 dropdown.onValueChanged.AddListener(delegate { Dropdown(customizationValue); });
             }
             else
             {
                 uiObject = Instantiate(customizationToggle, customizationPanel.GetComponentInChildren<VerticalLayoutGroup>().transform);
                 int customizationValue = i;
-                Toggle toggle = uiObject.GetComponentInChildren<Toggle>();
+                var toggle = uiObject.GetComponentInChildren<Toggle>();
                 toggle.onValueChanged.AddListener(delegate { Toggle(customizationValue); });
                 toggle.isOn = false;
             }
-            EventTrigger trigger = uiObject.GetComponent<EventTrigger>();
+            var trigger = uiObject.GetComponent<EventTrigger>();
             trigger.triggers[0].callback.AddListener(delegate { PointerEnter(); });
             trigger.triggers[1].callback.AddListener(delegate { PointerExit(); });
             uiObject.GetComponentInChildren<Text>().text = character.Options[i].Name;
@@ -475,7 +475,7 @@ public class ScreenInput : MonoBehaviour
     // Load customization choices and fill the panel with them
     private void GetCustomizationChoices()
     {
-        Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color1");
+        var sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color1");
         character.Customization = new int[character.Options.Length];
         for (int i = 0; i < character.Options.Length; i++)
         {
@@ -483,10 +483,10 @@ public class ScreenInput : MonoBehaviour
             character.Options[i].Choices = character.Options[i].AllChoices;
             if (character.Options[i].Type == WoWHelper.CustomizationType.Dropdown)
             {
-                Dropdown dropdown = customizationOptions[i].GetComponentInChildren<Dropdown>();
+                var dropdown = customizationOptions[i].GetComponentInChildren<Dropdown>();
                 dropdown.options.Clear();
                 int j = 0;
-                foreach(var choice in character.Options[i].Choices)
+                foreach (var choice in character.Options[i].Choices)
                 {
                     string name;
                     if (choice.Value.Color1 != Color.black)
@@ -563,7 +563,7 @@ public class ScreenInput : MonoBehaviour
         items = DB.GetItems(connection, condition);
         DB.GetAppearances(connection, items);
         connection.Close();
-        Toggle none = panel.GetComponentInChildren<Toggle>();
+        var none = panel.GetComponentInChildren<Toggle>();
         if (panel == leftPanel)
         {
             LoadItems(leftScrollItems);
@@ -579,7 +579,7 @@ public class ScreenInput : MonoBehaviour
     private void LoadItems(ScrollItem[] scrollItems)
     {
         int i = 0;
-        foreach(var item in items)
+        foreach (var item in items)
         {
             if (i == maxScrollItems)
             {
@@ -642,7 +642,7 @@ public class ScreenInput : MonoBehaviour
 #else
             BLP blp = new(casc.OpenFile(file));
 #endif
-            Texture2D texture = blp.GetImage();
+            var texture = blp.GetImage();
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
         }
         catch
@@ -653,7 +653,7 @@ public class ScreenInput : MonoBehaviour
 #else
             BLP blp = new(casc.OpenFile(134400));
 #endif
-            Texture2D texture = blp.GetImage();
+            var texture = blp.GetImage();
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
         }
     }
@@ -661,7 +661,7 @@ public class ScreenInput : MonoBehaviour
     // Change colors for ui buttons for hero classes
     private void ChangeButtonColors()
     {
-        Color32 color = character.Class switch
+        var color = character.Class switch
         {
             WoWHelper.Class.DeathKnight => new Color32(0, 128, 255, 255),
             _ => new Color32(192, 0, 0, 255),
@@ -686,9 +686,9 @@ public class ScreenInput : MonoBehaviour
     {
         if (selected != null)
         {
-            GameObject button = selected.transform.parent.parent.gameObject;
-            GameObject panel = button.transform.parent.gameObject;
-            Image[] images = panel.GetComponentsInChildren<Image>(true);
+            var button = selected.transform.parent.parent.gameObject;
+            var panel = button.transform.parent.gameObject;
+            var images = panel.GetComponentsInChildren<Image>(true);
             foreach (var image in images)
             {
                 if (image.gameObject.name == "glow")
@@ -715,15 +715,15 @@ public class ScreenInput : MonoBehaviour
         }
         formButtons.Clear();
         character.CreatureForms = DB.GetCreatureForms(connection, character.Race, character.Gender, (int)character.Class);
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
+        var sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
         for (int i = 0; i < character.CreatureForms.Length; i++)
         {
             int formIndex = i + 1;
-            GameObject uiElement = Instantiate(formButton, formPanel.transform);
+            var uiElement = Instantiate(formButton, formPanel.transform);
             uiElement.transform.SetAsFirstSibling();
-            Button button = uiElement.GetComponentInChildren<Button>();
+            var button = uiElement.GetComponentInChildren<Button>();
             button.onClick.AddListener(delegate { FormButton(formIndex); });
-            Sprite sprite = sprites.Single(s => s.name == character.CreatureForms[i].Icon);
+            var sprite = sprites.Single(s => s.name == character.CreatureForms[i].Icon);
             button.image.sprite = sprite;
             button.transform.localScale = new Vector3(character.CreatureForms[i].Flip ? -1f : 1f, 1f, 1f);
             formButtons.Add(button);
@@ -734,7 +734,7 @@ public class ScreenInput : MonoBehaviour
     // Reset round buttons borders
     private void ResetBorder()
     {
-        Image[] images = classPanel.GetComponentsInChildren<Image>(true);
+        var images = classPanel.GetComponentsInChildren<Image>(true);
         foreach (var image in images)
         {
             if (image.gameObject.name == "glow")
@@ -756,8 +756,8 @@ public class ScreenInput : MonoBehaviour
     {
         if (selected != null)
         {
-            GameObject button = selected.transform.parent.parent.gameObject;
-            Image[] images = alliancePanel.GetComponentsInChildren<Image>(true);
+            var button = selected.transform.parent.parent.gameObject;
+            var images = alliancePanel.GetComponentsInChildren<Image>(true);
             foreach (var image in images)
             {
                 if (image.gameObject.name == "glow")
@@ -790,8 +790,8 @@ public class ScreenInput : MonoBehaviour
     // Swap race buttons icons depending on the gender
     private void SwapIcons(bool gender)
     {
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
-        Button[] buttons = alliancePanel.GetComponentsInChildren<Button>();
+        var sprites = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
+        var buttons = alliancePanel.GetComponentsInChildren<Button>();
         string icon;
         Sprite sprite;
         foreach (var button in buttons)
@@ -872,7 +872,7 @@ public class ScreenInput : MonoBehaviour
         {
             extraCollection = null;
         }
-        WoWHelper.Class c = character.Class;
+        var c = character.Class;
         character.Class = WoWHelper.Class.Warrior;
         SetupFormPanel();
         SetupCustomizationPanel();
@@ -1033,9 +1033,9 @@ public class ScreenInput : MonoBehaviour
     {
         string icon;
         Sprite sprite;
-        Sprite[] sprites1 = Resources.LoadAll<Sprite>("Icons/charactercreate");
-        Sprite[] sprites2 = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
-        Sprite[] sprites3 = Resources.LoadAll<Sprite>("Icons/dragonridingcustomization");
+        var sprites1 = Resources.LoadAll<Sprite>("Icons/charactercreate");
+        var sprites2 = Resources.LoadAll<Sprite>("Icons/charactercreateicons");
+        var sprites3 = Resources.LoadAll<Sprite>("Icons/dragonridingcustomization");
         for (int i = 0; i < customizationCategories.Count; i++)
         {
             icon = character.Categories[i].Icon.ToString();
@@ -1072,13 +1072,13 @@ public class ScreenInput : MonoBehaviour
     // Handle dropdown value change
     public void Dropdown(int index)
     {
-        CustomDropdown dropdown = customizationOptions[index].GetComponentInChildren<CustomDropdown>();
+        var dropdown = customizationOptions[index].GetComponentInChildren<CustomDropdown>();
         dropdown.RefreshShownValue();
         character.Customization[index] = dropdown.GetValue();
         string str = dropdown.captionText.text;
         str = str[(str.IndexOf(':') + 1)..];
         dropdown.captionText.text = str;
-        Text text = dropdown.GetComponentInChildren<Text>();
+        var text = dropdown.GetComponentInChildren<Text>();
         TextGenerationSettings settings = new()
         {
             textAnchor = text.alignment,
@@ -1102,7 +1102,7 @@ public class ScreenInput : MonoBehaviour
     // Handle toggle value change
     public void Toggle(int index)
     {
-        Toggle toggle = customizationOptions[index].GetComponentInChildren<Toggle>();
+        var toggle = customizationOptions[index].GetComponentInChildren<Toggle>();
         character.Customization[index] = toggle.isOn ? character.Options[index].Choices.Last().Key :
             character.Options[index].Choices.First().Key;
         character.Change = true;
@@ -1127,7 +1127,7 @@ public class ScreenInput : MonoBehaviour
     // Select previous customization option in Dropdown
     public void PrevButton(int index)
     {
-        Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
+        var dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
         if (dropdown.value == 0)
         {
             dropdown.value = dropdown.value;
@@ -1151,7 +1151,7 @@ public class ScreenInput : MonoBehaviour
     // Select next customization option in Dropdown
     public void NextButton(int index)
     {
-        Dropdown dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
+        var dropdown = customizationOptions[index].GetComponentInChildren<Dropdown>();
         if (dropdown.value == dropdown.options.Count - 1)
         {
             dropdown.value = dropdown.value;
@@ -1203,7 +1203,7 @@ public class ScreenInput : MonoBehaviour
         translate = false;
         bool none = true;
         int slot = (int)WoWHelper.MapSlots(slotButton.name);
-        GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
+        var panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
         ScrollItem scrollItem;
         for (int i = 0; i < maxScrollItems; i++)
         {
@@ -1225,6 +1225,7 @@ public class ScreenInput : MonoBehaviour
                     DB.GetDisplayInfo(connection, itemAppearance);
                     itemAppearance.DisplayInfo.ParticleColors = DB.GetParticleColors(connection, itemAppearance.DisplayInfo.ParticleColor);
                     DB.GetItemModels(connection, itemAppearance.DisplayInfo);
+                    DB.GetItemMaterials(connection, itemAppearance.DisplayInfo);
                     DB.GetItemTextures(connection, itemAppearance.DisplayInfo);
                     DB.GetHelmetGeosets(connection, itemAppearance.DisplayInfo);
                     DB.GetComponents(connection, itemAppearance);
@@ -1261,7 +1262,7 @@ public class ScreenInput : MonoBehaviour
     {
         rotate = false;
         translate = false;
-        GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
+        var panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
         panel.GetComponentInChildren<InputField>().text = "";
         EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject.SetActive(false);
         items.Clear();
@@ -1271,7 +1272,7 @@ public class ScreenInput : MonoBehaviour
     // Filter displayed items using filter box
     public void Filter(string text)
     {
-        GameObject panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
+        var panel = EventSystem.current.GetComponent<EventSystem>().currentSelectedGameObject.transform.parent.gameObject;
         if (text == "")
         {
             if (panel == leftPanel)
@@ -1294,7 +1295,7 @@ public class ScreenInput : MonoBehaviour
                 FilterItems(rightScrollItems, text);
             }
         }
-        Toggle none = panel.GetComponentInChildren<Toggle>();
+        var none = panel.GetComponentInChildren<Toggle>();
         if (none != null)
         {
             none.isOn = true;
@@ -1409,10 +1410,10 @@ public class ScreenInput : MonoBehaviour
     {
         importPanel.SetActive(true);
 #if UNITY_EDITOR
-        InputField[] boxes = importPanel.GetComponentsInChildren<InputField>();
+        var boxes = importPanel.GetComponentsInChildren<InputField>();
         boxes[0].text = string.IsNullOrEmpty(boxes[0].text) ? "Cedrad" : boxes[0].text;
         boxes[1].text = string.IsNullOrEmpty(boxes[1].text) ? "The Maelstrom" : boxes[1].text;
-        Dropdown dropdown = importPanel.GetComponentInChildren<Dropdown>();
+        var dropdown = importPanel.GetComponentInChildren<Dropdown>();
         dropdown.value = 1;
 #endif
     }
@@ -1420,12 +1421,12 @@ public class ScreenInput : MonoBehaviour
     //Import character from armory when pressed OK button
     public void OKImportButton()
     {
-        InputField[] boxes = importPanel.GetComponentsInChildren<InputField>();
+        var boxes = importPanel.GetComponentsInChildren<InputField>();
         string name = boxes[0].text.ToLower();
         string realm = boxes[1].text.ToLower().Replace(' ', '-');
-        Dropdown dropdown = importPanel.GetComponentInChildren<Dropdown>();
+        var dropdown = importPanel.GetComponentInChildren<Dropdown>();
         string region = WoWHelper.WoWRegion(dropdown.value);
-        HttpResponseMessage response = FetchCharacter(region, realm, name);
+        var response = FetchCharacter(region, realm, name);
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
             token = GetToken();
@@ -1442,7 +1443,7 @@ public class ScreenInput : MonoBehaviour
             {
                 Exit();
             }
-            JObject jCharacter = JObject.Parse(resp);
+            var jCharacter = JObject.Parse(resp);
             int race = jCharacter["playable_race"].Value<int>("id");
             bool gender = jCharacter["gender"].Value<string>("name") == "Male";
             int id = jCharacter["playable_class"].Value<int>("id");
@@ -1451,7 +1452,7 @@ public class ScreenInput : MonoBehaviour
             {
                 race = 24;
             }
-            Button button = (faction == "Alliance" ? alliancePanel.transform.Find(races[race].ToLower()) :
+            var button = (faction == "Alliance" ? alliancePanel.transform.Find(races[race].ToLower()) :
                 hordePanel.transform.Find(races[race].ToLower())).GetComponentInChildren<Button>();
             EventSystem.current.SetSelectedGameObject(GameObject.Find(gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
             GenderButton(gender);
@@ -1459,8 +1460,8 @@ public class ScreenInput : MonoBehaviour
             RaceButton(race);
             EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[id].ToLower()).GetComponentInChildren<Button>().gameObject);
             ClassButton(id);
-            List<JToken> list = jCharacter["customizations"].Children().ToList();
-            foreach (JToken custom in list)
+            var list = jCharacter["customizations"].Children().ToList();
+            foreach (var custom in list)
             {
                 int index = Array.FindIndex(character.Options, o => o.ID == custom["option"].Value<int>("id"));
                 if (index == -1)
@@ -1543,6 +1544,7 @@ public class ScreenInput : MonoBehaviour
                 appearance.Value.DisplayInfo.ParticleColors = DB.GetParticleColors(connection,
                     appearance.Value.DisplayInfo.ParticleColor);
                 DB.GetItemModels(connection, appearance.Value.DisplayInfo);
+                DB.GetItemMaterials(connection, appearance.Value.DisplayInfo);
                 DB.GetItemTextures(connection, appearance.Value.DisplayInfo);
                 DB.GetHelmetGeosets(connection, appearance.Value.DisplayInfo);
                 DB.GetComponents(connection, appearance.Value);

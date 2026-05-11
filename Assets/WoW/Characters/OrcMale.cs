@@ -32,7 +32,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
             ChangeEyes(activeGeosets);
@@ -51,14 +51,19 @@ namespace WoW.Characters
         private void ChangeUpright()
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == "Upright");
+            bool changed;
             if (Character.Customization[index] == Character.Options[index].Choices.First().Key)
             {
-                Character.ActivateMainMesh();
+                changed = Character.ActivateMainMesh();
             }
             else
             {
-                Character.ActivateExtraMesh();
-            }    
+                changed = Character.ActivateExtraMesh();
+            }
+            if (changed)
+            {
+                Character.ReloadAllItems();
+            }
         }
 
         // Generate skin texture from many layers
@@ -67,8 +72,8 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
-            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
             DrawLayer(texture, "Face", "Skin Color", face);
             MultiplyLayer(texture, "Tattoo", 16, full);
             DrawLayer(texture, "War Paint Color", "War Paint", full);

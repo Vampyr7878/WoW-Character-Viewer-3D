@@ -21,10 +21,10 @@ public class CustomDropdown : Dropdown
     // Make disabled options half transparent
     protected override DropdownItem CreateItem(DropdownItem itemTemplate)
     {
-        DropdownItem item = base.CreateItem(itemTemplate);
-        Image[] images = item.GetComponentsInChildren<Image>();
+        var item = base.CreateItem(itemTemplate);
+        var images = item.GetComponentsInChildren<Image>();
         item.toggle.interactable = ((CustomOptionData)options[index]).Interactable;
-        Color color = item.text.color;
+        var color = item.text.color;
         color.a = ((CustomOptionData)options[index]).Interactable ? 1f : 0.5f;
         item.text.color = color;
         if (((CustomOptionData)options[index]).Color1 == Color.black)

@@ -51,7 +51,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             Character.racial.ActiveGeosets.Clear();
             ChangeFace(activeGeosets);
@@ -69,10 +69,10 @@ namespace WoW.Characters
         }
 
         // Change goesets in according to eye color and make sure left over geosets are removed
-        private new void ChangeEyeColor(List<int> activeGeosets)
+        private new void ChangeEyeColor(HashSet<int> activeGeosets)
         {
-            activeGeosets.RemoveAll(x => x > 1699 && x < 1800);
-            activeGeosets.RemoveAll(x => x > 5099 && x < 5200);
+            activeGeosets.RemoveWhere(x => x > 1699 && x < 1800);
+            activeGeosets.RemoveWhere(x => x > 5099 && x < 5200);
             ActivateRelatedGeosetOptions(activeGeosets, "Skin Color", "Eye Color", skinColorEyes);
             ChangeGeosetOption(activeGeosets, "Eye Color");
         }
@@ -84,8 +84,8 @@ namespace WoW.Characters
             textures.Clear();
 #endif
             Emission = null;
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
-            RectInt body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
             DrawLayer(texture, "Face", "Skin Color", face);
             DrawLayer(texture, "Tattoo Color", "Tattoo", body);
             DrawEmission("Tattoo Color", "Tattoo", body);

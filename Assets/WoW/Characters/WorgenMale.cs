@@ -55,7 +55,7 @@ namespace WoW.Characters
         }
 
         // Change geosets according to chosen character customization
-        public override void ChangeGeosets(List<int> activeGeosets)
+        public override void ChangeGeosets(HashSet<int> activeGeosets)
         {
             HideOtherFormsOptions();
             switch (Character.Form)
@@ -70,7 +70,7 @@ namespace WoW.Characters
         }
 
         // Change Worgen form geosets according to chosen character customization
-        private void WorgenGeosets(List<int> activeGeosets)
+        private void WorgenGeosets(HashSet<int> activeGeosets)
         {
             ChangeFace(activeGeosets);
             ChangeEyes(activeGeosets);
@@ -82,7 +82,7 @@ namespace WoW.Characters
         }
 
         // Change Human form geosets according to chosen character customization
-        private void HumanGeosets(List<int> activeGeosets)
+        private void HumanGeosets(HashSet<int> activeGeosets)
         {
             ChangeEyes(activeGeosets);
             ChangeEars(activeGeosets);
@@ -139,7 +139,7 @@ namespace WoW.Characters
         // Generate Worgen form skin texture from many layers
         private void WorgenTextures(Texture2D texture)
         {
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
             DrawLayer(texture, "Face", "Fur Color", face);
             DrawUnderwear(texture, "Fur Color");
             DrawLayer(texture, "Eyesight", "Eye Color", face);
@@ -149,8 +149,8 @@ namespace WoW.Characters
         // Generate Human form skin texture from many layers
         private void HumanTextures(Texture2D texture)
         {
-            RectInt face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
-            RectInt full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
+            var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
             DrawLayer(texture, "Face", "Skin Color", face);
             OverlayLayer(texture, "Skin Color", 30, full);
             DrawUnderwear(texture);

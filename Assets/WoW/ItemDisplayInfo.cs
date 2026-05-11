@@ -4,6 +4,8 @@ namespace Assets.WoW
 {
     public class ItemDisplayInfo
     {
+        // DisplayInfo ID
+        public int ID { get; private set; }
         // Item geosets to be enabled
         public int ItemGeoset { get; private set; }
         // Item particle color ID
@@ -12,8 +14,6 @@ namespace Assets.WoW
         public int Flags { get; private set; }
         // Item models
         public int[] ModelID { get; private set; }
-        // Item model textures
-        public int[] Materials { get; private set; }
         // Item geosets
         public int[] Geosets { get; private set; }
         // Item skinned geosets
@@ -24,6 +24,8 @@ namespace Assets.WoW
         public ParticleColor[] ParticleColors { get; set; }
         // Sets of item models
         public ItemModel[][] Models { get; set; }
+        // Item model materials
+        public ItemMaterial[] Materials { get;  set; }
         // Sets of item textures for each model
         public ItemTexture[][] Textures { get; set; }
         // Item helmet geoset data
@@ -31,16 +33,16 @@ namespace Assets.WoW
         // Item components
         public ItemComponent[] Components { get; set; }
 
-        public ItemDisplayInfo(int itemGeoset, int particleColor, int flags, int[] models,
-            int[] materials, int[] geosets, int[] skinnedGeosets, int[] helmetGeosetsID)
+        public ItemDisplayInfo(int id, int itemGeoset, int particleColor, int flags,
+            int[] models, int[] geosets, int[] skinnedGeosets, int[] helmetGeosetsID)
         {
+            ID = id;
             ItemGeoset = itemGeoset;
             ParticleColor = particleColor;
             Flags = flags;
             ModelID = models;
             Models = new ItemModel[models.Length][];
-            Materials = materials;
-            Textures = new ItemTexture[materials.Length][];
+            Textures = new ItemTexture[models.Length][];
             Geosets = geosets;
             SkinnedGeosets = skinnedGeosets;
             HelmetGeosetsID = helmetGeosetsID;

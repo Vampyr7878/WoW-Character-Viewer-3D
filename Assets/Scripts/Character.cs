@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using WoW;
@@ -48,8 +48,10 @@ public class Character : ModelRenderer
     public List<Toggle> CustomizationToggles { get; set; }
     // Buttons containing customization categories
     public List<Button> CustomizationCategories { get; set; }
-    //Equipped items
+    // Equipped items
     public ItemInstance[] Items { get; set; }
+    // Collections for each item slot
+    public Collection[] Collections { get; set; }
     // Path from where the model is loaded
     public string RacePath { get; set; }
     // Extra path from where the model is loaded
@@ -83,8 +85,8 @@ public class Character : ModelRenderer
     {
         // Initialize
         Items = new ItemInstance[14];
+        Collections = new Collection[14];
         modelsPath = @"character\";
-        converter = new System.Drawing.ImageConverter();
         CustomizationDropdowns = new List<CustomDropdown>();
         CustomizationToggles = new List<Toggle>();
         CustomizationCategories = new List<Button>();
@@ -104,7 +106,6 @@ public class Character : ModelRenderer
                 {
                     Resources.UnloadUnusedAssets();
                     GC.Collect();
-                    // CheckHair();
                     if (mesh.activeSelf)
                     {
                         helper.ChangeGeosets(activeGeosets);
@@ -138,10 +139,6 @@ public class Character : ModelRenderer
                     racial.Change = true;
                     armor.Change = true;
                     extraRacial.Change = true;
-                    // foreach (Collection collection in collections)
-                    // {
-                    //     collection.Change = true;
-                    // }
                 }
                 catch (Exception e)
                 {
@@ -179,7 +176,7 @@ public class Character : ModelRenderer
     public void ActivateRelatedChoices(int index, int index2)
     {
         int firstID = Options[index].Choices[Customization[index]].ID;
-        List<Dropdown.OptionData> options = CustomizationDropdowns[index2].options;
+        var options = CustomizationDropdowns[index2].options;
         for (int i = 0; i < CustomizationDropdowns[index2].options.Count; i++)
         {
             if (Options[index2].Choices[((CustomOptionData)options[i]).ID].Textures.FirstOrDefault(t => t.Related == firstID) == null)
@@ -196,7 +193,7 @@ public class Character : ModelRenderer
     // Mark dropdown options active/inactive depending on if they are available based on requirements
     public void ActivateUsingRequirmenets(int index, int[] requirements)
     {
-        List<Dropdown.OptionData> options = CustomizationDropdowns[index].options;
+        var options = CustomizationDropdowns[index].options;
         for (int i = 0; i < CustomizationDropdowns[index].options.Count; i++)
         {
             if (requirements.Contains(Options[index].Choices[((CustomOptionData)options[i]).ID].Requirement))
@@ -213,7 +210,7 @@ public class Character : ModelRenderer
     // Mark dropdown options active/inactive depending on if they are on the list
     public void ActivateUsingIds(int index, int[] list)
     {
-        List<Dropdown.OptionData> options = CustomizationDropdowns[index].options;
+        var options = CustomizationDropdowns[index].options;
         for (int i = 0; i < CustomizationDropdowns[index].options.Count; i++)
         {
             if (list.Contains(((CustomOptionData)options[i]).ID))
@@ -237,7 +234,7 @@ public class Character : ModelRenderer
             CustomizationToggles[index].isOn = on && Options[index].Choices.Count == 2;
             return;
         }
-        Sprite sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color1");
+        var sprite = Resources.LoadAll<Sprite>("Icons/charactercreate").Single(s => s.name == "color1");
         int value = CustomizationDropdowns[index].GetValue(), j = 0;
         CustomizationDropdowns[index].options.Clear();
         foreach (var choice in Options[index].Choices)
@@ -271,7 +268,7 @@ public class Character : ModelRenderer
     {
         Form = form;
         helper.ChangeForm();
-        foreach(var item in Items)
+        foreach (var item in Items)
         {
             if (item != null)
             {
@@ -283,7 +280,7 @@ public class Character : ModelRenderer
     // Set material with proper shader
     protected override void SetMaterial(SkinnedMeshRenderer renderer, int i)
     {
-        if (Race == WoWHelper.Race.Goblin && i == 1)
+        if (Race == WoWHelper.Race.Goblin && Model.Skin.Textures[i].Id == 1)
         {
             renderer.materials[i] = new Material(hiddenMaterial.shader);
             renderer.materials[i].shader = hiddenMaterial.shader;
@@ -291,7 +288,7 @@ public class Character : ModelRenderer
         }
         else if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            Material material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            var material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
             if (material == null)
             {
                 Debug.LogError(Model.Skin.Textures[i].Shader);
@@ -317,7 +314,6 @@ public class Character : ModelRenderer
         EquipRightShoulder();
         EquipLeftShoulder();
         EquipBack();
-        EquipLegs();
         EquipChest();
         EquipTabard();
         EquipHands();
@@ -330,41 +326,37 @@ public class Character : ModelRenderer
     // Load head slot item models and geosets
     private void EquipHead()
     {
-        ItemObject helm = GameObject.Find("helm").GetComponent<ItemObject>();
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Head];
+        var helm = GameObject.Find("helm").GetComponent<ItemObject>();
+        var item = Items[(int)WoWHelper.SlotIndex.Head];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Head];
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
             helm.UnloadModel();
-            //collections[0].UnloadModel();
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Head] = null;
             return;
         }
         if (item.Changed)
         {
+            List<int> geosets = new() { 2701 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0] };
             item.Changed = false;
             helm.UnloadModel();
-            LoadItemModel(item, helm, 0, -1);
+            LoadItemModel(item, helm, 0, -1, geosets);
+            LoadItemCollection(item, WoWHelper.SlotIndex.Head, "head", 1, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Head];
+            if (collection != null)
+            {
+                collection.ActiveGeosets = new() { 2701 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0] };
+                collection.Change = true;
+            }
         }
-        //if (Items[0].RightModel > 0)
-        //{
-        //    model = Items[0].GetRaceSpecificModel(Items[0].RightModel, Race, Gender, Class);
-        //    collections[0].ActiveGeosets = new List<int>();
-        //    collections[0].ActiveGeosets.Add(2701);
-        //}
-        //if (collections[0].File != model || collections[0].Texture != Items[0].RightTexture2)
-        //{
-        //    collections[0].UnloadModel();
-        //    if (Items[0].RightModel > 0)
-        //    {
-        //        StartCoroutine(collections[0].LoadModel(model, Items[0].RightTexture2, casc));
-        //    }
-        //}
     }
 
     // Load right shoulder slot item model
     private void EquipRightShoulder()
     {
-        ItemObject shoulder = GameObject.Find("right shoulder").GetComponent<ItemObject>();
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.RightShoulder];
+        var shoulder = GameObject.Find("right shoulder").GetComponent<ItemObject>();
+        var item = Items[(int)WoWHelper.SlotIndex.RightShoulder];
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
             shoulder.UnloadModel();
@@ -372,17 +364,18 @@ public class Character : ModelRenderer
         }
         if (item.Changed)
         {
+            List<int> geosets = new();
             item.Changed = Items[(int)WoWHelper.SlotIndex.LeftShoulder] == null;
             shoulder.UnloadModel();
-            LoadItemModel(item, shoulder, 1, 1);
+            LoadItemModel(item, shoulder, 1, 1, geosets);
         }
     }
 
     // Load left shoulder slot item model
     private void EquipLeftShoulder()
     {
-        ItemObject shoulder = GameObject.Find("left shoulder").GetComponent<ItemObject>();
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.LeftShoulder];
+        var shoulder = GameObject.Find("left shoulder").GetComponent<ItemObject>();
+        var item = Items[(int)WoWHelper.SlotIndex.LeftShoulder];
         item ??= Items[(int)WoWHelper.SlotIndex.RightShoulder];
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
@@ -391,45 +384,28 @@ public class Character : ModelRenderer
         }
         if (item.Changed)
         {
+            List<int> geosets = new();
             item.Changed = false;
             shoulder.UnloadModel();
-            LoadItemModel(item, shoulder, 0, 0);
+            LoadItemModel(item, shoulder, 0, 0, geosets);
         }
     }
 
     // Load back slot item models and geosets
     private void EquipBack()
     {
-        ItemObject backpack = GameObject.Find("backpack").GetComponent<ItemObject>();
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Back];
-        activeGeosets.RemoveAll(x => x > 1499 && x < 1600);
+        var backpack = GameObject.Find("backpack").GetComponent<ItemObject>();
+        var item = Items[(int)WoWHelper.SlotIndex.Back];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Back];
+        activeGeosets.RemoveWhere(x => x > 1499 && x < 1600);
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-            //collections[1].UnloadModel();
             backpack.UnloadModel();
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Back] = null;
             activeGeosets.Add(1501);
             return;
         }
-        if (item.Changed)
-        {
-            item.Changed = false;
-            backpack.UnloadModel();
-            LoadItemModel(item, backpack, 1, -1);
-        }
-        // if (Items[2].LeftModel > 0)
-        // {
-        //     model = Items[2].GetRaceSpecificModel(Items[2].LeftModel, Race, Gender, Class);
-        //     collections[1].ActiveGeosets = new List<int>();
-        //     collections[1].ActiveGeosets.Add(1501);
-        // }
-        // if (collections[1].File != model || collections[1].Texture != Items[2].LeftTexture2)
-        // {
-        //     collections[1].UnloadModel();
-        //     if (Items[2].LeftModel > 0)
-        //     {
-        //         StartCoroutine(collections[1].LoadModel(model, Items[2].LeftTexture2, casc));
-        //     }
-        // }
         int geoset = item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0];
         if (Race == WoWHelper.Race.Undead)
         {
@@ -440,93 +416,128 @@ public class Character : ModelRenderer
             }
         }
         activeGeosets.Add(1501 + geoset);
+        if (item.Changed)
+        {
+            List<int> geosets = new();
+            item.Changed = false;
+            backpack.UnloadModel();
+            LoadItemModel(item, backpack, 1, -1, geosets);
+            LoadItemCollection(item, WoWHelper.SlotIndex.Back, "back", 0, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Back];
+            if (collection != null)
+            {
+                collection.ActiveGeosets = new() { 1501 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0] };
+                collection.Change = true;
+            }
+        }
     }
 
     // Load chest slot item models and geosets
     private void EquipChest()
     {
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Chest];
-        activeGeosets.RemoveAll(x => x > 799 && x < 900);
-        activeGeosets.RemoveAll(x => x > 999 && x < 1100);
-        activeGeosets.RemoveAll(x => x > 2199 && x < 2300);
+        var item = Items[(int)WoWHelper.SlotIndex.Chest];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Chest];
+        var gloves = Items[(int)WoWHelper.SlotIndex.Hands];
+        var pants = Items[(int)WoWHelper.SlotIndex.Legs];
+        var boots = Items[(int)WoWHelper.SlotIndex.Feet];
+        activeGeosets.RemoveWhere(x => x > 799 && x < 900);
+        activeGeosets.RemoveWhere(x => x > 999 && x < 1100);
+        activeGeosets.RemoveWhere(x => x > 2199 && x < 2300);
+        if (gloves != null)
+        {
+            gloves.Changed = true;
+        }
+        if (pants != null)
+        {
+            pants.Changed = true;
+        }
+        if (boots != null)
+        {
+            boots.Changed = true;
+        }
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-            //collections[2].UnloadModel();
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Chest] = null;
             EquipShirt();
             EquipWrist();
+            EquipLegs();
             activeGeosets.Add(1001);
             activeGeosets.Add(1301);
             activeGeosets.Add(2201);
             return;
         }
-        //int model = 0;
-        //if (Items[3].LeftModel > 0)
-        //{
-        //    model = Items[3].GetRaceSpecificModel(Items[3].LeftModel, Race, Gender, Class);
-        //    collections[2].ActiveGeosets = new List<int>();
-        //    collections[2].ActiveGeosets.Add(801);
-        //    collections[2].ActiveGeosets.Add(1001);
-        //    if (Items[3].Geoset3 == 1)
-        //    {
-        //        collections[2].ActiveGeosets.Add(1301);
-        //    }
-        //    collections[2].ActiveGeosets.Add(2201);
-        //    collections[2].ActiveGeosets.Add(2801);
-        //}
-        //if (collections[2].File != model || collections[2].Texture != Items[3].LeftTexture2)
-        //{
-        //    collections[2].UnloadModel();
-        //    if (Items[3].LeftModel > 0)
-        //    {
-        //        StartCoroutine(collections[2].LoadModel(model, Items[3].LeftTexture2, casc));
-        //    }
-        //}
         activeGeosets.Add(801 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0]);
         activeGeosets.Add(1001 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[1]);
-        activeGeosets.Add(2201 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[4]);
+        activeGeosets.Add(2201 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[3]);
         if (item.Item.Appearances[item.Appearance].DisplayInfo.Components
             .FirstOrDefault(c => c.ComponentSection == WoWHelper.ComponentSection.ArmLower) == null)
         {
             EquipShirt();
             EquipWrist();
         }
+        else
+        {
+            var wrist = Collections[(int)WoWHelper.SlotIndex.Wrist];
+            if (wrist != null)
+            {
+                wrist.ActiveGeosets.Clear();
+                wrist.Change = true;
+            }
+        }
+        EquipLegs();
+        var legs = Collections[(int)WoWHelper.SlotIndex.Legs];
         if (item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[2] == 1)
         {
-            activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
-            activeGeosets.RemoveAll(x => x > 899 && x < 1000);
+            activeGeosets.RemoveWhere(x => x > 1099 && x < 1200);
+            activeGeosets.RemoveWhere(x => x > 899 && x < 1000);
+            activeGeosets.RemoveWhere(x => x > 1299 && x < 1400);
             if (racial.Loaded)
             {
-                racial.ActiveGeosets.RemoveAll(x => x > 2999 && x < 3100);
+                racial.ActiveGeosets.RemoveWhere(x => x > 2999 && x < 3100);
             }
-            //if (collections[5].Loaded)
-            //{
-            //    collections[5].ActiveGeosets.RemoveAll(x => x > 1099 && x < 1200);
-            //}
-        }
-        if (item.Item.ItemSlot == WoWHelper.ItemSlot.Robe)
-        {
-            activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
+            if (legs != null)
+            {
+                legs.ActiveGeosets.Clear();
+                legs.Change = true;
+            }
             activeGeosets.Add(1301 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[2]);
-            activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
+            activeGeosets.RemoveWhere(x => x > 1399 && x < 1500);
             if (racial.Loaded)
             {
-                racial.ActiveGeosets.RemoveAll(x => x > 1399 && x < 1500);
+                racial.ActiveGeosets.RemoveWhere(x => x > 1399 && x < 1500);
             }
-            //if (collections[5].Loaded)
-            //{
-            //    collections[5].ActiveGeosets.Clear();
-            //}
+        }
+        if (item.Changed)
+        {
+            item.Changed = false;
+            LoadItemCollection(item, WoWHelper.SlotIndex.Chest, "chest", 0, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Chest];
+            if (collection != null)
+            {
+                collection.ActiveGeosets = new()
+                {
+                    801 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0],
+                    1001 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[1],
+                    2201 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[3],
+                    2801 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[4]
+                };
+                if (item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[2] == 1)
+                {
+                    collection.ActiveGeosets.Add(1301 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[2]);
+                }
+                collection.Change = true;
+            }
         }
     }
 
     // Load shirt slot item geosets
     private void EquipShirt()
     {
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Shirt];
-        activeGeosets.RemoveAll(x => x > 799 && x < 900);
+        var item = Items[(int)WoWHelper.SlotIndex.Shirt];
+        activeGeosets.RemoveWhere(x => x > 799 && x < 900);
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-            activeGeosets.Add(801);
             return;
         }
         activeGeosets.Add(801 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0]);
@@ -535,8 +546,8 @@ public class Character : ModelRenderer
     // Load tabard slot item geosets
     private void EquipTabard()
     {
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Tabard];
-        activeGeosets.RemoveAll(x => x > 1199 && x < 1300);
+        var item = Items[(int)WoWHelper.SlotIndex.Tabard];
+        activeGeosets.RemoveWhere(x => x > 1199 && x < 1300);
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
             activeGeosets.Add(1201);
@@ -548,7 +559,7 @@ public class Character : ModelRenderer
         }
         else
         {
-            ItemInstance belt = Items[(int)WoWHelper.SlotIndex.Waist];
+            var belt = Items[(int)WoWHelper.SlotIndex.Waist];
             if (belt == null || (belt.Item.Appearances[belt.Appearance].DisplayInfo.Flags & 0x200) == 0)
             {
                 activeGeosets.Add(1201 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0]);
@@ -559,7 +570,7 @@ public class Character : ModelRenderer
             }
             if (item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0] == 1)
             {
-                activeGeosets.RemoveAll(x => x > 999 && x < 1100);
+                activeGeosets.RemoveWhere(x => x > 999 && x < 1100);
             }
         }
     }
@@ -567,150 +578,178 @@ public class Character : ModelRenderer
     // Load wrist slot item geosets
     private void EquipWrist()
     {
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Wrist];
+        var item = Items[(int)WoWHelper.SlotIndex.Wrist];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Wrist];
+        var gloves = Items[(int)WoWHelper.SlotIndex.Hands];
+        var hands = Collections[(int)WoWHelper.SlotIndex.Hands];
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-             return;
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Wrist] = null;
+            return;
         }
         if (item.Item.Appearances.Count > 0)
         {
-            activeGeosets.RemoveAll(x => x > 799 && x < 900);
+            activeGeosets.RemoveWhere(x => x > 799 && x < 900);
+        }
+        if (item.Changed || gloves == null || gloves.Changed)
+        {
+            item.Changed = false;
+            LoadItemCollection(item, WoWHelper.SlotIndex.Wrist, "wrist", 0, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Wrist];
+            if (collection != null)
+            {
+                if (hands == null && (gloves == null || gloves.Item.Appearances[gloves.Appearance].DisplayInfo.Geosets[0] == 0))
+                {
+                    collection.ActiveGeosets = new() { 2301 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0] };
+                }
+                else
+                {
+                    collection.ActiveGeosets = new();
+                }
+                collection.Change = true;
+            }
         }
     }
 
     // Load hands slot item models and geosets
     private void EquipHands()
     {
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Hands];
-        activeGeosets.RemoveAll(x => x > 399 && x < 500);
+        var item = Items[(int)WoWHelper.SlotIndex.Hands];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Hands];
+        activeGeosets.RemoveWhere(x => x > 399 && x < 500);
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-            //collections[3].UnloadModel();
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Hands] = null;
             activeGeosets.Add(401);
             return;
         }
-        // int model = 0;
-        // if (Items[8].LeftModel > 0)
-        // {
-        //     model = Items[8].GetRaceSpecificModel(Items[8].LeftModel, Race, Gender, Class);
-        //     collections[3].ActiveGeosets = new List<int>();
-        //     if (Race != 37)
-        //     {
-        //         if (activeGeosets.Contains(801))
-        //         {
-        //             collections[3].ActiveGeosets.Add(401);
-        //         }
-        //         collections[3].ActiveGeosets.Add(2301);
-        //     }
-        // }
-        // if (collections[3].File != model || collections[3].Texture != Items[8].LeftTexture2)
-        // {
-        //     collections[3].UnloadModel();
-        //     if (Items[8].LeftModel > 0)
-        //     {
-        //         StartCoroutine(collections[3].LoadModel(model, Items[8].LeftTexture2, casc));
-        //     }
-        // }
         activeGeosets.Add(401 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0]);
         if (item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0] != 0)
         {
-            activeGeosets.RemoveAll(x => x > 799 && x < 900);
+            activeGeosets.RemoveWhere(x => x > 799 && x < 900);
+        }
+        if (item.Changed)
+        {
+            item.Changed = false;
+            LoadItemCollection(item, WoWHelper.SlotIndex.Hands, "hands", 0, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Hands];
+            if (collection != null)
+            {
+                collection.ActiveGeosets = new() { 2301 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[1] };
+                if (activeGeosets.Count(x => x > 801 && x < 900) == 0)
+                {
+                    collection.ActiveGeosets.Add(401 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0]);
+                }
+                collection.Change = true;
+            }
         }
     }
 
     // Load waist slot item models and geosets
     private void EquipWaist()
     {
-        ItemObject buckle = GameObject.Find("buckle").GetComponent<ItemObject>();
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Waist];
-        activeGeosets.RemoveAll(x => x > 1799 && x < 1900);
+        var buckle = GameObject.Find("buckle").GetComponent<ItemObject>();
+        var item = Items[(int)WoWHelper.SlotIndex.Waist];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Waist];
+        activeGeosets.RemoveWhere(x => x > 1799 && x < 1900);
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-            //collections[4].UnloadModel();
             buckle.UnloadModel();
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Waist] = null;
             activeGeosets.Add(1801);
             return;
         }
-        if (item.Changed)
-        {
-            item.Changed = false;
-            buckle.UnloadModel();
-            LoadItemModel(item, buckle, 0, -1);
-        }
-        //if (Items[9].RightModel > 0)
-        //{
-        //    model = Items[9].GetRaceSpecificModel(Items[9].RightModel, Race, Gender, Class);
-        //    collections[4].ActiveGeosets = new List<int>();
-        //    collections[4].ActiveGeosets.Add(1801);
-        //}
-        //if (collections[4].File != model || collections[4].Texture != Items[9].RightTexture2)
-        //{
-        //    collections[4].UnloadModel();
-        //    if (Items[9].RightModel > 0)
-        //    {
-        //        StartCoroutine(collections[4].LoadModel(model, Items[9].RightTexture2, casc));
-        //    }
-        //}
         activeGeosets.Add(1801 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0]);
         if (item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0] == 1)
         {
-            activeGeosets.RemoveAll(x => x > 999 && x < 1100);
+            activeGeosets.RemoveWhere(x => x > 999 && x < 1100);
+        }
+        if (item.Changed)
+        {
+            List<int> geosets = new();
+            item.Changed = false;
+            buckle.UnloadModel();
+            LoadItemModel(item, buckle, 0, -1, geosets);
+            LoadItemCollection(item, WoWHelper.SlotIndex.Waist, "waist", 1, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Waist];
+            if (collection != null)
+            {
+                collection.ActiveGeosets = new() { 1801 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0] };
+                collection.Change = true;
+            }
         }
     }
 
     // Load legs slot item models and geosets
     private void EquipLegs()
     {
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Legs];
-        activeGeosets.RemoveAll(x => x > 1099 && x < 1200);
-        activeGeosets.RemoveAll(x => x > 899 && x < 1000);
-        activeGeosets.RemoveAll(x => x > 1299 && x < 1400);
+        var item = Items[(int)WoWHelper.SlotIndex.Legs];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Legs];
+        var boots = Items[(int)WoWHelper.SlotIndex.Legs];
+        activeGeosets.RemoveWhere(x => x > 1099 && x < 1200);
+        activeGeosets.RemoveWhere(x => x > 899 && x < 1000);
+        activeGeosets.RemoveWhere(x => x > 1299 && x < 1400);
+        if (boots != null)
+        {
+            boots.Changed = true;
+        }
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-            //collections[5].UnloadModel();
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Legs] = null;
+            activeGeosets.Add(1801);
             activeGeosets.Add(1101);
             activeGeosets.Add(901);
             activeGeosets.Add(1301);
             return;
         }
-        //int model = 0;
-        //if (Items[10].LeftModel > 0)
-        //{
-        //    model = Items[10].GetRaceSpecificModel(Items[10].LeftModel, Race, Gender, Class);
-        //    collections[5].ActiveGeosets = new List<int>();
-        //    collections[5].ActiveGeosets.Add(901);
-        //    if (Race != 37)
-        //    {
-        //        collections[5].ActiveGeosets.Add(1101);
-        //    }
-        //}
-        //if (collections[5].File != model || collections[5].Texture != Items[10].LeftTexture2)
-        //{
-        //    collections[5].UnloadModel();
-        //    if (Items[10].LeftModel > 0)
-        //    {
-        //        StartCoroutine(collections[5].LoadModel(model, Items[10].LeftTexture2, casc));
-        //    }
-        //}
+        if (item.Changed)
+        {
+            item.Changed = false;
+            LoadItemCollection(item, WoWHelper.SlotIndex.Legs, "legs", 0, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Legs];
+            if (collection != null)
+            {
+                if (!activeGeosets.Contains(1302))
+                {
+                    collection.ActiveGeosets = new()
+                    {
+                        1101 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0],
+                        901 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[1],
+                        1301 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[2]
+                    };
+                }
+                else
+                {
+                    collection.ActiveGeosets = new();
+                }
+                collection.Change = true;
+            }
+        }
         activeGeosets.Add(1101 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0]);
         activeGeosets.Add(901 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[1]);
         activeGeosets.Add(1301 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[2]);
-        activeGeosets.RemoveAll(x => x > 1399 && x < 1500);
+        activeGeosets.RemoveWhere(x => x > 1399 && x < 1500);
         if (racial.Loaded)
         {
-            racial.ActiveGeosets.RemoveAll(x => x > 1399 && x < 1500);
+            racial.ActiveGeosets.RemoveWhere(x => x > 1399 && x < 1500);
         }
     }
 
     // Load feet slot item models and geosets
     private void EquipFeet()
     {
-        ItemInstance item = Items[(int)WoWHelper.SlotIndex.Feet];
-        activeGeosets.RemoveAll(x => x > 499 && x < 600);
-        activeGeosets.RemoveAll(x => x > 1999 && x < 2100);
+        var item = Items[(int)WoWHelper.SlotIndex.Feet];
+        var collection = Collections[(int)WoWHelper.SlotIndex.Feet];
+        activeGeosets.RemoveWhere(x => x > 499 && x < 600);
+        activeGeosets.RemoveWhere(x => x > 1999 && x < 2100);
         if (item == null || item.Item.Appearances[item.Appearance].DisplayInfo == null)
         {
-            //collections[6].UnloadModel();
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)WoWHelper.SlotIndex.Feet] = null;
             if (!activeGeosets.Contains(1302))
             {
                 activeGeosets.Add(501);
@@ -718,35 +757,13 @@ public class Character : ModelRenderer
             activeGeosets.Add(2001);
             return;
         }
-        // int model = 0;
-        // if (Items[11].LeftModel > 0)
-        // {
-        //     model = Items[11].GetRaceSpecificModel(Items[11].LeftModel, Race, Gender, Class);
-        //     collections[6].ActiveGeosets = new List<int>();
-        //     if (Race != 37)
-        //     {
-        //         if (!activeGeosets.Contains(1302))
-        //         {
-        //             collections[6].ActiveGeosets.Add(501);
-        //         }
-        //         collections[6].ActiveGeosets.Add(2001);
-        //     }
-        // }
-        // if (collections[6].File != model || collections[6].Texture != Items[11].LeftTexture2)
-        // {
-        //     collections[6].UnloadModel();
-        //     if (Items[11].LeftModel > 0)
-        //     {
-        //         StartCoroutine(collections[6].LoadModel(model, Items[11].LeftTexture2, casc));
-        //     }
-        // }
         if (!activeGeosets.Contains(1302))
         {
             activeGeosets.Add(501 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0]);
         }
         if (item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[0] != 0)
         {
-            activeGeosets.RemoveAll(x => x > 899 && x < 1000);
+            activeGeosets.RemoveWhere(x => x > 899 && x < 1000);
         }
         if (item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[1] == 0 || item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[1] == -1)
         {
@@ -760,10 +777,25 @@ public class Character : ModelRenderer
         {
             activeGeosets.Add(2001 + item.Item.Appearances[item.Appearance].DisplayInfo.Geosets[1]);
         }
+        if (item.Changed)
+        {
+            item.Changed = false;
+            LoadItemCollection(item, WoWHelper.SlotIndex.Feet, "feet", 0, -1);
+            collection = Collections[(int)WoWHelper.SlotIndex.Feet];
+            if (collection != null)
+            {
+                collection.ActiveGeosets = new() { 2001 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[1] };
+                if (!activeGeosets.Contains(1302))
+                {
+                    collection.ActiveGeosets.Add(501 + item.Item.Appearances[item.Appearance].DisplayInfo.SkinnedGeosets[0]);
+                }
+                collection.Change = true;
+            }
+        }
     }
 
     // Load item model into given slot
-    private void LoadItemModel(ItemInstance item, ItemObject itemObject, int index, int position)
+    private void LoadItemModel(ItemInstance item, ItemObject itemObject, int index, int position, List<int> geosets)
     {
         int model = 0;
         var displayInfo = item.Item.Appearances[item.Appearance].DisplayInfo;
@@ -777,11 +809,69 @@ public class Character : ModelRenderer
                 itemObject.ParticleColors = item.Item.Appearances[item.Appearance].DisplayInfo.ParticleColors;
                 itemObject.Geoset = item.Item.Appearances[item.Appearance].DisplayInfo.ItemGeoset;
 #if UNITY_EDITOR
-                StartCoroutine(itemObject.LoadModel(model, textures, listFile, dataPath));
+                StartCoroutine(itemObject.LoadModel(model, textures, listFile, dataPath, geosets));
+#else
+                StartCoroutine(buckle.LoadModel(model, textures, casc, geosets));
+#endif
+                itemObject.Change = true;
+            }
+        }
+    }
+
+    // Load item model into given slot
+    private void LoadItemCollection(ItemInstance item, WoWHelper.SlotIndex slot, string name, int index, int position)
+    {
+        int model = 0;
+        var displayInfo = item.Item.Appearances[item.Appearance].DisplayInfo;
+        var collection = Collections[(int)slot];
+        if (displayInfo != null && displayInfo.ModelID[index] > 0)
+        {
+            model = item.GetModel(index, Gender, CurrentRace, Class, position);
+            var textures = item.Item.Appearances[item.Appearance].DisplayInfo.Textures[index];
+            if (collection == null)
+            {
+                GameObject go = new(name);
+                go.transform.parent = transform;
+                collection = Collections[(int)slot] = go.AddComponent<Collection>();
+                collection.character = this;
+                collection.hiddenMaterial = hiddenMaterial;
+            }
+            if (collection.File != model || collection.Texture != (textures.Length == 0 ? 0 : textures[0].ID))
+            {
+                collection.UnloadModel();
+#if UNITY_EDITOR
+                StartCoroutine(collection.LoadModel(model, textures.Length == 0 ? 0 : textures[0].ID, mesh, Model.Skeleton.Bones, listFile, dataPath));
 #else
                 StartCoroutine(buckle.LoadModel(model, textures, casc));
 #endif
-                itemObject.Change = true;
+            }
+        }
+        else
+        {
+            DestroyImmediate(collection?.gameObject);
+            Collections[(int)slot] = null;
+        }
+    }
+
+    // force reloading for all item models and collections
+    public void ReloadAllItems()
+    {
+        foreach (var item in Items)
+        {
+            if (item != null)
+            {
+                item.Changed = true;
+            }
+        }
+        foreach (var Item in GetComponentsInChildren<ItemObject>())
+        {
+            Item.File = 0;
+        }
+        foreach (var collection in Collections)
+        {
+            if (collection != null)
+            {
+                collection.File = 0;
             }
         }
     }
@@ -815,7 +905,7 @@ public class Character : ModelRenderer
         {
             material.SetColor("_Color", colors[Model.Skin.Textures[i].Color]);
         }
-        CullMode cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
+        var cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
         material.SetInt("_Cull", (int)cull);
         float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
         material.SetFloat("_DepthTest", depth);
@@ -913,8 +1003,9 @@ public class Character : ModelRenderer
     }
 
     // Enable main mesh
-    public void ActivateMainMesh()
+    public bool ActivateMainMesh()
     {
+        var previous = mesh;
         mainMesh.SetActive(true);
         extraMesh?.SetActive(false);
         creature.gameObject.SetActive(false);
@@ -927,11 +1018,13 @@ public class Character : ModelRenderer
         racial.gameObject.SetActive(true);
         armor.gameObject.SetActive(true);
         extraRacial.gameObject.SetActive(false);
+        return mesh != previous;
     }
 
     // Enable extra mesh
-    public void ActivateExtraMesh()
+    public bool ActivateExtraMesh()
     {
+        var previous = mesh;
         mainMesh.SetActive(false);
         extraMesh.SetActive(true);
         creature.gameObject.SetActive(false);
@@ -944,6 +1037,7 @@ public class Character : ModelRenderer
         racial.gameObject.SetActive(false);
         armor.gameObject.SetActive(false);
         extraRacial.gameObject.SetActive(true);
+        return mesh != previous;
     }
 
     // Load and setup main and extra model prefabs
@@ -952,12 +1046,20 @@ public class Character : ModelRenderer
         bool done = false;
         DestroyImmediate(mainMesh);
         DestroyImmediate(extraMesh);
+        for (int i = 0; i < Collections.Length; i++)
+        {
+            if (Collections[i] != null)
+            {
+                DestroyImmediate(Collections[i].gameObject);
+                Collections[i] = null;
+            }
+        }
         extraMesh = null;
         mainModel = null;
         extraModel = null;
         string path = $"{modelsPath}{RacePath}{modelFile}_prefab";
         path = Path.GetRelativePath(modelsPath, path);
-        GameObject prefab = Resources.Load<GameObject>($"{modelsPath}{path}");
+        var prefab = Resources.Load<GameObject>($"{modelsPath}{path}");
         mainMesh = Instantiate(prefab, gameObject.transform);
         mesh = mainMesh;
         CurrentRace = Race;
@@ -970,14 +1072,14 @@ public class Character : ModelRenderer
             extraMesh.SetActive(false);
         }
         yield return null;
-        M2Model[] m2 = GetComponentsInChildren<M2Model>(true);
+        var m2 = GetComponentsInChildren<M2Model>(true);
         byte[] data = m2[0].data.bytes;
         byte[] skin = m2[0].skin.bytes;
         byte[] skel = m2[0].skel == null ? null : m2[0].skel.bytes;
         loadBinaries = new Thread(() => { mainModel = m2[0].LoadModel(data, skin, skel); done = true; });
         loadBinaries.Start();
         yield return null;
-        activeGeosets = new List<int> { 0 };
+        activeGeosets = new() { 0 };
         while (loadBinaries.IsAlive)
         {
             yield return null;
@@ -991,7 +1093,7 @@ public class Character : ModelRenderer
             loadBinaries = new Thread(() => { extraModel = m2[1].LoadModel(data, skin, skel); done = true; });
             loadBinaries.Start();
             yield return null;
-            activeGeosets = new List<int> { 0 };
+            activeGeosets = new() { 0 };
             while (loadBinaries.IsAlive)
             {
                 yield return null;
