@@ -66,13 +66,7 @@ namespace WoW.Characters
         }
 
         // Get id of Skin Color Extra option
-        protected override int GetSkinExtraIndex()
-        {
-            return Array.FindIndex(Character.Options, o => o.Name == "Paint");
-        }
-
-        // Get id of Armor Color option
-        public override int GetArmorColorIndex()
+        public override int GetSkinExtraIndex()
         {
             return Array.FindIndex(Character.Options, o => o.Name == "Paint");
         }

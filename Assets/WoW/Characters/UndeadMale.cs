@@ -75,7 +75,7 @@ namespace WoW.Characters
             DrawLayer(texture, "Face", "Skin Color", face);
             DrawUnderwear(texture);
             DrawLayer(texture, "Hair Style", "Hair Color", face);
-            DrawLayer(texture, "Jaw Features", 7, face);
+            DrawLayer(texture, "Jaw Features", 8, face);
             DrawArmor(texture);
         }
     }

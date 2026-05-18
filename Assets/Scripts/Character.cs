@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 using WoW;
 using WoW.Characters;
@@ -128,7 +127,7 @@ public class Character : ModelRenderer
                         creature.ChangeRelatedOptions();
                         creature.ChangeRelatedOptions();
                         creature.ChangeRelatedOptions();
-                        creature.ChangeFullTransformation();
+                        //creature.ChangeCustomizationVisibility();
 #if UNITY_EDITOR
                         creature.ChangeModel(listFile, dataPath);
 #else
@@ -256,10 +255,13 @@ public class Character : ModelRenderer
             CustomizationDropdowns[index].options.Add(data);
             j++;
         }
-        value = Options[index].Choices.ContainsKey(value) ? value : Options[index].Choices.First().Key;
-        Customization[index] = value;
-        CustomizationDropdowns[index].SetValue(value);
-        CustomizationDropdowns[index].RefreshShownValue();
+        if (Options[index].Choices.Count > 0)
+        {
+            value = Options[index].Choices.ContainsKey(value) ? value : Options[index].Choices.First().Key;
+            Customization[index] = value;
+            CustomizationDropdowns[index].SetValue(value);
+            CustomizationDropdowns[index].RefreshShownValue();
+        }
         CustomizationDropdowns[index].transform.parent.gameObject.SetActive(CustomizationDropdowns[index].options.Count > 1 && Options[index].Category == Category);
     }
 
@@ -288,16 +290,21 @@ public class Character : ModelRenderer
         }
         else if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            var material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            string materialName = $@"Materials\{Model.Skin.Textures[i].Shader}\{Model.Skin.Textures[i].Shader}" +
+                $"{IsUnlit(Model.Materials[Model.Skin.Textures[i].Material].Flags)}{IsTwoSided(Model.Materials[Model.Skin.Textures[i].Material].Flags)}" +
+                $"{IsDepth(Model.Materials[Model.Skin.Textures[i].Material].Flags)}{BlendMode(Model.Materials[Model.Skin.Textures[i].Material].Blend)}";
+            var material = Resources.Load<Material>(materialName);
             if (material == null)
             {
-                Debug.LogError(Model.Skin.Textures[i].Shader);
+                Debug.LogError($"Shader:{Model.Skin.Textures[i].Shader}\tFlags:{Model.Materials[Model.Skin.Textures[i].Material].Flags}" +
+                    $"\tBlending:{Model.Materials[Model.Skin.Textures[i].Material].Blend}");
             }
             renderer.materials[i] = new Material(material.shader);
             renderer.materials[i].shader = material.shader;
             renderer.materials[i].CopyPropertiesFromMaterial(material);
             SetTexture(renderer.materials[i], i);
-            Debug.Log(Model.Skin.Textures[i].Shader);
+            Debug.Log($"Shader:{Model.Skin.Textures[i].Shader}\tFlags:{Model.Materials[Model.Skin.Textures[i].Material].Flags}" +
+                    $"\tBlending:{Model.Materials[Model.Skin.Textures[i].Material].Blend}");
         }
         else
         {
@@ -754,7 +761,14 @@ public class Character : ModelRenderer
             {
                 activeGeosets.Add(501);
             }
-            activeGeosets.Add(2001);
+            if (Race == WoWHelper.Race.Haranir)
+            {
+                helper.ChangeGeosetOption(activeGeosets, "Feet");
+            }
+            else
+            {
+                activeGeosets.Add(2001);
+            }
             return;
         }
         if (!activeGeosets.Contains(1302))
@@ -896,19 +910,10 @@ public class Character : ModelRenderer
         {
             material.SetTexture("_Emission", helper.Emission);
         }
-        material.SetInt("_SrcColorBlend", (int)SrcColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetInt("_DstColorBlend", (int)DstColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.5f : 0f);
         if (Model.Skin.Textures[i].Color != -1)
         {
             material.SetColor("_Color", colors[Model.Skin.Textures[i].Color]);
         }
-        var cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
-        material.SetInt("_Cull", (int)cull);
-        float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
-        material.SetFloat("_DepthTest", depth);
     }
 
     // Initialize helper class for chosen race/gender
@@ -991,6 +996,9 @@ public class Character : ModelRenderer
             case WoWHelper.Race.Earthen:
                 helper = Gender ? new EarthenMale(Model, this, layerShader) : new EarthenFemale(Model, this, layerShader);
                 break;
+            case WoWHelper.Race.Haranir:
+                helper = Gender ? new HaranirMale(Model, this, layerShader) : new HaranirFemale(Model, this, layerShader);
+                break;
         }
     }
 
@@ -999,6 +1007,7 @@ public class Character : ModelRenderer
     {
         mainMesh.SetActive(false);
         extraMesh?.SetActive(false);
+        racial.gameObject.SetActive(false);
         creature.gameObject.SetActive(true);
     }
 
@@ -1008,6 +1017,7 @@ public class Character : ModelRenderer
         var previous = mesh;
         mainMesh.SetActive(true);
         extraMesh?.SetActive(false);
+        racial.gameObject.SetActive(true);
         creature.gameObject.SetActive(false);
         mesh = mainMesh;
         Model = mainModel;

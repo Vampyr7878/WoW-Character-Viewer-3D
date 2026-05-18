@@ -63,6 +63,7 @@ namespace WoW.Characters
             Character.racial.ActiveGeosets.Clear();
             ChangeFace(activeGeosets);
             ChangeEyes(activeGeosets);
+            ChangeEyebrows(activeGeosets);
             ChangeHands(activeGeosets);
             ChangeDHUnderwear(Character.racial.ActiveGeosets);
             ActivateRelatedTextureOptions("Skin Color", "Face", skinColorFaces);

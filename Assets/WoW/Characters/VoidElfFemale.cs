@@ -17,6 +17,8 @@ namespace WoW.Characters
         private readonly Dictionary<int, int[]> skinColorEyes;
         // Mapping tentacles to hair styles
         private readonly Dictionary<int, int[]> HairStyleTentacles;
+        // Mapping tattoo colors to tattoos
+        private readonly Dictionary<int, int[]> tattooColors;
 
         public VoidElfFemale(M2 model, Character character, ComputeShader shader)
         {
@@ -28,6 +30,7 @@ namespace WoW.Characters
             layerShader = shader;
             skinColorFaces = new()
             {
+                { 143, new int[] { 2878, 2879, 2880, 2881, 2882, 2883, 2884, 2885, 9781, 9782, 9783, 9784, 9785, 9786 } },
                 { 218, new int[] { 9791, 9794, 9799 } },
                 { 323, new int[] { 2878, 2879, 2880, 2881, 2882, 2883, 2884, 2885 } },
                 { 324, new int[] { 9781, 9782, 9783, 9784, 9785, 9786, 9787, 9788, 9789, 9790,
@@ -41,12 +44,19 @@ namespace WoW.Characters
                 { 643, new int[] { 2870, 2871, 2872, 2875, 2874, 2873, 9706, 9712, 9705, 9711,
                     9708, 9710, 9709, 9704, 9713, 9707, 9717, 9718, 9719, 9720 } },
                 { 645, new int[] { 2870, 2871, 2872, 2875, 2874, 2873, 9706, 9712, 9705, 9711, 9708,
-                    9710, 9709, 9704, 9713, 9707, 9717, 9718, 9719, 9720, 9714, 9716, 9715 } }
+                    9710, 9709, 9704, 9713, 9707, 9717, 9718, 9719, 9720, 9714, 9716, 9715 } },
+                { 4602, new int[] { 2870, 2871, 2872, 2873, 2874, 2875, 9704, 9705, 9706, 9707, 9708, 9709, 9710,
+                    9711, 9712, 9713, 9717, 9718, 9719, 9720, 60155, 60156, 60157, 60158, 60159, 60160 } }
             };
             HairStyleTentacles = new()
             {
                 { 141, new int[] { 2886, 2887, 2888, 2889, 2890, 2891, 2892, 2893, 2894, 2895, 7486 } },
                 { 411, new int[] { 2886, 2887, 2888, 2889, 2892, 2894 } }
+            };
+            tattooColors = new()
+            {
+                { 4599, new int[] { 60134 } },
+                { 4600, new int[] { 60135, 60136, 60137, 60138, 60139, 60140 } }
             };
         }
 
@@ -55,13 +65,18 @@ namespace WoW.Characters
         {
             ChangeFace(activeGeosets);
             ChangeEyes(activeGeosets);
+            ChangeEyebrows(activeGeosets);
             ChangeHands(activeGeosets);
+            ChangeDHUnderwear(Character.racial.ActiveGeosets);
             ActivateRelatedTextureOptions("Skin Color", "Face", skinColorFaces);
             ChangeRelatedGeosetOptions(activeGeosets, "Hair Style", "Tentacles", HairStyleTentacles);
             ChangeEyeColor(activeGeosets);
             ChangeGeosetOption(activeGeosets, "Earrings");
             ChangeGeosetOption(activeGeosets, "Ears");
             ChangeTentacles(activeGeosets);
+            ChangeSkinnedGeosetOption(Character.racial.ActiveGeosets, "Horns");
+            ChangeSkinnedGeosetOption(Character.racial.ActiveGeosets, "Blindfold");
+            ChangeRelatedTextureOptions("Tattoo", "Tattoo Color", tattooColors);
         }
 
         // Change goesets in according to eye color and make sure left over geosets are removed
@@ -86,8 +101,12 @@ namespace WoW.Characters
 #if UNITY_EDITOR
             textures.Clear();
 #endif
+            Emission = null;
             var face = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Face);
+            var body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
             DrawLayer(texture, "Face", "Skin Color", face);
+            DrawLayer(texture, "Tattoo Color", "Tattoo", body);
+            DrawEmission("Tattoo Color", "Tattoo", body);
             DrawBra(texture);
             DrawUnderwear(texture);
             DrawArmor(texture);

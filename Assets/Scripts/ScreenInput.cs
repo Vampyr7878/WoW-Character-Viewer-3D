@@ -537,10 +537,10 @@ public class ScreenInput : MonoBehaviour
                 choice.Value.SkinnedGeosets = DB.GetSkinnedGeosets(connection, choice.Value.ID);
                 choice.Value.Textures = DB.GetCustomizationTextures(connection, choice.Value.ID);
                 choice.Value.Creatures = DB.GetCustomizationDisplayInfos(connection, choice.Value.ID);
-                if (choice.Value.Creatures.Length > 0)
+                for (int i = 0; i < choice.Value.Creatures.Length; i++)
                 {
-                    choice.Value.Creatures[0].Geosets = DB.GetCreatureGeosets(connection, choice.Value.Creatures[0].ID);
-                    choice.Value.Creatures[0].ParticleColors = DB.GetParticleColors(connection, choice.Value.Creatures[0].ParticleColor);
+                    choice.Value.Creatures[i].Geosets = DB.GetCreatureGeosets(connection, choice.Value.Creatures[i].ID);
+                    choice.Value.Creatures[i].ParticleColors = DB.GetParticleColors(connection, choice.Value.Creatures[i].ParticleColor);
                 }
             }
         }
@@ -1007,7 +1007,6 @@ public class ScreenInput : MonoBehaviour
         LinkToggles();
         LinkCategories();
         ChangeButtonColors();
-        Category(0);
         for (int i = 0; i < character.Customization.Length; i++)
         {
             if (customization.Length <= i)
@@ -1025,6 +1024,7 @@ public class ScreenInput : MonoBehaviour
             }
         }
         character.creature.ChangeRacialOptions();
+        Category(0);
         character.Change = true;
     }
 

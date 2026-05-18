@@ -91,6 +91,35 @@ public class CustomMenu : MonoBehaviour
         }
     }
 
+    // Right click option to create materials using shaders in the folder.
+    [MenuItem("Assets/Create materials")]
+    public static void CreateMaterials()
+    {
+        string path = AssetDatabase.GetAssetPath(Selection.activeObject);
+        if (!Directory.Exists(path))
+        {
+            path = Path.GetDirectoryName(path);
+        }
+        string dir = @$"Assets\Resources\Materials\{Path.GetFileName(path)}";
+        if (Directory.Exists(dir))
+        {
+            Directory.Delete(dir, true);
+        }
+        Directory.CreateDirectory(dir);
+        var shaders = AssetDatabase.FindAssets("t:Shader", new[] { path });
+        foreach(var guid in shaders)
+        {
+            Shader shader = AssetDatabase.LoadAssetAtPath<Shader>(AssetDatabase.GUIDToAssetPath(guid));
+            Material material = new(shader)
+            {
+                color = Color.white
+            };
+            AssetDatabase.CreateAsset(material, $@"{dir.Replace('\\', '/')}\{shader.name.Split('/')[2]}.mat");
+        }
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+    }
+
     // Recursively search for all files with given extension in given directory.
     private static List<string> ListFiles(string path, string extension)
     {

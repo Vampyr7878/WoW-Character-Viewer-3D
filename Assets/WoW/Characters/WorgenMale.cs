@@ -169,7 +169,7 @@ namespace WoW.Characters
         }
 
         // Get id of Skin Color Extra option
-        protected override int GetSkinExtraIndex()
+        public override int GetSkinExtraIndex()
         {
             if (Character.Form == 0)
                 return Array.FindIndex(Character.Options, o => o.Name == "Fur Color");

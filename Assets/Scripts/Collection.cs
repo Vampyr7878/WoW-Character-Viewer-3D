@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Rendering;
 using WoW;
 
 // Class to render any collection system models
@@ -16,6 +15,9 @@ public class Collection : ModelRenderer
 {
     // Reference to the character wearing that collection
     public Character character;
+
+    // Swappable textures for blindfolds
+    private Dictionary<int, int> dHBlindfolds;
 
     // List of geosets that are enabled for loading
     public HashSet<int> ActiveGeosets
@@ -33,6 +35,15 @@ public class Collection : ModelRenderer
         // Set the model to not loaded at start
         Change = false;
         Loaded = false;
+        dHBlindfolds = new()
+        {
+            { 7, 1306893 },
+            { 8, 1277004 },
+            { 19, 1306891 },
+            { 20, 1314796 },
+            { 57, 1306891 },
+            { 58, 1314796 }
+        };
     }
 
     private void FixedUpdate()
@@ -83,16 +94,21 @@ public class Collection : ModelRenderer
     {
         if (activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            var material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            string materialName = $@"Materials\{Model.Skin.Textures[i].Shader}\{Model.Skin.Textures[i].Shader}" +
+                $"{IsUnlit(Model.Materials[Model.Skin.Textures[i].Material].Flags)}{IsTwoSided(Model.Materials[Model.Skin.Textures[i].Material].Flags)}" +
+                $"{IsDepth(Model.Materials[Model.Skin.Textures[i].Material].Flags)}{BlendMode(Model.Materials[Model.Skin.Textures[i].Material].Blend)}";
+            var material = Resources.Load<Material>(materialName);
             if (material == null)
             {
-                Debug.LogError(Model.Skin.Textures[i].Shader);
+                Debug.LogError($"Shader:{Model.Skin.Textures[i].Shader}\tFlags:{Model.Materials[Model.Skin.Textures[i].Material].Flags}" +
+                    $"\tBlending:{Model.Materials[Model.Skin.Textures[i].Material].Blend}");
             }
             renderer.materials[i] = new Material(material.shader);
             renderer.materials[i].shader = material.shader;
             renderer.materials[i].CopyPropertiesFromMaterial(material);
-            Debug.Log(Model.Skin.Textures[i].Shader);
             SetTexture(renderer.materials[i], i);
+            Debug.Log($"Shader:{Model.Skin.Textures[i].Shader}\tFlags:{Model.Materials[Model.Skin.Textures[i].Material].Flags}" +
+                    $"\tBlending:{Model.Materials[Model.Skin.Textures[i].Material].Blend}");
         }
         else
         {
@@ -110,26 +126,30 @@ public class Collection : ModelRenderer
         {
             material.SetTexture("_Texture2", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 1]]);
         }
-        material.SetInt("_SrcColorBlend", (int)SrcColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetInt("_DstColorBlend", (int)DstColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 ? 0.5f : 0f);
         var color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
             color = colors[Model.Skin.Textures[i].Color];
         }
-        var cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
-        material.SetInt("_Cull", (int)cull);
-        float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
-        material.SetFloat("_DepthTest", depth);
         if (Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]].Transparency.Values[0].Length > 0)
         {
             color.a *= Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]].Transparency.Values[0][0];
         }
         material.SetColor("_Color", color);
         material.renderQueue += Model.Skin.Textures[i].Priority;
+    }
+
+    // Get target id for Ornaments for specific race
+    private int GetOrnamentTarget()
+    {
+        int target = character.Race switch
+        {
+            WoWHelper.Race.Dracthyr => character.ModelID == 89 ? 10 : 11,
+            WoWHelper.Race.Earthen => 16,
+            WoWHelper.Race.Haranir => 15,
+            _ => 0
+        };
+        return target;
     }
 
     // Load specific texture
@@ -142,7 +162,15 @@ public class Collection : ModelRenderer
         switch (texture.Type)
         {
             case 0:
-                file = Model.TextureIDs[i];
+                if (mesh.name.Contains("demonhunter") && dHBlindfolds.ContainsKey(character.ModelID)
+                    && dHBlindfolds[character.ModelID] == Model.TextureIDs[i])
+                {
+                    index = Array.FindIndex(character.Options, o => o.Name == "Blindfold" && o.Model == character.ModelID);
+                    index2 = Array.FindIndex(character.Options, o => o.Name == "Eye Color" && o.Model == character.ModelID);
+                    file = character.Options[index].Choices[character.Customization[index]].Textures.
+                        FirstOrDefault(t => t.Related == character.Options[index2].Choices[character.Customization[index2]].ID)?.ID;
+                }
+                file = file == null ? Model.TextureIDs[i]: file;
                 break;
             case 1:
                 index = character.helper.GetSkinColorIndex();
@@ -155,15 +183,16 @@ public class Collection : ModelRenderer
             case 6:
                 index = character.helper.GetHairColorIndex();
                 file = character.Options[index].Choices[character.Customization[index]].Textures[0].ID;
+                layered = WoWHelper.LayeredTexture.Hair;
                 break;
             case 8:
-                index = character.helper.GetArmorColorIndex();
+                index = character.Race == WoWHelper.Race.Dracthyr ? character.helper.GetArmorColorIndex(): character.helper.GetSkinExtraIndex();
                 file = character.Options[index].Choices[character.Customization[index]].Textures[0].ID;
                 break;
             case 9:
                 index = character.helper.GetOrnamentColorIndex();
                 file = character.Options[index].Choices[character.Customization[index]].Textures.
-                    FirstOrDefault(t => t.Target == (character.ModelID == 89 ? 10 : (character.Race == WoWHelper.Race.Earthen ? 16: 11)))?.ID;
+                    FirstOrDefault(t => t.Target == GetOrnamentTarget())?.ID;
                 break;
             case 20:
                 index = character.helper.GetJewelryColorIndex();
@@ -174,9 +203,16 @@ public class Collection : ModelRenderer
                 break;
             case 25:
                 index = character.helper.GetArmorColorIndex();
-                index2 = character.helper.GetArmorStyleIndex();
-                file = character.Options[index].Choices[character.Customization[index]].Textures.
-                    First(t => t.Related == character.Options[index2].Choices[character.Customization[index2]].ID).ID;
+                if (character.Race == WoWHelper.Race.Dracthyr)
+                {
+                    index2 = character.helper.GetArmorStyleIndex();
+                    file = character.Options[index].Choices[character.Customization[index]].Textures.
+                        First(t => t.Related == character.Options[index2].Choices[character.Customization[index2]].ID).ID;
+                }
+                else
+                {
+                    file = character.Options[index].Choices[character.Customization[index]].Textures[0].ID;
+                }
                 break;
         }
         return file == null ? -1 : file.Value;
@@ -204,6 +240,9 @@ public class Collection : ModelRenderer
                 {
                     case WoWHelper.LayeredTexture.Skin:
                         character.helper.LayeredTexture(textures[i]);
+                        break;
+                    case WoWHelper.LayeredTexture.Hair:
+                        character.helper.LayeredHair(textures[i]);
                         break;
                 }
             }

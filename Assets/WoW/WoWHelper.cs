@@ -36,7 +36,8 @@ namespace WoW
             FlightForm = 193,
             MoonkinForm = 194,
             Darkglare = 197,
-            Tyrant = 198
+            Tyrant = 198,
+            TreantForm = 213
         }
 
         // Enum for character races
@@ -69,7 +70,8 @@ namespace WoW
             Mechagnome = 37,
             Dracthyr = 52,
             Visage = 75,
-            Earthen = 84
+            Earthen = 84,
+            Haranir = 86
         }
 
         // Enum for character classes
@@ -404,7 +406,7 @@ namespace WoW
                 ComponentSection.Accessory => new RectInt(768, 0, 256, 128),
                 ComponentSection.Face => new RectInt(512, 0, 512, 512),
                 ComponentSection.Body => new RectInt(0, 0, 512, 512),
-                ComponentSection.Full => new RectInt(768, 0, 256, 128),
+                ComponentSection.Full => new RectInt(0, 0, 1028, 512),
                 _ => new RectInt(0, 0, 256, 128),
             };
         }

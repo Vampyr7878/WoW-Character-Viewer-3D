@@ -272,7 +272,7 @@ namespace WoW.Characters
             DrawArmor(texture);
         }
 
-        // Draw Layers on extra skin texture
+        // Draw layers on extra skin texture
         protected override void LayeredExtra1(Texture2D texture)
         {
             var body = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Body);
@@ -280,7 +280,7 @@ namespace WoW.Characters
             DrawLayer(texture, "Markings Color", "Face Pattern", 23, body);
         }
 
-        // Draw Layers on extra skin texture
+        // Draw layers on extra skin texture
         protected override void LayeredExtra2(Texture2D texture)
         {
             var full = WoWHelper.ComponentRect(WoWHelper.ComponentSection.Full);
@@ -290,8 +290,8 @@ namespace WoW.Characters
             DrawLayer(texture, "Secondary Color", "Secondary Color Strength", 24, full);
         }
 
-        // Draw Layers on hair texture
-        protected override void LayeredHair(Texture2D texture)
+        // Draw layers on hair texture
+        public override void LayeredHair(Texture2D texture)
         {
             RectInt rect = new(0, 0, texture.width, texture.height);
             DrawLayer(texture, "Hair Highlights", 12, rect);
@@ -308,7 +308,7 @@ namespace WoW.Characters
         }
 
         // Get id of Skin Color Extra option
-        protected override int GetSkinExtraIndex()
+        public override int GetSkinExtraIndex()
         {
             if (Character.Form == 0)
             {

@@ -7,15 +7,15 @@
 
 Texture2D<float4> Layer;
 RWTexture2D<float4> Result;
-int2 Offset;
-int2 Size;
-int2 Target;
+uint2 Offset;
+uint2 Size;
+uint2 Target;
 
 [numthreads(8, 8, 1)]
 void DrawTexture(uint3 id : SV_DispatchThreadID)
 {
-    int2 target = int2(id.xy);
-    int2 source = target - Offset;
+    uint2 target = uint2(id.xy);
+    uint2 source = target - Offset;
     if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
     {
         Result[target] = lerp(Result[target], Layer[source], Layer[source].a);
@@ -25,8 +25,8 @@ void DrawTexture(uint3 id : SV_DispatchThreadID)
 [numthreads(8, 8, 1)]
 void DoubleTexture(uint3 id : SV_DispatchThreadID)
 {
-    int2 target = int2(id.xy);
-    int2 source = target - Offset;
+    uint2 target = uint2(id.xy);
+    uint2 source = target - Offset;
     if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
     {
         Result[target] = lerp(Result[target], Layer[source], Layer[source].a);
@@ -37,8 +37,8 @@ void DoubleTexture(uint3 id : SV_DispatchThreadID)
 [numthreads(8, 8, 1)]
 void OverlayTexture(uint3 id : SV_DispatchThreadID)
 {
-    int2 target = int2(id.xy);
-    int2 source = target - Offset;
+    uint2 target = uint2(id.xy);
+    uint2 source = target - Offset;
     if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
     {
         float4 layerPixel = Layer[source];
@@ -55,8 +55,8 @@ void OverlayTexture(uint3 id : SV_DispatchThreadID)
 [numthreads(8, 8, 1)]
 void MultiplyTexture(uint3 id : SV_DispatchThreadID)
 {
-    int2 target = int2(id.xy);
-    int2 source = target - Offset;
+    uint2 target = uint2(id.xy);
+    uint2 source = target - Offset;
     if (source.x >= 0 && source.y >= 0 && source.x < Size.x && source.y < Size.y)
     {
         Result[target] = Result[target] * Layer[source];

@@ -38,6 +38,21 @@ namespace Assets.WoW
             return classes;
         }
 
+        // Get main craeture models from DB
+        public static Dictionary<int, string> GetCreatureModels(SqliteConnection connection)
+        {
+            Dictionary<int, string> models = new();
+            using var command = connection.CreateCommand();
+            command.CommandType = CommandType.Text;
+            command.CommandText = "SELECT Model, Path FROM CreatureModels WHERE Model NOT NULL;";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                models.Add(reader.GetInt32(0), reader.GetString(1));
+            }
+            return models;
+        }
+
         // Get customization categories from DB
         public static CustomizationCategory[] GetCategories(SqliteConnection connection, int modelID)
         {

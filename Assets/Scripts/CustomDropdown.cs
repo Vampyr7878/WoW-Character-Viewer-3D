@@ -136,7 +136,7 @@ public class CustomDropdown : Dropdown
     // Get current dropdown value
     public int GetValue()
     {
-        return ((CustomOptionData)options[value]).ID;
+        return options.Count == 0 ? 0 : ((CustomOptionData)options[value]).ID;
     }
 
     // Set current dropdown value

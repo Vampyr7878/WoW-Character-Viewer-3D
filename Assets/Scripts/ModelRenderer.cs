@@ -1,11 +1,9 @@
 using Assets.WoW;
 using CASCLib;
 using M2Lib;
-using SkelLib;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public abstract class ModelRenderer : MonoBehaviour
 {
@@ -67,22 +65,22 @@ public abstract class ModelRenderer : MonoBehaviour
         if (renderer.materials[i].shader != hiddenMaterial.shader)
         {
             int index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation];
-            string texture = "_Texture1";
+            string texture = "_Texture1Offset";
             if (index >= 0)
             {
-                var offset = renderer.materials[i].GetTextureOffset(texture);
+                var offset = renderer.materials[i].GetVector(texture);
                 offset = AnimateTexture(index, offset);
-                renderer.materials[i].SetTextureOffset(texture, offset);
+                renderer.materials[i].SetVector(texture, offset);
             }
             if (Model.Skin.Textures[i].TextureCount > 1)
             {
                 index = Model.TextureAnimationsLookup[Model.Skin.Textures[i].TextureAnimation + 1];
-                texture = "_Texture2";
+                texture = "_Texture2Offset";
                 if (index >= 0)
                 {
-                    var offset = renderer.materials[i].GetTextureOffset(texture);
+                    var offset = renderer.materials[i].GetVector(texture);
                     offset = AnimateTexture(index, offset);
-                    renderer.materials[i].SetTextureOffset(texture, offset);
+                    renderer.materials[i].SetVector(texture, offset);
                 }
             }
         }
@@ -218,110 +216,47 @@ public abstract class ModelRenderer : MonoBehaviour
         return color;
     }
 
-    // Get proper source color blend option for alpha blending
-    protected BlendMode SrcColorBlend(short value)
+    // Get proper blend mode
+    protected string BlendMode(short value)
     {
-        var blend = BlendMode.One;
-        switch (value)
+        return value switch
         {
-            case 0:
-            case 1:
-            case 3:
-                blend = BlendMode.One;
-                break;
-            case 2:
-            case 4:
-                blend = BlendMode.SrcAlpha;
-                break;
-            case 5:
-                blend = BlendMode.OneMinusSrcAlpha;
-                break;
-            case 6:
-                blend = BlendMode.DstColor;
-                break;
-            case 7:
-                blend = BlendMode.SrcColor;
-                break;
-        }
-        return blend;
+            1 => " Clipping",
+            2 or 3 => " Alpha",
+            4 or 7 => " Additive",
+            5 or 6 => " Multiply",
+            _ => "",
+        };
     }
 
-    // Get proper destination color blend option for alpha blending
-    protected BlendMode DstColorBlend(short value)
+    // Check if unlit material is used
+    protected string IsUnlit(short value)
     {
-        var blend = BlendMode.Zero;
-        switch (value)
+        if ((value & 0x01) == 0)
         {
-            case 0:
-            case 1:
-                blend = BlendMode.Zero;
-                break;
-            case 2:
-            case 7:
-                blend = BlendMode.OneMinusSrcAlpha;
-                break;
-            case 3:
-            case 4:
-                blend = BlendMode.One;
-                break;
-            case 5:
-            case 6:
-                blend = BlendMode.SrcColor;
-                break;
+            return "";
         }
-        return blend;
+        return " Unlit";
     }
 
-    // Get proper source alpha blend option for alpha blending
-    protected BlendMode SrcAlphaBlend(short value)
+    // Check if two-sided material is used
+    protected string IsTwoSided(short value)
     {
-        var blend = BlendMode.One;
-        switch (value)
+        if ((value & 0x04) == 0)
         {
-            case 0:
-            case 1:
-            case 2:
-                blend = BlendMode.One;
-                break;
-            case 3:
-            case 4:
-                blend = BlendMode.Zero;
-                break;
-            case 5:
-            case 7:
-                blend = BlendMode.SrcAlpha;
-                break;
-            case 6:
-                blend = BlendMode.DstAlpha;
-                break;
+            return "";
         }
-        return blend;
+        return " Two-Sided";
     }
 
-    // Get proper destination alpha blend option for alpha blending
-    protected BlendMode DstAlphaBlend(short value)
+    // Check if depth write is enabled
+    protected string IsDepth(short value)
     {
-        var blend = BlendMode.Zero;
-        switch (value)
+        if ((value & 0x10) == 0)
         {
-            case 0:
-            case 1:
-            case 5:
-                blend = BlendMode.Zero;
-                break;
-            case 2:
-            case 7:
-                blend = BlendMode.OneMinusSrcAlpha;
-                break;
-            case 3:
-            case 4:
-                blend = BlendMode.One;
-                break;
-            case 6:
-                blend = BlendMode.SrcAlpha;
-                break;
+            return "";
         }
-        return blend;
+        return " Depth";
     }
 
     // Select material for particle

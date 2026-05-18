@@ -1,5 +1,4 @@
-﻿using Assets.WoW;
-using M2Lib;
+﻿using M2Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,7 +133,7 @@ namespace WoW
             RenderTexture.active = null;
         }
 
-        // Multiply textures
+        // Scale Texture
         protected Texture2D ScaleTexture(Texture2D texture, int width, int height)
         {
             if (texture.width == width && texture.height == height)
@@ -596,6 +595,12 @@ namespace WoW
             AddGeoset(activeGeosets, 33, 1, -1);
         }
 
+        // Make sure eyebrow geosets are visible
+        protected void ChangeEyebrows(HashSet<int> activeGeosets)
+        {
+            AddGeoset(activeGeosets, 34, 1, -1);
+        }
+
         // Make sure ears geosets are visible
         protected void ChangeEars(HashSet<int> activeGeosets)
         {
@@ -677,8 +682,8 @@ namespace WoW
         {
             int index = Array.FindIndex(Character.Options, o => o.Name == name && o.Model == Character.ModelID);
             int index2 = Array.FindIndex(Character.Options, o => o.Name == name2 && o.Model == Character.ModelID);
-            int[] requirements = reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).
-                Select(x => x.Key).ToArray();
+            int[] requirements = Character.Options[index].Choices.Count == 0 ? Array.Empty<int>():
+                reqRelations.Where(x => x.Value.Contains(Character.Options[index].Choices[Character.Customization[index]].ID)).Select(x => x.Key).ToArray();
             Character.Options[index2].Choices = Character.Options[index2].AllChoices.
                 Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value);
             Character.ChangeDropdownOptions(index2);
@@ -714,12 +719,16 @@ namespace WoW
         }
 
         // Make sure dropdown only contains options for current race
-        public void ChangeRacialOptions(string name, int[] requirements)
+        public void ChangeRacialOptions(int form, int[] requirements)
         {
-            int index = Array.FindIndex(Character.Options, o => o.Name == name);
-            Character.Options[index].Choices = Character.Options[index].AllChoices.
-                Where(c => requirements.Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value);
-            Character.ChangeDropdownOptions(index);
+            int index;
+            foreach (var option in Character.Options.Where(o => o.Model == form))
+            {
+                index = Array.FindIndex(Character.Options, o => o.ID == option.ID);
+                option.Choices = option.AllChoices.Where(c => requirements
+                    .Contains(c.Value.Requirement)).ToDictionary(c => c.Key, c => c.Value);
+                Character.ChangeDropdownOptions(index);
+            }
         }
 
         // Change visible geosets for given option
@@ -876,7 +885,7 @@ namespace WoW
             int? file = null;
             int index, index2;
             layered = WoWHelper.LayeredTexture.None;
-            UnityEngine.Debug.Log($"Texture: {texture.Type}");
+            Debug.Log($"Texture: {texture.Type}");
             switch (texture.Type)
             {
                 case 0:
@@ -909,8 +918,13 @@ namespace WoW
                     break;
                 case 8:
                     index = GetSkinExtraIndex();
-                    file = Character.Options[index].Choices[Character.Customization[index]].Textures.First(t => t.Target == 2).ID;
+                    file = Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault(t => t.Target == 2)?.ID;
                     layered = WoWHelper.LayeredTexture.Extra1;
+                    break;
+                case 9:
+                    index = GetOrnamentColorIndex();
+                    file = Character.ModelID == Character.MainFormID ? 
+                        Character.Options[index].Choices[Character.Customization[index]].Textures.FirstOrDefault().ID : -1;
                     break;
                 case 10:
                     index = GetAccessoriesIndex();
@@ -941,7 +955,7 @@ namespace WoW
         }
 
         // Get id of Skin Color Extra option, can be overriden for specific race if name is different
-        protected virtual int GetSkinExtraIndex()
+        public virtual int GetSkinExtraIndex()
         {
             return Array.FindIndex(Character.Options, o => o.Name == "Skin Color" && o.Model == Character.ModelID);
         }
@@ -994,20 +1008,20 @@ namespace WoW
             return 0;
         }
 
-        // Draw Layers on extra skin texture
+        // Draw layers on extra skin texture
         protected virtual void LayeredExtra1(Texture2D texture)
         {
             return;
         }
 
-        // Draw Layers on extra skin texture
+        // Draw layers on extra skin texture
         protected virtual void LayeredExtra2(Texture2D texture)
         {
             return;
         }
 
-        // Draw Layers on hair texture
-        protected virtual void LayeredHair(Texture2D texture)
+        // Draw layers on hair texture
+        public virtual void LayeredHair(Texture2D texture)
         {
             return;
         }
