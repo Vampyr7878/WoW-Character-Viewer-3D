@@ -112,7 +112,7 @@
                 "m_Node": {
                     "m_Id": "c75ff7764bcb4363b023cf6219914cd8"
                 },
-                "m_SlotId": 0
+                "m_SlotId": 1
             }
         },
         {
@@ -152,7 +152,7 @@
             },
             "m_InputSlot": {
                 "m_Node": {
-                    "m_Id": "8b830124fb93487daa7b61875ddc432a"
+                    "m_Id": "c75ff7764bcb4363b023cf6219914cd8"
                 },
                 "m_SlotId": 0
             }
@@ -182,7 +182,7 @@
                 "m_Node": {
                     "m_Id": "8b830124fb93487daa7b61875ddc432a"
                 },
-                "m_SlotId": 1
+                "m_SlotId": 0
             }
         },
         {
@@ -197,20 +197,6 @@
                     "m_Id": "d8b52972aa904081bd998194bd3b872f"
                 },
                 "m_SlotId": 1
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "c75ff7764bcb4363b023cf6219914cd8"
-                },
-                "m_SlotId": 2
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "add72530c64f424780da82ec3c906e92"
-                },
-                "m_SlotId": 0
             }
         },
         {
@@ -239,6 +225,20 @@
                     "m_Id": "a865d48166d84cc98218d51e8a5bdb39"
                 },
                 "m_SlotId": 1
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "d0788413e6c34acd9344e1f23e98c92e"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "add72530c64f424780da82ec3c906e92"
+                },
+                "m_SlotId": 0
             }
         },
         {
@@ -638,7 +638,7 @@
         "e00": 2.0,
         "e01": 2.0,
         "e02": 2.0,
-        "e03": 2.0,
+        "e03": 1.0,
         "e10": 2.0,
         "e11": 2.0,
         "e12": 2.0,
@@ -1111,7 +1111,7 @@
     "m_SlotType": 0,
     "m_Hidden": false,
     "m_ShaderOutputName": "Alpha",
-    "m_StageCapability": 2,
+    "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [],

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using WoW;
 
 // Class to render item 3d models
@@ -98,17 +97,22 @@ public class ItemObject : ModelRenderer
     {
         if (activeGeosets.Count == 0 || activeGeosets.Contains(Model.Skin.Submeshes[Model.Skin.Textures[i].Id].Id))
         {
-            var material = Resources.Load<Material>($@"Materials\{Model.Skin.Textures[i].Shader}");
+            string materialName = $@"Materials\{Model.Skin.Textures[i].Shader}\{Model.Skin.Textures[i].Shader}" +
+                $"{IsUnlit(Model.Materials[Model.Skin.Textures[i].Material].Flags)}{IsTwoSided(Model.Materials[Model.Skin.Textures[i].Material].Flags, Model.Name)}" +
+                $"{IsDepth(Model.Materials[Model.Skin.Textures[i].Material].Flags)}{BlendMode(Model.Materials[Model.Skin.Textures[i].Material].Blend)}";
+            var material = Resources.Load<Material>(materialName);
             if (material == null)
             {
-                Debug.LogError(Model.Skin.Textures[i].Shader);
+                Debug.LogError($"Shader:{Model.Skin.Textures[i].Shader}\tFlags:{Model.Materials[Model.Skin.Textures[i].Material].Flags}" +
+                    $"\tBlending:{Model.Materials[Model.Skin.Textures[i].Material].Blend}");
             }
             renderer.materials[i] = new(material.shader);
             renderer.materials[i].shader = material.shader;
             renderer.materials[i].CopyPropertiesFromMaterial(material);
             renderer.sharedMesh.OptimizeReorderVertexBuffer();
-            Debug.Log(Model.Skin.Textures[i].Shader);
             SetTexture(renderer.materials[i], i);
+            Debug.Log($"Shader:{Model.Skin.Textures[i].Shader}\tFlags:{Model.Materials[Model.Skin.Textures[i].Material].Flags}" +
+                    $"\tBlending:{Model.Materials[Model.Skin.Textures[i].Material].Blend}");
         }
         else
         {
@@ -170,7 +174,7 @@ public class ItemObject : ModelRenderer
             }
             else
             {
-                particles[i].transform.localEulerAngles = new Vector3(180f, 0f, 0f);
+                particles[i].transform.localEulerAngles = Vector3.zero;
             }
             renderer.material.shader = material.shader;
             renderer.material.CopyPropertiesFromMaterial(material);
@@ -196,24 +200,15 @@ public class ItemObject : ModelRenderer
         {
             material.SetTexture("_Emission", textures[Model.TextureLookup[Model.Skin.Textures[i].Texture + 2]]);
         }
-        //material.SetInt("_SrcColorBlend", (int)SrcColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        //material.SetInt("_DstColorBlend", (int)DstColorBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        //material.SetInt("_SrcAlphaBlend", (int)SrcAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        //material.SetInt("_DstAlphaBlend", (int)DstAlphaBlend(Model.Materials[Model.Skin.Textures[i].Material].Blend));
-        //material.SetFloat("_AlphaCut", Model.Materials[Model.Skin.Textures[i].Material].Blend == 1 || Model.Materials[Model.Skin.Textures[i].Material].Blend == 7 ? 0.5f : 0f);
+        //if (File == 850143)
+        //{
+        //    cull = CullMode.Off;
+        //}
         var color = Color.white;
         if (Model.Skin.Textures[i].Color != -1)
         {
              color = colors[Model.Skin.Textures[i].Color];
         }
-        var cull = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x04) != 0 ? CullMode.Off : CullMode.Back;
-        if (File == 850143)
-        {
-            cull = CullMode.Off;
-        }
-        material.SetInt("_Cull", (int)cull);
-        float depth = (Model.Materials[Model.Skin.Textures[i].Material].Flags & 0x10) != 0 ? 0f : 1f;
-        material.SetFloat("_DepthTest", depth);
         if (Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]].Transparency.Values[0].Length > 0)
         {
             color.a *= Model.Transparencies[Model.TransparencyLookup[Model.Skin.Textures[i].Transparency]].Transparency.Values[0][0];
@@ -328,10 +323,14 @@ public class ItemObject : ModelRenderer
         activeGeosets = new() { 0 };
         for (int i = 0; i < Model.Skin.Submeshes.Length; i++)
         {
-            if (Model.Skin.Submeshes[i].Id != 0)
+            if (Model.Skin.Submeshes[i].Id > 99)
             {
                 int s = (Model.Skin.Submeshes[i].Id / 100) * 100 + (i == Model.Skin.Submeshes.Length - 1 ? 1 + Geoset: 1);
                 activeGeosets.Add(s);
+            }
+            else
+            {
+                activeGeosets.Add(Model.Skin.Submeshes[i].Id);
             }
         }
         LoadColors();

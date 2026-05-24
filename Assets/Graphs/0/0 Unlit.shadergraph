@@ -84,6 +84,20 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
+                    "m_Id": "450a87c2e0c64f3e98236556e00d6afa"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "273ef5f85c0c4750b7d1d7447e147401"
+                },
+                "m_SlotId": 1290908933
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
                     "m_Id": "9343665a0d3841dd8eb47a8248e72a81"
                 },
                 "m_SlotId": 0
@@ -381,6 +395,9 @@
             "m_Id": "5d8082914c3b4993b5ec8fe6fc7cee80"
         },
         {
+            "m_Id": "e6938b33868e4e72a76dd8f4eea33a04"
+        },
+        {
             "m_Id": "9314b867ff9e4c4aaf17e3cd4a1465da"
         },
         {
@@ -411,7 +428,8 @@
         "3222eb73-fd90-4256-9380-b69bfd88d172",
         "f2fdfd53-7f10-4646-9da8-afb634974b7d",
         "c285d9dd-9f48-4abf-9199-22af9ab704db",
-        "abee331c-99fc-4a89-a2de-4e877c5b70b2"
+        "abee331c-99fc-4a89-a2de-4e877c5b70b2",
+        "01e80118-241a-47cc-a506-5cafa29689a5"
     ],
     "m_PropertyIds": [
         -2034113426,
@@ -419,7 +437,8 @@
         -1726800243,
         2136980970,
         -65247074,
-        -732352706
+        -732352706,
+        1290908933
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []
@@ -918,7 +937,7 @@
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Alpha",
-    "m_StageCapability": 2,
+    "m_StageCapability": 3,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
@@ -1208,6 +1227,24 @@
     "m_Property": {
         "m_Id": "bccf3479478b4b979f04b5410a5f2e9d"
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Texture2DInputMaterialSlot",
+    "m_ObjectId": "e6938b33868e4e72a76dd8f4eea33a04",
+    "m_Id": 1290908933,
+    "m_DisplayName": "Emission",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_Emission",
+    "m_StageCapability": 2,
+    "m_BareResource": false,
+    "m_Texture": {
+        "m_SerializedTexture": "",
+        "m_Guid": ""
+    },
+    "m_DefaultType": 0
 }
 
 {

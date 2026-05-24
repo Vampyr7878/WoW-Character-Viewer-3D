@@ -73,6 +73,20 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
+                    "m_Id": "450a87c2e0c64f3e98236556e00d6afa"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "5925a101d93a461aac6fb52b11ae1138"
+                },
+                "m_SlotId": 189981548
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
                     "m_Id": "5925a101d93a461aac6fb52b11ae1138"
                 },
                 "m_SlotId": 2
@@ -409,7 +423,7 @@
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Alpha",
-    "m_StageCapability": 3,
+    "m_StageCapability": 2,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
@@ -550,6 +564,9 @@
             "m_Id": "c516e59075504ec180681fba885b002d"
         },
         {
+            "m_Id": "a72c48e1a6a24263a5bae319c08e0fef"
+        },
+        {
             "m_Id": "13caecec3f80403691afe86d2c37d591"
         },
         {
@@ -579,14 +596,16 @@
         "41bec93b-7659-49bc-82f9-1588b2a2314f",
         "f2fdfd53-7f10-4646-9da8-afb634974b7d",
         "c285d9dd-9f48-4abf-9199-22af9ab704db",
-        "abee331c-99fc-4a89-a2de-4e877c5b70b2"
+        "abee331c-99fc-4a89-a2de-4e877c5b70b2",
+        "7ae442eb-205f-4c31-ba5f-8cc862de0bf5"
     ],
     "m_PropertyIds": [
         -2034113426,
         -819534766,
         2136980970,
         -65247074,
-        -732352706
+        -732352706,
+        189981548
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []
@@ -936,6 +955,24 @@
     },
     "m_Labels": [],
     "m_Space": 0
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Texture2DInputMaterialSlot",
+    "m_ObjectId": "a72c48e1a6a24263a5bae319c08e0fef",
+    "m_Id": 189981548,
+    "m_DisplayName": "Emission",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_Emission",
+    "m_StageCapability": 2,
+    "m_BareResource": false,
+    "m_Texture": {
+        "m_SerializedTexture": "",
+        "m_Guid": ""
+    },
+    "m_DefaultType": 0
 }
 
 {

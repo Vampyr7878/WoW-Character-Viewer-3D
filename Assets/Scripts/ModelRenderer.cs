@@ -240,8 +240,12 @@ public abstract class ModelRenderer : MonoBehaviour
     }
 
     // Check if two-sided material is used
-    protected string IsTwoSided(short value)
+    protected string IsTwoSided(short value, string name = "")
     {
+        if (name.Contains("Helm_Mail_PVPHunter_G_01"))
+        {
+            return " Two-Sided";
+        }
         if ((value & 0x04) == 0)
         {
             return "";

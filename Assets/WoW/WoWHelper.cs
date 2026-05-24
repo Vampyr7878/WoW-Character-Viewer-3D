@@ -595,19 +595,49 @@ namespace WoW
             element.AddComponent<ParticleSystem>();
             var system = element.GetComponent<ParticleSystem>();
             // Setup lifetime and speed in main module
-            var main = system.main;
-            float variation = particle.LifespanVariation * particle.Lifespan;
-            main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2f, (particle.Lifespan + variation) / 2f);
-            variation = particle.SpeedVariation * particle.Speed;
-            main.startSpeed = new ParticleSystem.MinMaxCurve((particle.Speed - variation) / 2f, (particle.Speed + variation) / 2f);
-            // Setup emission rate in emission module
-            var emission = system.emission;
+            switch (particle.Type)
+            {
+                case 0:
+                    element.AddComponent<PointEmitter>();
+                    break;
+                case 1:
+                    element.AddComponent<PlaneEmitter>();
+                    break;
+                case 2:
+                    element.AddComponent<SphereEmitter>();
+                    break;
+                default:
+                    Debug.LogError($"Particle Emitter Type: {particle.Type}");
+                    return null;
+            }
+            var emitter = element.GetComponent<Emitter>();
+            float variation = particle.SpeedVariation * particle.Speed;
+            emitter.minSpeed = (particle.Speed - variation) / 2;
+            emitter.maxSpeed = (particle.Speed + variation) / 2;
+            emitter.verticalRange = particle.VerticalRange;
+            emitter.horizontalRange = particle.HorizontalRange;
+            emitter.gravity = particle.Gravity;
+            variation = particle.LifespanVariation * particle.Lifespan;
+            emitter.minLifespan = (particle.Lifespan - variation) / 2;
+            emitter.maxLifespan = (particle.Lifespan + variation) / 2;
             variation = particle.EmissionVariation * particle.EmissionRate;
-            emission.rateOverTime = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
-            // Setup shape and scale in shape module
-            var shape = system.shape;
-            shape.shapeType = ParticleShape(particle.Type);
-            shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionLength, particle.EmissionWidth);
+            emitter.minEmission = particle.EmissionRate - variation;
+            emitter.maxEmission = particle.EmissionRate + variation;
+            emitter.emissionLength = particle.EmissionLength;
+            emitter.emissionWidth = particle.EmissionWidth;
+            //var main = system.main;
+            //float variation = particle.LifespanVariation * particle.Lifespan;
+            //main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2f, (particle.Lifespan + variation) / 2f);
+            //variation = particle.SpeedVariation * particle.Speed;
+            //main.startSpeed = new ParticleSystem.MinMaxCurve((particle.Speed - variation) / 2f, (particle.Speed + variation) / 2f);
+            //// Setup emission rate in emission module
+            //var emission = system.emission;
+            //variation = particle.EmissionVariation * particle.EmissionRate;
+            //emission.rateOverTime = new ParticleSystem.MinMaxCurve(particle.EmissionRate - variation, particle.EmissionRate + variation);
+            //// Setup shape and scale in shape module
+            //var shape = system.shape;
+            //shape.shapeType = ParticleShape(particle.Type);
+            //shape.scale = new Vector3(particle.EmissionWidth, particle.EmissionLength, particle.EmissionWidth);
             // Setup color and alpha gradients in color over lifetime module
             var color = system.colorOverLifetime;
             color.enabled = true;

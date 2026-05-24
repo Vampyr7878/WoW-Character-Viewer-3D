@@ -70,6 +70,20 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
+                    "m_Id": "450a87c2e0c64f3e98236556e00d6afa"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "9fed9ec93d5b44d5b46439728c1baf86"
+                },
+                "m_SlotId": 189981548
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
                     "m_Id": "9343665a0d3841dd8eb47a8248e72a81"
                 },
                 "m_SlotId": 0
@@ -602,6 +616,24 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Texture2DInputMaterialSlot",
+    "m_ObjectId": "80e447f580004a5b977adc96a08b499e",
+    "m_Id": 189981548,
+    "m_DisplayName": "Emission",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_Emission",
+    "m_StageCapability": 2,
+    "m_BareResource": false,
+    "m_Texture": {
+        "m_SerializedTexture": "",
+        "m_Guid": ""
+    },
+    "m_DefaultType": 0
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty",
     "m_ObjectId": "82ddcda33c1447b78ded866631b9b148",
     "m_Guid": {
@@ -793,6 +825,9 @@
             "m_Id": "ec9fd6bf192a48efbbc0ecacd83784b0"
         },
         {
+            "m_Id": "80e447f580004a5b977adc96a08b499e"
+        },
+        {
             "m_Id": "79f5e4a3fe424cdab4db4cdac9c2b2a4"
         },
         {
@@ -822,14 +857,16 @@
         "41bec93b-7659-49bc-82f9-1588b2a2314f",
         "f2fdfd53-7f10-4646-9da8-afb634974b7d",
         "c285d9dd-9f48-4abf-9199-22af9ab704db",
-        "abee331c-99fc-4a89-a2de-4e877c5b70b2"
+        "abee331c-99fc-4a89-a2de-4e877c5b70b2",
+        "7ae442eb-205f-4c31-ba5f-8cc862de0bf5"
     ],
     "m_PropertyIds": [
         -2034113426,
         -819534766,
         2136980970,
         -65247074,
-        -732352706
+        -732352706,
+        189981548
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []
@@ -901,7 +938,7 @@
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Alpha",
-    "m_StageCapability": 3,
+    "m_StageCapability": 2,
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
