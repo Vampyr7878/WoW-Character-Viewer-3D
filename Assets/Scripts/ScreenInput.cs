@@ -1614,34 +1614,40 @@ public class ScreenInput : MonoBehaviour
             {
                 Exit();
             }
-            EventSystem.current.SetSelectedGameObject(GameObject.Find(races[sCharacter.raceid].ToLower()).GetComponentInChildren<Button>().gameObject);
-            RaceButton(sCharacter.raceid);
-            EventSystem.current.SetSelectedGameObject(GameObject.Find(sCharacter.gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
-            GenderButton(sCharacter.gender);
-            EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[sCharacter.classid].ToLower()).GetComponentInChildren<Button>().gameObject);
-            ClassButton(sCharacter.classid);
-            for (int i = 0; i < sCharacter.customization.Length; i++)
+            if (sCharacter.raceid > 0)
             {
-                character.Customization[i] = sCharacter.customization[i];
-                if (character.Options[i].Type == WoWHelper.CustomizationType.Dropdown)
+                EventSystem.current.SetSelectedGameObject(GameObject.Find(races[sCharacter.raceid].ToLower()).GetComponentInChildren<Button>().gameObject);
+                RaceButton(sCharacter.raceid);
+                EventSystem.current.SetSelectedGameObject(GameObject.Find(sCharacter.gender ? "male" : "female").GetComponentInChildren<Button>().gameObject);
+                GenderButton(sCharacter.gender);
+                EventSystem.current.SetSelectedGameObject(GameObject.Find(classes[sCharacter.classid].ToLower()).GetComponentInChildren<Button>().gameObject);
+                ClassButton(sCharacter.classid);
+                for (int i = 0; i < sCharacter.customization.Length; i++)
                 {
-                    ((CustomDropdown)customizationOptions[i].GetComponentInChildren<Dropdown>(true)).SetValue(character.Customization[i]);
-                }
-                else
-                {
-                    (customizationOptions[i].GetComponentInChildren<Toggle>(true)).isOn = character.Customization[i] != character.Options[i].Choices.First().Key;
+                    character.Customization[i] = sCharacter.customization[i];
+                    if (character.Options[i].Type == WoWHelper.CustomizationType.Dropdown)
+                    {
+                        ((CustomDropdown)customizationOptions[i].GetComponentInChildren<Dropdown>(true)).SetValue(character.Customization[i]);
+                    }
+                    else
+                    {
+                        (customizationOptions[i].GetComponentInChildren<Toggle>(true)).isOn = character.Customization[i] != character.Options[i].Choices.First().Key;
+                    }
                 }
             }
-            connection.Open();
-            gearPanel.SetActive(true);
-            ClearItems();
-            for (int i = 0; i < sCharacter.items.Length; i++)
+            if (character.Loaded)
             {
-                EquipItem(sCharacter.items[i].id, sCharacter.items[i].appearance, (WoWHelper.SlotIndex)i);
+                connection.Open();
+                gearPanel.SetActive(true);
+                ClearItems();
+                for (int i = 0; i < sCharacter.items.Length; i++)
+                {
+                    EquipItem(sCharacter.items[i].id, sCharacter.items[i].appearance, (WoWHelper.SlotIndex)i);
+                }
+                gearPanel.SetActive(false);
+                connection.Close();
+                character.Change = true;
             }
-            gearPanel.SetActive(false);
-            connection.Close();
-            character.Change = true;
         }
     }
 

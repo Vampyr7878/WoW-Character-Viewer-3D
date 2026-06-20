@@ -53,12 +53,19 @@ public class Collection : ModelRenderer
             // Render the model
             if (Change)
             {
-                Resources.UnloadUnusedAssets();
-                GC.Collect();
-                LoadTextures();
-                for (int i = 0; i < Model.Skin.Textures.Length; i++)
+                try
                 {
-                    SetMaterial(renderer, i);
+                    Resources.UnloadUnusedAssets();
+                    GC.Collect();
+                    LoadTextures();
+                    for (int i = 0; i < Model.Skin.Textures.Length; i++)
+                    {
+                        SetMaterial(renderer, i);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e, this);
                 }
                 Change = false;
             }
@@ -324,10 +331,10 @@ public class Collection : ModelRenderer
             MatchBones(parent, parentBones);
             textureTime = new float[Model.TextureAnimations.Length];
             textureFrame = new int[Model.TextureAnimations.Length];
-            colorTime = new float[Model.TextureAnimations.Length];
-            colorFrame = new int[Model.TextureAnimations.Length];
-            transparencyTime = new float[Model.TextureAnimations.Length];
-            transparencyFrame = new int[Model.TextureAnimations.Length];
+            colorTime = new float[Model.Colors.Length];
+            colorFrame = new int[Model.Colors.Length];
+            transparencyTime = new float[Model.Colors.Length];
+            transparencyFrame = new int[Model.Colors.Length];
             for (int i = 0; i < textureTime.Length; i++)
             {
                 textureTime[i] = 0f;
@@ -420,7 +427,7 @@ public class Collection : ModelRenderer
                 var particles = new GameObject[Model.Particles.Length];
                 for (int i = 0; i < particles.Length; i++)
                 {
-                    particles[i] = WoWHelper.ParticleEffect(Model.Particles[i]);
+                    particles[i] = WoWHelper.ParticleEffect(this, Model.Particles[i]);
                     particles[i].transform.parent = bones[Model.Particles[i].Bone];
                     particles[i].transform.localPosition = Vector3.zero;
                     particles[i].name = $"Particle{i}";
@@ -430,10 +437,10 @@ public class Collection : ModelRenderer
             MatchBones(parent, parentBones);
             textureTime = new float[Model.TextureAnimations.Length];
             textureFrame = new int[Model.TextureAnimations.Length];
-            colorTime = new float[Model.TextureAnimations.Length];
-            colorFrame = new int[Model.TextureAnimations.Length];
-            transparencyTime = new float[Model.TextureAnimations.Length];
-            transparencyFrame = new int[Model.TextureAnimations.Length];
+            colorTime = new float[Model.Colors.Length];
+            colorFrame = new int[Model.Colors.Length];
+            transparencyTime = new float[Model.Colors.Length];
+            transparencyFrame = new int[Model.Colors.Length];
             for (int i = 0; i < textureTime.Length; i++)
             {
                 textureTime[i] = 0f;

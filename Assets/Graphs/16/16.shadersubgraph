@@ -115,20 +115,6 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
-                    "m_Id": "8b830124fb93487daa7b61875ddc432a"
-                },
-                "m_SlotId": 2
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "b0054ec363f744ea821d600b063cf32d"
-                },
-                "m_SlotId": 2
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
                     "m_Id": "920f2711e7fe4f9f9f44ba8f78042514"
                 },
                 "m_SlotId": 0
@@ -166,6 +152,20 @@
                     "m_Id": "8b830124fb93487daa7b61875ddc432a"
                 },
                 "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "a865d48166d84cc98218d51e8a5bdb39"
+                },
+                "m_SlotId": 2
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "b0054ec363f744ea821d600b063cf32d"
+                },
+                "m_SlotId": 2
             }
         },
         {
@@ -316,6 +316,7 @@
     "isMainTexture": false,
     "useTilingAndOffset": false,
     "useTexelSize": true,
+    "isHDR": false,
     "m_Modifiable": true,
     "m_DefaultType": 0
 }
@@ -1043,6 +1044,7 @@
     "isMainTexture": false,
     "useTilingAndOffset": false,
     "useTexelSize": true,
+    "isHDR": false,
     "m_Modifiable": true,
     "m_DefaultType": 0
 }

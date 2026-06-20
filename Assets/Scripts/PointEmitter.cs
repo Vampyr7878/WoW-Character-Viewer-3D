@@ -13,7 +13,15 @@ public class PointEmitter : Emitter
     protected override void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        Vector3 forward = transform.TransformDirection(Vector3.forward.normalized);
-        Gizmos.DrawRay(transform.position, forward * 2f);
+        Vector3 direction = transform.TransformDirection(Vector3.forward.normalized);
+        Gizmos.DrawRay(transform.position, direction * 2f);
+        direction = Quaternion.Euler(-verticalRange * Mathf.Rad2Deg, -horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(transform.position, direction * 5f);
+        direction = Quaternion.Euler(-verticalRange * Mathf.Rad2Deg, horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(transform.position, direction * 5f);
+        direction = Quaternion.Euler(verticalRange * Mathf.Rad2Deg, horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(transform.position, direction * 5f);
+        direction = Quaternion.Euler(verticalRange * Mathf.Rad2Deg, -horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(transform.position, direction * 5f);
     }
 }

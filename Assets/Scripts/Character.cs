@@ -1178,10 +1178,10 @@ public class Character : ModelRenderer
             yield return null;
             textureTime = new float[Model.TextureAnimations.Length];
             textureFrame = new int[Model.TextureAnimations.Length];
-            colorTime = new float[Model.TextureAnimations.Length];
-            colorFrame = new int[Model.TextureAnimations.Length];
-            transparencyTime = new float[Model.TextureAnimations.Length];
-            transparencyFrame = new int[Model.TextureAnimations.Length];
+            colorTime = new float[Model.Colors.Length];
+            colorFrame = new int[Model.Colors.Length];
+            transparencyTime = new float[Model.Colors.Length];
+            transparencyFrame = new int[Model.Colors.Length];
             for (int i = 0; i < textureTime.Length; i++)
             {
                 textureTime[i] = 0f;

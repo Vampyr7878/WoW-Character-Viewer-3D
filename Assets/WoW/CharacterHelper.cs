@@ -575,7 +575,7 @@ namespace WoW
             if (item != null && item.Item.Appearances[item.Appearance].DisplayInfo?.HelmetGeosets[Character.Gender ? 0 : 1]
                 .FirstOrDefault(h => h.Race == Character.Race && h.Geoset == type) != null)
             {
-                activeGeosets.Add(modifier == -1 ? type * 100 + (type == 0 ? 1 : 0) : type * 100 + modifier);
+                activeGeosets.Add(modifier == -1 ? type * 100 + (type == 0 || type == 1 ? 1 : 0) : type * 100 + modifier);
             }
             else
             {

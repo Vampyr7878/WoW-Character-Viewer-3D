@@ -15,8 +15,22 @@ public class PlaneEmitter : Emitter
     protected override void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(transform.position, new Vector3(emissionWidth, 0.001f, emissionLength));
-        Vector3 forward = transform.TransformDirection(Vector3.forward.normalized);
-        Gizmos.DrawRay(transform.position, forward * 2f);
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+        if (emissionWidth > 0 && emissionLength > 0)
+        {
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(emissionWidth, emissionLength, 0.001f));
+        }
+        Vector3 direction = Quaternion.Euler(-verticalRange * Mathf.Rad2Deg, -horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(Vector3.zero, direction * 5f);
+        direction = Quaternion.Euler(-verticalRange * Mathf.Rad2Deg, horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(Vector3.zero, direction * 5f);
+        direction = Quaternion.Euler(verticalRange * Mathf.Rad2Deg, horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(Vector3.zero, direction * 5f);
+        direction = Quaternion.Euler(verticalRange * Mathf.Rad2Deg, -horizontalRange * Mathf.Rad2Deg, 0f) * Vector3.forward;
+        Gizmos.DrawRay(Vector3.zero, direction * 5f);
+        Gizmos.matrix = oldMatrix;
+        direction = transform.TransformDirection(Vector3.forward.normalized);
+        Gizmos.DrawRay(transform.position, direction * 5f);
     }
-}
+} 

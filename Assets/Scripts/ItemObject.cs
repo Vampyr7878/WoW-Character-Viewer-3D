@@ -71,7 +71,15 @@ public class ItemObject : ModelRenderer
             for (int i = 0; i < Model.Skin.Textures.Length; i++)
             {
                 AnimateTextures(renderer, i);
-                AnimateColors(renderer, i);
+                if (Model.Name.Contains("Helm_Robe_RaidWarlock_F_01") || Model.Name.Contains("Helm_Cloth_RaidWarlock_R_01")
+                    || Model.Name.Contains("Helm_Cloth_RaidWarlockMythic_R_01"))
+                {
+                    AnimateColors(renderer, i, 2);
+                }
+                else
+                {
+                    AnimateColors(renderer, i);
+                }
             }
             for (int i = 0; i < textureTime.Length; i++)
             {
@@ -162,7 +170,7 @@ public class ItemObject : ModelRenderer
             limitVelocityOverLifetime.multiplyDragByParticleVelocity = true;
             var renderer = particles[i].GetComponent<ParticleSystemRenderer>();
             var material = ParticleMaterial(Model.Particles[i].Blend);
-            particles[i].transform.localScale = transform.localScale;
+            particles[i].transform.localScale = Vector3.one;
             bool right = name.Contains("right");
             if (Model.Particles[i].Flags == 8652344)
             {
@@ -349,7 +357,7 @@ public class ItemObject : ModelRenderer
             var particles = new GameObject[Model.Particles.Length];
             for (int i = 0; i < particles.Length; i++)
             {
-                particles[i] = WoWHelper.ParticleEffect(Model.Particles[i]);
+                particles[i] = WoWHelper.ParticleEffect(this, Model.Particles[i]);
                 particles[i].transform.parent = bones[Model.Particles[i].Bone];
                 particles[i].transform.localPosition = Vector3.zero;
                 particles[i].name = $"Particle{i}";
@@ -359,10 +367,10 @@ public class ItemObject : ModelRenderer
         }
         textureTime = new float[Model.TextureAnimations.Length];
         textureFrame = new int[Model.TextureAnimations.Length];
-        colorTime = new float[Model.TextureAnimations.Length];
-        colorFrame = new int[Model.TextureAnimations.Length];
-        transparencyTime = new float[Model.TextureAnimations.Length];
-        transparencyFrame = new int[Model.TextureAnimations.Length];
+        colorTime = new float[Model.Colors.Length];
+        colorFrame = new int[Model.Colors.Length];
+        transparencyTime = new float[Model.Colors.Length];
+        transparencyFrame = new int[Model.Colors.Length];
         for (int i = 0; i < textureTime.Length; i++)
         {
             textureTime[i] = 0f;
@@ -379,6 +387,24 @@ public class ItemObject : ModelRenderer
         {
             transparencyTime[i] = 0f;
             transparencyFrame[i] = 0;
+            yield return null;
+        }
+        if (Model.Skeleton.Sequences.Length > 0)
+        {
+            string[] bonePaths = new string[Model.Skeleton.Bones.Length];
+            for (int i = 0; i < bonePaths.Length; i++)
+            {
+                bonePaths[i] = $"{WoWHelper.GetBonePath(Model.Skeleton.Bones[i].Parent, Model.Skeleton.Bones)}Bone{i}";
+                yield return null;
+            }
+            AnimationClip clip = WoWHelper.GetSequence(0, Model.Skeleton, bonePaths, bones);
+            yield return null;
+            clip.legacy = true;
+            clip.wrapMode = WrapMode.Loop;
+            var animation = renderer.gameObject.AddComponent<Animation>();
+            animation.AddClip(clip, clip.name);
+            animation.clip = clip;
+            animation.Play();
             yield return null;
         }
         for (int i = 0; i < bones.Length; i++)

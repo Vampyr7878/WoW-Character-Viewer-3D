@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 using WoW;
-using static WoW.WoWHelper;
 
 public class Creature : ModelRenderer
 {
@@ -828,7 +827,7 @@ public class Creature : ModelRenderer
             limitVelocityOverLifetime.drag = Model.Particles[i].Drag;
             limitVelocityOverLifetime.multiplyDragByParticleSize = false;
             limitVelocityOverLifetime.multiplyDragByParticleVelocity = true;
-            particles[i].transform.localScale = transform.lossyScale;
+            particles[i].transform.localScale = Vector3.one;
             var renderer = particles[i].GetComponent<ParticleSystemRenderer>();
             var material = ParticleMaterial(Model.Particles[i].Blend);
             renderer.material.shader = material.shader;
@@ -1060,7 +1059,7 @@ public class Creature : ModelRenderer
                 GameObject[] particles = new GameObject[Model.Particles.Length];
                 for (int i = 0; i < particles.Length; i++)
                 {
-                    particles[i] = WoWHelper.ParticleEffect(Model.Particles[i]);
+                    particles[i] = WoWHelper.ParticleEffect(this, Model.Particles[i]);
                     particles[i].transform.parent = bones[Model.Particles[i].Bone];
                     particles[i].transform.localPosition = Vector3.zero;
                     particles[i].name = $"Particle{i}";
@@ -1070,10 +1069,10 @@ public class Creature : ModelRenderer
             }
             textureTime = new float[Model.TextureAnimations.Length];
             textureFrame = new int[Model.TextureAnimations.Length];
-            colorTime = new float[Model.TextureAnimations.Length];
-            colorFrame = new int[Model.TextureAnimations.Length];
-            transparencyTime = new float[Model.TextureAnimations.Length];
-            transparencyFrame = new int[Model.TextureAnimations.Length];
+            colorTime = new float[Model.Colors.Length];
+            colorFrame = new int[Model.Colors.Length];
+            transparencyTime = new float[Model.Colors.Length];
+            transparencyFrame = new int[Model.Colors.Length];
             for (int i = 0; i < textureTime.Length; i++)
             {
                 textureTime[i] = 0f;

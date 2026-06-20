@@ -125,23 +125,25 @@ public abstract class ModelRenderer : MonoBehaviour
     }
 
     // Animate current texture unit
-    protected void AnimateColors(SkinnedMeshRenderer renderer, int i)
+    protected void AnimateColors(SkinnedMeshRenderer renderer, int i, int sequence = 0)
     {
         if (renderer.materials[i].shader != hiddenMaterial.shader)
         {
             int index = Model.Skin.Textures[i].Color;
             if (index >= 0)
             {
-                if (Model.Colors[index].Color.Values[0].Length > 1)
+                if ((Model.Colors[index].Color.Values.Length > sequence ? Model.Colors[index].Color.Values[sequence].Length
+                    : Model.Colors[index].Color.Values[0].Length) > 1 )
                 {
                     var color = renderer.materials[i].GetColor("_Color");
-                    color = AnimateColor(index, color);
+                    color = AnimateColor(index, color, Model.Colors[index].Color.Values.Length > sequence ? sequence : 0);
                     renderer.materials[i].SetColor("_Color", color);
                 }
-                if (Model.Colors[index].Transparency.Values[0].Length > 1)
+                if ((Model.Colors[index].Transparency.Values.Length > sequence ? Model.Colors[index].Transparency.Values[sequence].Length
+                    : Model.Colors[index].Transparency.Values[0].Length) > 1)
                 {
                     var color = renderer.materials[i].GetColor("_Color");
-                    color = AnimateTransparency(index, color);
+                    color = AnimateTransparency(index, color, Model.Colors[index].Transparency.Values.Length > sequence ? sequence : 0);
                     renderer.materials[i].SetColor("_Color", color);
                 }
             }
@@ -149,17 +151,17 @@ public abstract class ModelRenderer : MonoBehaviour
     }
 
     // Animate current colors
-    protected Color AnimateColor(int index, Color color)
+    protected Color AnimateColor(int index, Color color, int sequence)
     {
-        if (index < Model.TextureAnimations.Length)
+        if (index < Model.Colors.Length)
         {
             var animation = Model.Colors[index].Color;
-            if (animation.Timestamps.Length > 0 && animation.Timestamps[0].Length > 1)
+            if (animation.Timestamps.Length > 0 && animation.Timestamps[sequence].Length > 1)
             {
-                if (colorTime[index] >= animation.Timestamps[0][colorFrame[index]] / 1000f)
+                if (colorTime[index] >= animation.Timestamps[sequence][colorFrame[index]] / 1000f)
                 {
                     colorFrame[index]++;
-                    if (colorFrame[index] == animation.Timestamps[0].Length)
+                    if (colorFrame[index] == animation.Timestamps[sequence].Length)
                     {
                         colorFrame[index] = 0;
                         colorTime[index] = 0f;
@@ -167,17 +169,17 @@ public abstract class ModelRenderer : MonoBehaviour
                 }
                 if (colorFrame[index] == 0)
                 {
-                    color.r = animation.Values[0][colorFrame[index]].X;
-                    color.g = animation.Values[0][colorFrame[index]].Y;
-                    color.b = animation.Values[0][colorFrame[index]].Z;
+                    color.r = animation.Values[sequence][colorFrame[index]].X;
+                    color.g = animation.Values[sequence][colorFrame[index]].Y;
+                    color.b = animation.Values[sequence][colorFrame[index]].Z;
                 }
                 else
                 {
-                    float colorTimestamp = (animation.Timestamps[0][colorFrame[index]] - animation.Timestamps[0][colorFrame[index] - 1]) / 1000f;
-                    colorTimestamp = (colorTime[index] - animation.Timestamps[0][colorFrame[index] - 1] / 1000f) / colorTimestamp;
-                    color.r = Mathf.Lerp(animation.Values[0][colorFrame[index] - 1].X, animation.Values[0][colorFrame[index]].X, colorTimestamp);
-                    color.g = Mathf.Lerp(animation.Values[0][colorFrame[index] - 1].Y, animation.Values[0][colorFrame[index]].Y, colorTimestamp);
-                    color.b = Mathf.Lerp(animation.Values[0][colorFrame[index] - 1].Z, animation.Values[0][colorFrame[index]].Z, colorTimestamp);
+                    float colorTimestamp = (animation.Timestamps[sequence][colorFrame[index]] - animation.Timestamps[sequence][colorFrame[index] - 1]) / 1000f;
+                    colorTimestamp = (colorTime[index] - animation.Timestamps[sequence][colorFrame[index] - 1] / 1000f) / colorTimestamp;
+                    color.r = Mathf.Lerp(animation.Values[sequence][colorFrame[index] - 1].X, animation.Values[sequence][colorFrame[index]].X, colorTimestamp);
+                    color.g = Mathf.Lerp(animation.Values[sequence][colorFrame[index] - 1].Y, animation.Values[sequence][colorFrame[index]].Y, colorTimestamp);
+                    color.b = Mathf.Lerp(animation.Values[sequence][colorFrame[index] - 1].Z, animation.Values[sequence][colorFrame[index]].Z, colorTimestamp);
                 }
             }
         }
@@ -185,17 +187,17 @@ public abstract class ModelRenderer : MonoBehaviour
     }
 
     // Animate current transparency
-    protected Color AnimateTransparency(int index, Color color)
+    protected Color AnimateTransparency(int index, Color color, int sequence)
     {
-        if (index < Model.TextureAnimations.Length)
+        if (index < Model.Colors.Length)
         {
             var animation = Model.Colors[index].Transparency;
-            if (animation.Timestamps.Length > 0 && animation.Timestamps[0].Length > 1)
+            if (animation.Timestamps.Length > 0 && animation.Timestamps[sequence].Length > 1)
             {
-                if (transparencyTime[index] >= animation.Timestamps[0][transparencyFrame[index]] / 1000f)
+                if (transparencyTime[index] >= animation.Timestamps[sequence][transparencyFrame[index]] / 1000f)
                 {
                     transparencyFrame[index]++;
-                    if (transparencyFrame[index] == animation.Timestamps[0].Length)
+                    if (transparencyFrame[index] == animation.Timestamps[sequence].Length)
                     {
                         transparencyFrame[index] = 0;
                         transparencyTime[index] = 0f;
@@ -203,13 +205,13 @@ public abstract class ModelRenderer : MonoBehaviour
                 }
                 if (transparencyFrame[index] == 0)
                 {
-                    color.a = animation.Values[0][transparencyFrame[index]];
+                    color.a = animation.Values[sequence][transparencyFrame[index]];
                 }
                 else
                 {
-                    float transparencyTimestamp = (animation.Timestamps[0][transparencyFrame[index]] - animation.Timestamps[0][transparencyFrame[index] - 1]) / 1000f;
-                    transparencyTimestamp = (transparencyTime[index] - animation.Timestamps[0][transparencyFrame[index] - 1] / 1000f) / transparencyTimestamp;
-                    color.a = Mathf.Lerp(animation.Values[0][transparencyFrame[index] - 1], animation.Values[0][transparencyFrame[index]], transparencyTimestamp);
+                    float transparencyTimestamp = (animation.Timestamps[sequence][transparencyFrame[index]] - animation.Timestamps[sequence][transparencyFrame[index] - 1]) / 1000f;
+                    transparencyTimestamp = (transparencyTime[index] - animation.Timestamps[sequence][transparencyFrame[index] - 1] / 1000f) / transparencyTimestamp;
+                    color.a = Mathf.Lerp(animation.Values[sequence][transparencyFrame[index] - 1], animation.Values[sequence][transparencyFrame[index]], transparencyTimestamp);
                 }
             }
         }

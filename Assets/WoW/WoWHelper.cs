@@ -1,4 +1,8 @@
 ﻿using M2Lib;
+using SkelLib;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace WoW
@@ -568,27 +572,8 @@ namespace WoW
             return model;
         }
 
-        // Particle shape
-        private static ParticleSystemShapeType ParticleShape(byte value)
-        {
-            var shape = ParticleSystemShapeType.Cone;
-            switch (value)
-            {
-                case 1:
-                    shape = ParticleSystemShapeType.Rectangle;
-                    break;
-                case 2:
-                    shape = ParticleSystemShapeType.Sphere;
-                    break;
-                case 3:
-                    shape = ParticleSystemShapeType.Circle;
-                    break;
-            }
-            return shape;
-        }
-
         // Generate particle effect system based on the data
-        public static GameObject ParticleEffect(M2Particle particle)
+        public static GameObject ParticleEffect(ModelRenderer model, M2Particle particle)
         {
             // Create gameobject
             GameObject element = new();
@@ -611,20 +596,8 @@ namespace WoW
                     return null;
             }
             var emitter = element.GetComponent<Emitter>();
-            float variation = particle.SpeedVariation * particle.Speed;
-            emitter.minSpeed = (particle.Speed - variation) / 2;
-            emitter.maxSpeed = (particle.Speed + variation) / 2;
-            emitter.verticalRange = particle.VerticalRange;
-            emitter.horizontalRange = particle.HorizontalRange;
-            emitter.gravity = particle.Gravity;
-            variation = particle.LifespanVariation * particle.Lifespan;
-            emitter.minLifespan = (particle.Lifespan - variation) / 2;
-            emitter.maxLifespan = (particle.Lifespan + variation) / 2;
-            variation = particle.EmissionVariation * particle.EmissionRate;
-            emitter.minEmission = particle.EmissionRate - variation;
-            emitter.maxEmission = particle.EmissionRate + variation;
-            emitter.emissionLength = particle.EmissionLength;
-            emitter.emissionWidth = particle.EmissionWidth;
+            emitter.model = model;
+            emitter.Setup(particle);
             //var main = system.main;
             //float variation = particle.LifespanVariation * particle.Lifespan;
             //main.startLifetime = new ParticleSystem.MinMaxCurve((particle.Lifespan - variation) / 2f, (particle.Lifespan + variation) / 2f);
@@ -688,6 +661,229 @@ namespace WoW
             }
             textureSheet.frameOverTime = new ParticleSystem.MinMaxCurve(1f, curve);
             return element;
+        }
+
+        // Recursively get full path to the bone
+        public static string GetBonePath(short bone, Bone[] bones)
+        {
+            if (bone == -1)
+            {
+                return "Skeleton/";
+            }
+            if (bones[bone].Parent == -1)
+            {
+                return $"Skeleton/Bone{bone}/";
+            }
+            else
+            {
+                return $"{GetBonePath(bones[bone].Parent, bones)}Bone{bone}/";
+            }
+        }
+
+        // Get animation sequence
+        public static AnimationClip GetSequence(int index, Skel skeleton, string[] bonePaths, Transform[] bones)
+        {
+            AnimationClip clip = new()
+            {
+                name = $"Seqence{index}"
+            };
+            for (int i = 0; i < skeleton.Bones.Length; i++)
+            {
+                Bone bone = skeleton.Bones[i];
+                if (bone.Translation.Values.Length == skeleton.Sequences.Length)
+                {
+                    TranslationCurves(clip, index, i, bonePaths, bone, bones);
+                }
+                if (bone.Rotation.Values.Length == skeleton.Sequences.Length)
+                {
+                    RotationCurves(clip, index, i, bonePaths, bone, bones);
+                }
+                if (bone.Scale.Values.Length == skeleton.Sequences.Length)
+                {
+                    ScaleCurves(clip, index, i, bonePaths, bone, bones);
+                }
+            }
+            return clip;
+        }
+
+        // Get translation curves for all 3 axis
+        public static void TranslationCurves(AnimationClip clip, int index, int i, string[] bonePaths, Bone bone, Transform[] bones)
+        {
+            AnimationCurve curve = TranslationCurve(bone.Translation.Interpolation, bone.Translation.Timestamps[index],
+                bone.Translation.Values[index].Select(v => v.X).ToArray(), bones[i].transform.localPosition.x);
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalPosition.x", curve);
+            }
+            curve = TranslationCurve(bone.Translation.Interpolation, bone.Translation.Timestamps[index],
+                bone.Translation.Values[index].Select(v => v.Y).ToArray(), bones[i].transform.localPosition.y);
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalPosition.y", curve);
+            }
+            curve = TranslationCurve(bone.Translation.Interpolation, bone.Translation.Timestamps[index],
+                bone.Translation.Values[index].Select(v => v.Z).ToArray(), bones[i].transform.localPosition.z);
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalPosition.z", curve);
+            }
+        }
+
+        // Get rotation curves for quaternion
+        public static void RotationCurves(AnimationClip clip, int index, int i, string[] bonePaths, Bone bone, Transform[] bones)
+        {
+            AnimationCurve curve = RotationCurve(bone.Rotation.Interpolation, bone.Rotation.Timestamps[index],
+                bone.Rotation.Values[index].Select(v => v.X).ToArray());
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalRotation.x", curve);
+            }
+            curve = RotationCurve(bone.Rotation.Interpolation, bone.Rotation.Timestamps[index],
+                bone.Rotation.Values[index].Select(v => v.Y).ToArray());
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalRotation.y", curve);
+            }
+            curve = RotationCurve(bone.Rotation.Interpolation, bone.Rotation.Timestamps[index],
+                bone.Rotation.Values[index].Select(v => v.Z).ToArray());
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalRotation.z", curve);
+            }
+            curve = RotationCurve(bone.Rotation.Interpolation, bone.Rotation.Timestamps[index],
+                bone.Rotation.Values[index].Select(v => v.W).ToArray());
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalRotation.w", curve);
+            }
+        }
+
+        // Get scale curves for all 3 axis
+        public static void ScaleCurves(AnimationClip clip, int index, int i, string[] bonePaths, Bone bone, Transform[] bones)
+        {
+            AnimationCurve curve = ScaleCurve(bone.Scale.Interpolation, bone.Scale.Timestamps[index],
+                bone.Scale.Values[index].Select(v => v.X).ToArray());
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalScale.x", curve);
+            }
+            curve = ScaleCurve(bone.Scale.Interpolation, bone.Scale.Timestamps[index],
+                bone.Scale.Values[index].Select(v => v.Y).ToArray());
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalScale.y", curve);
+            }
+            curve = ScaleCurve(bone.Scale.Interpolation, bone.Scale.Timestamps[index],
+                bone.Scale.Values[index].Select(v => v.Z).ToArray());
+            if (curve != null)
+            {
+                clip.SetCurve(bonePaths[i], typeof(Transform), "m_LocalScale.z", curve);
+            }
+        }
+
+        // Create curve for translation keys
+        private static AnimationCurve TranslationCurve(short interpolation, int[] timestamps, float[] values, float position)
+        {
+            AnimationCurve curve = null;
+            List<Keyframe> keys;
+            if (interpolation < 2)
+            {
+                keys = AddKeyframes(timestamps, values, position);
+            }
+            else
+            {
+                keys = AddKeyframes(timestamps, values, position, 2);
+            }
+            if (keys.Count > 0)
+            {
+                curve = new AnimationCurve(keys.ToArray());
+                SetInterpolation(curve, interpolation);
+            }
+            return curve;
+        }
+
+        // Create curve for rotation keys
+        private static AnimationCurve RotationCurve(short interpolation, int[] timestamps, float[] values)
+        {
+            AnimationCurve curve = null;
+            List<Keyframe> keys;
+            if (interpolation < 2)
+            {
+                keys = AddKeyframes(timestamps, values, 0);
+            }
+            else
+            {
+                keys = AddKeyframes(timestamps, values, 0, 2);
+            }
+            if (keys.Count > 0)
+            {
+                curve = new AnimationCurve(keys.ToArray());
+                SetInterpolation(curve, interpolation);
+            }
+            return curve;
+        }
+
+        // Create curve for scale keys
+        private static AnimationCurve ScaleCurve(short interpolation, int[] timestamps, float[] values)
+        {
+            AnimationCurve curve = null;
+            List<Keyframe> keys;
+            if (interpolation < 2)
+            {
+                keys = AddKeyframes(timestamps, values, 0);
+            }
+            else
+            {
+                keys = AddKeyframes(timestamps, values, 0, 2);
+            }
+            if (keys.Count > 0)
+            {
+                curve = new AnimationCurve(keys.ToArray());
+                SetInterpolation(curve, interpolation);
+            }
+            return curve;
+        }
+
+        // Add keyframes
+        private static List<Keyframe> AddKeyframes(int[] timestamps, float[] values, float position, int step = 1)
+        {
+            List<Keyframe> keys = new();
+            for (int j = 0; j < values.Length / step; j++)
+            {
+                if (j > 0 && timestamps[j * step] == 0)
+                {
+                    continue;
+                }
+                if (values[j * step] == float.NaN)
+                {
+                    values[j * step] = 0;
+                }
+                keys.Add(new Keyframe(timestamps[j] / 1000f, position + values[j * step]));
+            }
+            return keys;
+        }
+
+        // Set proper interpolation mode for given curve
+        private static void SetInterpolation(AnimationCurve curve, short interpolation)
+        {
+            for (int j = 0; j < curve.length; j++)
+            {
+                switch (interpolation)
+                {
+                    case 0:
+                        AnimationUtility.SetKeyLeftTangentMode(curve, j, AnimationUtility.TangentMode.Constant);
+                        AnimationUtility.SetKeyRightTangentMode(curve, j, AnimationUtility.TangentMode.Constant);
+                        break;
+                    case 1:
+                        AnimationUtility.SetKeyLeftTangentMode(curve, j, AnimationUtility.TangentMode.Linear);
+                        AnimationUtility.SetKeyRightTangentMode(curve, j, AnimationUtility.TangentMode.Linear);
+                        break;
+                    default:
+                        AnimationUtility.SetKeyLeftTangentMode(curve, j, AnimationUtility.TangentMode.Auto);
+                        AnimationUtility.SetKeyRightTangentMode(curve, j, AnimationUtility.TangentMode.Auto);
+                        break;
+                }
+            }
         }
     }
 }
