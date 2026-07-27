@@ -825,7 +825,7 @@ public class Character : ModelRenderer
 #if UNITY_EDITOR
                 StartCoroutine(itemObject.LoadModel(model, textures, listFile, dataPath, geosets));
 #else
-                StartCoroutine(buckle.LoadModel(model, textures, casc, geosets));
+                StartCoroutine(itemObject.LoadModel(model, textures, casc, geosets));
 #endif
                 itemObject.Change = true;
             }
@@ -856,7 +856,7 @@ public class Character : ModelRenderer
 #if UNITY_EDITOR
                 StartCoroutine(collection.LoadModel(model, textures.Length == 0 ? 0 : textures[0].ID, mesh, Model.Skeleton.Bones, listFile, dataPath));
 #else
-                StartCoroutine(buckle.LoadModel(model, textures, casc));
+                StartCoroutine(collection.LoadModel(model, textures.Length == 0 ? 0 : textures[0].ID, mesh, Model.Skeleton.Bones, casc));
 #endif
             }
         }
@@ -1134,7 +1134,7 @@ public class Character : ModelRenderer
 #if UNITY_EDITOR
             StartCoroutine(armor.LoadModel(path, mainMesh, mainModel.Skeleton.Bones, listFile, dataPath));
 #else
-            StartCoroutine(head.LoadModel(path, mainMesh, mainModel.Skeleton.Bones, casc));
+            StartCoroutine(armor.LoadModel(path, mainMesh, mainModel.Skeleton.Bones, casc));
 #endif
             yield return null;
             while (!armor.Loaded)

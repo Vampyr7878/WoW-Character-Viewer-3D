@@ -289,7 +289,7 @@ public class ScreenInput : MonoBehaviour
     {
         try
         {
-            using HttpClient client = new HttpClient();
+            using HttpClient client = new();
             using HttpRequestMessage request = new(new HttpMethod("POST"), "https://us.battle.net/oauth/token");
             var api = Resources.Load<TextAsset>("API");
             string auth = Convert.ToBase64String(Encoding.ASCII.GetBytes(api.text));

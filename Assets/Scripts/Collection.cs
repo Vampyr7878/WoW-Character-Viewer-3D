@@ -394,7 +394,7 @@ public class Collection : ModelRenderer
 #if UNITY_EDITOR
                 using BinaryReader reader = new(System.IO.File.Open($@"{dataPath}\{listFile[Model.SkelFileID]}", FileMode.Open));
 #else
-                using BinaryReader reader = new(casc.OpenFile(Model.SkelFileID))
+                using BinaryReader reader = new(casc.OpenFile(Model.SkelFileID));
 #endif
                 bytes = reader.ReadBytes((int)reader.BaseStream.Length);
             }

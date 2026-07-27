@@ -189,7 +189,6 @@ public class ItemObject : ModelRenderer
             var temp = textures[Model.Particles[i].Textures[0]];
             Texture2D texture = new(temp.width, temp.height, TextureFormat.ARGB32, false);
             texture.SetPixels32(temp.GetPixels32());
-            texture.alphaIsTransparency = true;
             texture.Apply();
             renderer.material.SetTexture("_MainTex", texture);
             renderer.material.renderQueue = 3100;

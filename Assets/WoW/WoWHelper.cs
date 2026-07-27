@@ -863,26 +863,78 @@ namespace WoW
             return keys;
         }
 
+        // Set constant interpolation
+        private static void SetConstant(AnimationCurve curve)
+        {
+            for (int i = 0; i < curve.length; i++)
+            {
+                Keyframe key = curve[i];
+                key.outTangent = float.PositiveInfinity;
+                curve.MoveKey(i, key);
+            }
+        }
+
+        // Set linear interpolation
+        private static void SetLinear(AnimationCurve curve)
+        {
+            for (int i = 0; i < curve.length; i++)
+            {
+                Keyframe key = curve[i];
+                if (i > 0)
+                {
+                    Keyframe prev = curve[i - 1];
+                    float dx = key.time - prev.time;
+                    key.inTangent = dx != 0 ? (key.value - prev.value) / dx : 0;
+                }
+                if (i < curve.length - 1)
+                {
+                    Keyframe next = curve[i + 1];
+                    float dx = next.time - key.time;
+                    key.outTangent = dx != 0 ? (next.value - key.value) / dx : 0;
+                }
+                curve.MoveKey(i, key);
+            }
+        }
+
+        // Set smooth interpolation
+        private static void SetSmooth(AnimationCurve curve)
+        {
+            for (int i = 0; i < curve.length; i++)
+            {
+                Keyframe key = curve[i];
+
+                if (i > 0 && i < curve.length - 1)
+                {
+                    Keyframe prev = curve[i - 1];
+                    Keyframe next = curve[i + 1];
+
+                    float dx = next.time - prev.time;
+                    float tangent = dx != 0 ? (next.value - prev.value) / dx : 0;
+
+                    key.inTangent = tangent;
+                    key.outTangent = tangent;
+                }
+
+                curve.MoveKey(i, key);
+            }
+        }
+
         // Set proper interpolation mode for given curve
         private static void SetInterpolation(AnimationCurve curve, short interpolation)
         {
-            for (int j = 0; j < curve.length; j++)
+            switch (interpolation)
             {
-                switch (interpolation)
-                {
-                    case 0:
-                        AnimationUtility.SetKeyLeftTangentMode(curve, j, AnimationUtility.TangentMode.Constant);
-                        AnimationUtility.SetKeyRightTangentMode(curve, j, AnimationUtility.TangentMode.Constant);
-                        break;
-                    case 1:
-                        AnimationUtility.SetKeyLeftTangentMode(curve, j, AnimationUtility.TangentMode.Linear);
-                        AnimationUtility.SetKeyRightTangentMode(curve, j, AnimationUtility.TangentMode.Linear);
-                        break;
-                    default:
-                        AnimationUtility.SetKeyLeftTangentMode(curve, j, AnimationUtility.TangentMode.Auto);
-                        AnimationUtility.SetKeyRightTangentMode(curve, j, AnimationUtility.TangentMode.Auto);
-                        break;
-                }
+                case 0:
+                    SetConstant(curve);
+                    break;
+
+                case 1:
+                    SetLinear(curve);
+                    break;
+
+                default:
+                    SetSmooth(curve);
+                    break;
             }
         }
     }
